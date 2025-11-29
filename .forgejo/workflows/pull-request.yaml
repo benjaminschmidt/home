@@ -1,0 +1,19 @@
+---
+name: Pull request pipeline
+on:
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  check-commit-messages:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Obtain next version
+        uses: ${{ forge.server_url }}/phaib/simple-semantic-release@1.2.0
+        with:
+          create-release: false
