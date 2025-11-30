@@ -6,6 +6,16 @@ on:
       - main
 
 jobs:
+  run-java-tests:
+    runs-on: ubuntu-latest
+    container: docker.io/library/maven:3.9.11-eclipse-temurin-25
+    steps:
+      - name: Check out repository code
+        run: git clone --depth 1 ${{ forgejo.server_url }}/${{ forgejo.repository }}.git
+      - name: Run tests
+        run: |
+          cd home/backend
+          mvn clean verify
   check-commit-messages:
     runs-on: ubuntu-latest
     steps:
@@ -14,6 +24,6 @@ jobs:
         with:
           fetch-depth: 0
       - name: Obtain next version
-        uses: ${{ forge.server_url }}/phaib/simple-semantic-release@1.2.1
+        uses: ${{ forgejo.server_url }}/phaib/simple-semantic-release@1.2.1
         with:
           create-release: false

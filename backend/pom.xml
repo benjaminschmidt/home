@@ -28,7 +28,7 @@
     </scm>
     <properties>
         <java.version>25</java.version>
-        <revision>SNAPSHOT</revision>
+        <revision>0.0.0</revision>
     </properties>
     <dependencies>
         <dependency>
