@@ -1,0 +1,5 @@
+zonky:
+  test:
+    database:
+      type: POSTGRES
+      provider: ZONKY
