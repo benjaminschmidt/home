@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  run-java-tests:
+  run-backend-tests:
     runs-on: ubuntu-latest
     container: docker.io/library/maven:3.9.11-eclipse-temurin-25
     steps:
@@ -16,6 +16,23 @@ jobs:
         run: |
           cd home/backend
           mvn clean verify
+  run-frontend-tests:
+    runs-on: ubuntu-latest
+    container: docker.io/library/node:24.11.1-slim
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+      - name: Install dependencies
+        working-directory: frontend
+        run: npm ci
+      - name: Check code formatting
+        working-directory: frontend
+        run: npm run biome-ci
+      - name: Run tests
+        working-directory: frontend
+        run: npm run test
   check-commit-messages:
     runs-on: ubuntu-latest
     steps:
