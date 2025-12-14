@@ -6,12 +6,35 @@ on:
       - main
 
 jobs:
-  run-backend-tests:
+  build-maven-container:
     runs-on: ubuntu-latest
-    container: docker.io/library/maven:3.9.11-eclipse-temurin-25
     steps:
       - name: Check out repository code
-        run: git clone --depth 1 ${{ forgejo.server_url }}/${{ forgejo.repository }}.git
+        uses: actions/checkout@v6
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+        with:
+          endpoint: tcp://${{ vars.SERVER_DOMAIN }}:2375
+      - name: Login to gitea container registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ vars.SERVER_DOMAIN }}
+          username: ${{ github.repository_owner }}
+          password: ${{ secrets.PACKAGE_TOKEN }}
+      - name: Build and push
+        uses: docker/build-push-action@v6
+        with:
+          context: "{{defaultContext}}:maven"
+          push: true
+          tags: ${{ vars.SERVER_DOMAIN }}/${{ github.repository }}-maven:latest,
+  run-backend-tests:
+    needs: build-maven-container
+    runs-on: ubuntu-latest
+    container:
+      image: ${{ vars.SERVER_DOMAIN }}/${{ github.repository }}-maven:latest
+    steps:
+      - name: Check out repository code
+        run: git clone -b ${{ forgejo.head_ref }} --single-branch --depth 1 ${{ forgejo.server_url }}/${{ forgejo.repository }}.git
       - name: Run tests
         run: |
           cd home/backend
@@ -22,8 +45,6 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v6
-        with:
-          fetch-depth: 0
       - name: Install dependencies
         working-directory: frontend
         run: npm ci
