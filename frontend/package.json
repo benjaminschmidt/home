@@ -24,7 +24,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.3.8",
-    "@tanstack/devtools-vite": "^0.3.11",
+    "@tanstack/devtools-vite": "0.3.12",
     "@testing-library/dom": "^10.4.0",
     "@testing-library/react": "^16.2.0",
     "@types/node": "24.10.1",
