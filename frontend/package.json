@@ -17,7 +17,7 @@
     "@tanstack/react-devtools": "0.8.4",
     "@tanstack/react-router": "1.141.2",
     "@tanstack/react-router-devtools": "1.141.2",
-    "lucide-react": "^0.556.0",
+    "lucide-react": "0.561.0",
     "react": "19.2.3",
     "react-dom": "19.2.3",
     "tailwindcss": "4.1.18"
