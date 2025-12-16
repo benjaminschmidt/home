@@ -6,7 +6,32 @@ on:
       - main
 
 jobs:
+  changes:
+    name: Detect changed paths
+    runs-on: ubuntu-latest
+    outputs:
+      backend: ${{ steps.filter.outputs.backend }}
+      maven: ${{ steps.filter.outputs.maven }}
+      frontend: ${{ steps.filter.outputs.frontend }}
+      workflow: ${{ steps.filter.outputs.workflow }}
+    steps:
+      - name: Check out repository code
+        uses: actions/checkout@v6
+      - id: filter
+        uses: https://github.com/dorny/paths-filter@v3
+        with:
+          filters: |
+            backend:
+              - 'backend/**'
+            maven:
+              - 'maven/**'
+            frontend:
+              - 'frontend/**'
+            workflow:
+              - '.forgejo/workflows/pull-request.yaml'
   build-maven-container:
+    needs: changes
+    if: ${{ needs.changes.outputs.workflow == 'true' || needs.changes.outputs.backend == 'true' || needs.changes.outputs.maven == 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository code
@@ -28,7 +53,8 @@ jobs:
           push: true
           tags: ${{ vars.SERVER_DOMAIN }}/${{ github.repository }}-maven:latest,
   run-backend-tests:
-    needs: build-maven-container
+    needs: [ changes, build-maven-container ]
+    if: ${{ needs.changes.outputs.workflow == 'true' || needs.changes.outputs.backend == 'true' || needs.changes.outputs.maven == 'true' }}
     runs-on: ubuntu-latest
     container:
       image: ${{ vars.SERVER_DOMAIN }}/${{ github.repository }}-maven:latest
@@ -40,6 +66,8 @@ jobs:
           cd home/backend
           mvn clean verify
   run-frontend-tests:
+    needs: changes
+    if: ${{ needs.changes.outputs.workflow == 'true' || needs.changes.outputs.frontend == 'true' }}
     runs-on: ubuntu-latest
     container: docker.io/library/node:24.11.1-slim
     steps:
