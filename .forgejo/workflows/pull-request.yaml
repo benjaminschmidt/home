@@ -69,7 +69,7 @@ jobs:
     needs: changes
     if: ${{ needs.changes.outputs.workflow == 'true' || needs.changes.outputs.frontend == 'true' }}
     runs-on: ubuntu-latest
-    container: docker.io/library/node:24.11.1-slim
+    container: docker.io/library/node:24.12.0-slim
     steps:
       - name: Check out repository code
         uses: actions/checkout@v6
