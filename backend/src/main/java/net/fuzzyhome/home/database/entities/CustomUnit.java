@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -19,7 +20,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import net.fuzzyhome.home.constants.GenericUnit;
+import net.fuzzyhome.home.database.enums.GenericUnit;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 @AllArgsConstructor
@@ -39,18 +41,23 @@ public class CustomUnit {
     @Column(nullable = false)
     @GeneratedValue(strategy = GenerationType.UUID)
     @Id
+    @Nullable
     private UUID id;
 
     @Column(nullable = false)
+    @NonNull
     private String name;
 
+    @Nullable
     private Double conversionUnitToCustomUnitFactor;
 
     @Enumerated(EnumType.STRING)
+    @Nullable
     private GenericUnit conversionUnit;
 
-    @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @Nullable
     private Ingredient ingredient;
 
     @Override

@@ -1,0 +1,77 @@
+get:
+  summary: Get a specific custom unit
+  operationId: getCustomUnit
+  parameters:
+    - name: ingredientId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    - name: unitId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    '200':
+      description: Retrieved custom unit
+      content:
+        application/json:
+          schema:
+            $ref: '../../../../components/ingredients/CustomUnitDto.yaml'
+    '404':
+      description: Ingredient or unit not found
+put:
+  summary: Update a custom unit
+  operationId: updateCustomUnit
+  parameters:
+    - name: ingredientId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    - name: unitId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../../../components/ingredients/CustomUnitDto.yaml'
+  responses:
+    '200':
+      description: Successfully updated custom unit
+      content:
+        application/json:
+          schema:
+            $ref: '../../../../components/ingredients/CustomUnitDto.yaml'
+    '404':
+      description: Ingredient or unit not found
+delete:
+  summary: Remove a custom unit
+  operationId: deleteCustomUnit
+  parameters:
+    - name: ingredientId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    - name: unitId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    '204':
+      description: Custom unit successfully removed
+    '404':
+      description: Ingredient not found

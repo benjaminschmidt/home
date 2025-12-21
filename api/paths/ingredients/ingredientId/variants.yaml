@@ -1,0 +1,44 @@
+get:
+  summary: List variants for an ingredient
+  operationId: listIngredientVariants
+  parameters:
+    - name: ingredientId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    '200':
+      description: A list of ingredient variants
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../../../components/ingredients/IngredientVariantDto.yaml'
+post:
+  summary: Add a new ingredient variant
+  operationId: addIngredientVariant
+  parameters:
+    - name: ingredientId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../../components/ingredients/IngredientVariantDto.yaml'
+  responses:
+    '201':
+      description: Successfully added ingredient variant
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/ingredients/IngredientVariantDto.yaml'
+    '404':
+      description: Ingredient not found

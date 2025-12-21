@@ -1,4 +1,4 @@
-package net.fuzzyhome.home.constants;
+package net.fuzzyhome.home.database.enums;
 
 import org.jspecify.annotations.NonNull;
 
@@ -21,7 +21,7 @@ public enum GenericUnit implements Unit {
      */
     @NonNull
     @SuppressWarnings("unused")
-    private Unit getGenericUnit() {
+    private Unit getSpecificUnit() {
         return switch (this) {
             case GRAM -> WeightUnit.GRAM;
             case MILLIGRAM -> WeightUnit.MILLIGRAM;

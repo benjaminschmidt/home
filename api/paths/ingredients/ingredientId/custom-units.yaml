@@ -1,0 +1,44 @@
+get:
+  summary: List custom units for an ingredient
+  operationId: listCustomUnits
+  parameters:
+    - name: ingredientId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    '200':
+      description: A list of custom units
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../../../components/ingredients/CustomUnitDto.yaml'
+post:
+  summary: Add a new custom unit
+  operationId: addCustomUnit
+  parameters:
+    - name: ingredientId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../../components/ingredients/CustomUnitDto.yaml'
+  responses:
+    '201':
+      description: Successfully added custom unit
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/ingredients/CustomUnitDto.yaml'
+    '404':
+      description: Ingredient or unit not found

@@ -1,3 +1,6 @@
 spring:
   application:
     name: home
+springdoc:
+  swagger-ui:
+    url: "/api.yaml"

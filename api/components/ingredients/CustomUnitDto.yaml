@@ -1,0 +1,17 @@
+title: CustomUnitDto
+type: object
+required: [
+  "name"
+]
+properties:
+  id:
+    type: string
+    format: uuid
+    readOnly: true
+  name:
+    type: string
+  conversionUnitToCustomUnitFactor:
+    type: number
+    format: double
+  conversionUnit:
+    $ref: './GenericUnitDto.yaml'

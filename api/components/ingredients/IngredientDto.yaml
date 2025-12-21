@@ -1,0 +1,27 @@
+title: IngredientDto
+type: object
+required: [
+  "name"
+]
+properties:
+  id:
+    type: string
+    format: uuid
+    readOnly: true
+  name:
+    type: string
+  weightToVolumeConversionFactor:
+    type: number
+    format: double
+  conversionWeightUnit:
+    $ref: './WeightUnitDto.yaml'
+  conversionVolumeUnit:
+    $ref: './VolumeUnitDto.yaml'
+  ingredientVariants:
+    type: array
+    items:
+      $ref: './IngredientVariantDto.yaml'
+  customUnits:
+    type: array
+    items:
+      $ref: './CustomUnitDto.yaml'

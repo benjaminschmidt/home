@@ -2,10 +2,11 @@ package net.fuzzyhome.home.database.repositories;
 
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
 import java.util.List;
-import net.fuzzyhome.home.constants.GenericUnit;
+import java.util.Optional;
 import net.fuzzyhome.home.database.entities.CustomUnit;
 import net.fuzzyhome.home.database.entities.Ingredient;
 import net.fuzzyhome.home.database.entities.IngredientVariant;
+import org.instancio.Instancio;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,6 +14,7 @@ import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchException;
+import static org.instancio.Select.field;
 
 @AutoConfigureEmbeddedDatabase
 @DataJpaTest
@@ -37,9 +39,11 @@ class RepositoryDbTest {
     @Test
     void ingredient_gets_created() {
         // given
-        final var ingredient = Ingredient.builder()
-            .name("ingredient")
-            .build();
+        final var ingredient = Instancio.of(Ingredient.class)
+            .ignore(field(Ingredient::getId))
+            .ignore(field(Ingredient::getCustomUnits))
+            .ignore(field(Ingredient::getIngredientVariants))
+            .create();
 
         // when
         ingredientRepository.save(ingredient);
@@ -53,15 +57,15 @@ class RepositoryDbTest {
     @Test
     void custom_unit_gets_created_through_ingredient() {
         // given
-        final var customUnit = CustomUnit.builder()
-            .name("unit")
-            .conversionUnit(GenericUnit.GRAM)
-            .conversionUnitToCustomUnitFactor(1.0)
-            .build();
-        final var ingredient = Ingredient.builder()
-            .name("ingredient")
-            .customUnits(List.of(customUnit))
-            .build();
+        final var customUnit = Instancio.of(CustomUnit.class)
+            .ignore(field(CustomUnit::getId))
+            .ignore(field(CustomUnit::getIngredient))
+            .create();
+        final var ingredient = Instancio.of(Ingredient.class)
+            .ignore(field(Ingredient::getId))
+            .ignore(field(Ingredient::getIngredientVariants))
+            .set(field(Ingredient::getCustomUnits), List.of(customUnit))
+            .create();
         customUnit.setIngredient(ingredient);
 
         // when
@@ -70,25 +74,26 @@ class RepositoryDbTest {
 
         // then
         assertThat(result).singleElement()
-            .isEqualTo(ingredient.getCustomUnits()
-                           .getFirst());
+            .isEqualTo(customUnit);
     }
 
     @Test
     void ingredient_with_ingredient_variants_gets_created() {
         // given
-        final var ingredientVariantOne = IngredientVariant.builder()
-            .description("description")
-            .defaultVariant(false)
-            .build();
-        final var ingredientVariantTwo = IngredientVariant.builder()
-            .description("description2")
-            .defaultVariant(false)
-            .build();
-        final var ingredient = Ingredient.builder()
-            .name("ingredient")
-            .ingredientVariants(List.of(ingredientVariantOne, ingredientVariantTwo))
-            .build();
+        final var ingredientVariantOne = Instancio.of(IngredientVariant.class)
+            .ignore(field(IngredientVariant::getId))
+            .ignore(field(IngredientVariant::getIngredient))
+            .create();
+        final var ingredientVariantTwo = Instancio.of(IngredientVariant.class)
+            .ignore(field(IngredientVariant::getId))
+            .ignore(field(IngredientVariant::getIngredient))
+            .set(field(IngredientVariant::getDefaultVariant), false)
+            .create();
+        final var ingredient = Instancio.of(Ingredient.class)
+            .ignore(field(Ingredient::getId))
+            .ignore(field(Ingredient::getCustomUnits))
+            .set(field(Ingredient::getIngredientVariants), List.of(ingredientVariantOne, ingredientVariantTwo))
+            .create();
         ingredientVariantOne.setIngredient(ingredient);
         ingredientVariantTwo.setIngredient(ingredient);
 
@@ -107,21 +112,24 @@ class RepositoryDbTest {
     @Test
     void duplicate_ingredient_variant_cannot_be_created() {
         // given
-        final var ingredientVariant = IngredientVariant.builder()
-            .description("description")
-            .defaultVariant(true)
-            .build();
-        final var ingredient = Ingredient.builder()
-            .name("ingredient")
-            .ingredientVariants(List.of(ingredientVariant))
-            .build();
+        final var ingredientVariant = Instancio.of(IngredientVariant.class)
+            .ignore(field(IngredientVariant::getId))
+            .ignore(field(IngredientVariant::getIngredient))
+            .set(field(IngredientVariant::getDescription), "description")
+            .create();
+        final var ingredient = Instancio.of(Ingredient.class)
+            .ignore(field(Ingredient::getId))
+            .ignore(field(Ingredient::getCustomUnits))
+            .set(field(Ingredient::getIngredientVariants), List.of(ingredientVariant))
+            .create();
         ingredientVariant.setIngredient(ingredient);
         ingredientRepository.saveAndFlush(ingredient);
-        final var duplicateIngredientVariant = IngredientVariant.builder()
-            .description("description")
-            .defaultVariant(false)
-            .build();
-        duplicateIngredientVariant.setIngredient(ingredient);
+        final var duplicateIngredientVariant = Instancio.of(IngredientVariant.class)
+            .ignore(field(IngredientVariant::getId))
+            .set(field(IngredientVariant::getDescription), "description")
+            .set(field(IngredientVariant::getDefaultVariant), false)
+            .set(field(IngredientVariant::getIngredient), ingredient)
+            .create();
 
         // when
         final var exception =
@@ -135,29 +143,30 @@ class RepositoryDbTest {
     @Test
     void two_default_ingredient_variants_cannot_be_created() {
         // given
-        final var ingredientVariant = IngredientVariant.builder()
-            .description("description")
-            .defaultVariant(true)
-            .build();
-        final var ingredient = Ingredient.builder()
-            .name("ingredient")
-            .ingredientVariants(List.of(ingredientVariant))
-            .build();
+        final var ingredientVariant = Instancio.of(IngredientVariant.class)
+            .ignore(field(IngredientVariant::getId))
+            .ignore(field(IngredientVariant::getIngredient))
+            .set(field(IngredientVariant::getDefaultVariant), true)
+            .create();
+        final var secondIngredientVariant = Instancio.of(IngredientVariant.class)
+            .ignore(field(IngredientVariant::getId))
+            .ignore(field(IngredientVariant::getIngredient))
+            .set(field(IngredientVariant::getDefaultVariant), false)
+            .create();
+        final var ingredient = Instancio.of(Ingredient.class)
+            .ignore(field(Ingredient::getId))
+            .ignore(field(Ingredient::getCustomUnits))
+            .set(field(Ingredient::getIngredientVariants), List.of(ingredientVariant, secondIngredientVariant))
+            .create();
         ingredientVariant.setIngredient(ingredient);
+        secondIngredientVariant.setIngredient(ingredient);
         ingredientRepository.saveAndFlush(ingredient);
 
-        final var secondIngredientVariant = IngredientVariant.builder()
-            .description("description2")
-            .defaultVariant(false)
-            .build();
-        secondIngredientVariant.setIngredient(ingredient);
-        ingredientVariantRepository.saveAndFlush(secondIngredientVariant);
-
-        final var thirdIngredientVariant = IngredientVariant.builder()
-            .description("description3")
-            .defaultVariant(true)
-            .build();
-        thirdIngredientVariant.setIngredient(ingredient);
+        final var thirdIngredientVariant = Instancio.of(IngredientVariant.class)
+            .ignore(field(IngredientVariant::getId))
+            .set(field(IngredientVariant::getDefaultVariant), true)
+            .set(field(IngredientVariant::getIngredient), ingredient)
+            .create();
 
         // when
         final var exception = catchException(() -> ingredientVariantRepository.saveAndFlush(thirdIngredientVariant));
@@ -165,6 +174,56 @@ class RepositoryDbTest {
         // then
         assertThat(exception).isInstanceOf(org.springframework.dao.DataIntegrityViolationException.class)
             .hasMessageContaining("idx_ingredientvariant_default_variant");
+    }
+
+    @Test
+    void retrieve_ingredient_variants_by_ingredient_id() {
+        // given
+        final var ingredientVariant = Instancio.of(IngredientVariant.class)
+            .ignore(field(IngredientVariant::getId))
+            .ignore(field(IngredientVariant::getIngredient))
+            .create();
+        final var ingredient = Instancio.of(Ingredient.class)
+            .ignore(field(Ingredient::getId))
+            .ignore(field(Ingredient::getCustomUnits))
+            .set(field(Ingredient::getIngredientVariants), List.of(ingredientVariant))
+            .create();
+        ingredientVariant.setIngredient(ingredient);
+        ingredientRepository.saveAndFlush(ingredient);
+
+        // when
+        final var result = Optional.ofNullable(ingredient.getId())
+            .map(ingredientVariantRepository::findAllByIngredientId)
+            .orElse(List.of());
+
+        // then
+        assertThat(result).singleElement()
+            .isEqualTo(ingredientVariant);
+    }
+
+    @Test
+    void retrieve_custom_units_by_ingredient_id() {
+        // given
+        final var customUnit = Instancio.of(CustomUnit.class)
+            .ignore(field(CustomUnit::getId))
+            .ignore(field(CustomUnit::getIngredient))
+            .create();
+        final var ingredient = Instancio.of(Ingredient.class)
+            .ignore(field(Ingredient::getId))
+            .ignore(field(Ingredient::getIngredientVariants))
+            .set(field(Ingredient::getCustomUnits), List.of(customUnit))
+            .create();
+        customUnit.setIngredient(ingredient);
+        ingredientRepository.save(ingredient);
+
+        // when
+        final var result = Optional.ofNullable(ingredient.getId())
+            .map(customUnitRepository::findAllByIngredientId)
+            .orElse(List.of());
+
+        // then
+        assertThat(result).singleElement()
+            .isEqualTo(customUnit);
     }
 
 }

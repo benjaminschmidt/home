@@ -1,0 +1,3 @@
+title: WeightUnitDto
+type: string
+enum: [ GRAM, MILLIGRAM, KILOGRAM, OUNCE, POUND ]

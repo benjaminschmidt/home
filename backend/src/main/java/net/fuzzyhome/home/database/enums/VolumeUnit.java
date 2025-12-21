@@ -1,4 +1,4 @@
-package net.fuzzyhome.home.constants;
+package net.fuzzyhome.home.database.enums;
 
 import org.jspecify.annotations.NonNull;
 
@@ -14,7 +14,7 @@ public enum VolumeUnit implements Unit {
      * This method ensures that any VolumeUnit exists as a GenericUnit. If not, this leads to a compilation error.
      */
     @NonNull
-    @SuppressWarnings("unused")
+    @SuppressWarnings({"unused", "Duplicates"})
     private GenericUnit getGenericUnit() {
         return switch (this) {
             case MILLILITER -> GenericUnit.MILLILITER;

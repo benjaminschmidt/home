@@ -1,0 +1,3 @@
+title: VolumeUnitDto
+type: string
+enum: [ MILLILITER, LITER, FLUID_OUNCE, TEASPOON, TABLESPOON, CUP ]

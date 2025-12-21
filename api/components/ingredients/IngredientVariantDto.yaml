@@ -1,0 +1,40 @@
+title: IngredientVariantDto
+type: object
+required: [
+  "description", "defaultVariant"
+]
+properties:
+  id:
+    type: string
+    format: uuid
+    readOnly: true
+  description:
+    type: string
+  defaultVariant:
+    type: boolean
+  unit:
+    $ref: './GenericUnitDto.yaml'
+  servingSize:
+    type: number
+    format: double
+  calories:
+    type: number
+    format: double
+  carbohydrate:
+    type: number
+    format: double
+  fat:
+    type: number
+    format: double
+  protein:
+    type: number
+    format: double
+  saturatedFat:
+    type: number
+    format: double
+  sodium:
+    type: number
+    format: double
+  sugar:
+    type: number
+    format: double

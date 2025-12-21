@@ -1,0 +1,28 @@
+get:
+  summary: List all ingredients
+  operationId: listIngredients
+  responses:
+    '200':
+      description: A list of ingredients
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '../components/ingredients/IngredientDto.yaml'
+post:
+  summary: Create a new ingredient
+  operationId: createIngredient
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../components/ingredients/IngredientDto.yaml'
+  responses:
+    '201':
+      description: Successfully created ingredient
+      content:
+        application/json:
+          schema:
+            $ref: '../components/ingredients/IngredientDto.yaml'

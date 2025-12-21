@@ -4,6 +4,7 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -19,7 +20,8 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import net.fuzzyhome.home.constants.GenericUnit;
+import net.fuzzyhome.home.database.enums.GenericUnit;
+import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 
 @AllArgsConstructor
@@ -46,35 +48,48 @@ public class IngredientVariant {
     @Column(nullable = false)
     @GeneratedValue(strategy = GenerationType.UUID)
     @Id
+    @Nullable
     private UUID id;
 
     @Column(nullable = false)
+    @NonNull
     private String description;
 
+    @NonNull
     @Column(nullable = false)
     private Boolean defaultVariant;
 
     @Enumerated(EnumType.STRING)
+    @Nullable
     private GenericUnit unit;
 
+    @Nullable
     private Double servingSize;
 
+    @Nullable
     private Double calories;
 
+    @Nullable
     private Double carbohydrate;
 
+    @Nullable
     private Double fat;
 
+    @Nullable
     private Double protein;
 
+    @Nullable
     private Double saturatedFat;
 
+    @Nullable
     private Double sodium;
 
+    @Nullable
     private Double sugar;
 
-    @ManyToOne(optional = false)
     @JoinColumn(nullable = false)
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @Nullable
     private Ingredient ingredient;
 
     @Override

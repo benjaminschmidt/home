@@ -1,4 +1,4 @@
-package net.fuzzyhome.home.constants;
+package net.fuzzyhome.home.database.enums;
 
 import org.jspecify.annotations.NonNull;
 

@@ -1,0 +1,77 @@
+get:
+  summary: Get a specific ingredient variant
+  operationId: getIngredientVariant
+  parameters:
+    - name: ingredientId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    - name: variantId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    '200':
+      description: Retrieved ingredient variant
+      content:
+        application/json:
+          schema:
+            $ref: '../../../../components/ingredients/IngredientVariantDto.yaml'
+    '404':
+      description: Ingredient or variant not found
+put:
+  summary: Update an ingredient variant
+  operationId: updateIngredientVariant
+  parameters:
+    - name: ingredientId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    - name: variantId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../../../components/ingredients/IngredientVariantDto.yaml'
+  responses:
+    '200':
+      description: Successfully updated ingredient variant
+      content:
+        application/json:
+          schema:
+            $ref: '../../../../components/ingredients/IngredientVariantDto.yaml'
+    '404':
+      description: Ingredient or variant not found
+delete:
+  summary: Remove an ingredient variant
+  operationId: deleteIngredientVariant
+  parameters:
+    - name: ingredientId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+    - name: variantId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    '204':
+      description: Ingredient variant deleted
+    '404':
+      description: Ingredient not found

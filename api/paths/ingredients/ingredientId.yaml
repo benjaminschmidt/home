@@ -1,0 +1,57 @@
+get:
+  summary: Get a specific ingredient
+  operationId: getIngredient
+  parameters:
+    - name: ingredientId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    '200':
+      description: Retrieved ingredient
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/ingredients/IngredientDto.yaml'
+    '404':
+      description: Ingredient not found
+put:
+  summary: Update an ingredient
+  operationId: updateIngredient
+  parameters:
+    - name: ingredientId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  requestBody:
+    required: true
+    content:
+      application/json:
+        schema:
+          $ref: '../../components/ingredients/IngredientDto.yaml'
+  responses:
+    '200':
+      description: Successfully updated ingredient
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/ingredients/IngredientDto.yaml'
+    '404':
+      description: Ingredient not found
+delete:
+  summary: Delete an ingredient
+  operationId: deleteIngredient
+  parameters:
+    - name: ingredientId
+      in: path
+      required: true
+      schema:
+        type: string
+        format: uuid
+  responses:
+    '204':
+      description: Ingredient successfully deleted

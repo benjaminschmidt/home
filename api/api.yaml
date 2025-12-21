@@ -1,0 +1,17 @@
+openapi: 3.0.3
+info:
+  title: Home App API
+  version: 0.0.0
+paths:
+  /ingredients:
+    $ref: './paths/ingredients.yaml'
+  /ingredients/{ingredientId}:
+    $ref: './paths/ingredients/ingredientId.yaml'
+  /ingredients/{ingredientId}/variants:
+    $ref: './paths/ingredients/ingredientId/variants.yaml'
+  /ingredients/{ingredientId}/variants/{variantId}:
+    $ref: './paths/ingredients/ingredientId/variants/variantId.yaml'
+  /ingredients/{ingredientId}/custom-units:
+    $ref: './paths/ingredients/ingredientId/custom-units.yaml'
+  /ingredients/{ingredientId}/custom-units/{unitId}:
+    $ref: './paths/ingredients/ingredientId/custom-units/unitId.yaml'
