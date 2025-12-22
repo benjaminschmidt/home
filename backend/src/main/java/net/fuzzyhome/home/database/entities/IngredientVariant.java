@@ -34,7 +34,12 @@ import org.jspecify.annotations.Nullable;
     ), indexes = {
     @Index(
         name = "idx_ingredientvariant_ingredient", columnList = "ingredient_id"
-    )
+    ), @Index(
+    name = "idx_ingredientvariant_default_variant",
+    columnList = "ingredient_id, default_variant",
+    unique = true,
+    options = "WHERE (\"default_variant\" IS true)"
+)
 }
 )
 public class IngredientVariant {
@@ -45,6 +50,9 @@ public class IngredientVariant {
 
     @Column(nullable = false)
     private String description;
+
+    @Column(nullable = false)
+    private Boolean defaultVariant;
 
     @Enumerated(EnumType.STRING)
     private GenericUnit unit;

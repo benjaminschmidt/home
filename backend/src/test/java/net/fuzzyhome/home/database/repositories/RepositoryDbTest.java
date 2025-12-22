@@ -37,7 +37,9 @@ class RepositoryDbTest {
     @Test
     void ingredient_gets_created() {
         // given
-        final var ingredient = getIngredient();
+        final var ingredient = Ingredient.builder()
+            .name("ingredient")
+            .build();
 
         // when
         ingredientRepository.save(ingredient);
@@ -51,7 +53,16 @@ class RepositoryDbTest {
     @Test
     void custom_unit_gets_created_through_ingredient() {
         // given
-        final var ingredient = getIngredientWithCustomUnit();
+        final var customUnit = CustomUnit.builder()
+            .name("unit")
+            .conversionUnit(GenericUnit.GRAM)
+            .conversionUnitToCustomUnitFactor(1.0)
+            .build();
+        final var ingredient = Ingredient.builder()
+            .name("ingredient")
+            .customUnits(List.of(customUnit))
+            .build();
+        customUnit.setIngredient(ingredient);
 
         // when
         ingredientRepository.save(ingredient);
@@ -64,9 +75,22 @@ class RepositoryDbTest {
     }
 
     @Test
-    void ingredient_with_default_ingredient_variant_gets_created() {
+    void ingredient_with_ingredient_variants_gets_created() {
         // given
-        final var ingredient = getIngredientWithDefaultIngredientVariant();
+        final var ingredientVariantOne = IngredientVariant.builder()
+            .description("description")
+            .defaultVariant(false)
+            .build();
+        final var ingredientVariantTwo = IngredientVariant.builder()
+            .description("description2")
+            .defaultVariant(false)
+            .build();
+        final var ingredient = Ingredient.builder()
+            .name("ingredient")
+            .ingredientVariants(List.of(ingredientVariantOne, ingredientVariantTwo))
+            .build();
+        ingredientVariantOne.setIngredient(ingredient);
+        ingredientVariantTwo.setIngredient(ingredient);
 
         // when
         ingredientRepository.save(ingredient);
@@ -75,19 +99,28 @@ class RepositoryDbTest {
         // then
         assertThat(result).singleElement()
             .isEqualTo(ingredient);
-        assertThat(ingredient.getDefaultIngredientVariant()).isEqualTo(ingredient.getIngredientVariants()
-                                                                           .getFirst());
-        assertThat(ingredient.getIngredientVariants()
-                       .getFirst()
-                       .getIngredient()).isEqualTo(ingredient);
+
+        assertThat(ingredient.getIngredientVariants()).hasSize(2)
+            .containsExactlyInAnyOrder(ingredientVariantOne, ingredientVariantTwo);
     }
 
     @Test
     void duplicate_ingredient_variant_cannot_be_created() {
         // given
-        final var ingredient = getIngredientWithDefaultIngredientVariant();
+        final var ingredientVariant = IngredientVariant.builder()
+            .description("description")
+            .defaultVariant(true)
+            .build();
+        final var ingredient = Ingredient.builder()
+            .name("ingredient")
+            .ingredientVariants(List.of(ingredientVariant))
+            .build();
+        ingredientVariant.setIngredient(ingredient);
         ingredientRepository.saveAndFlush(ingredient);
-        final var duplicateIngredientVariant = getIngredientVariant();
+        final var duplicateIngredientVariant = IngredientVariant.builder()
+            .description("description")
+            .defaultVariant(false)
+            .build();
         duplicateIngredientVariant.setIngredient(ingredient);
 
         // when
@@ -97,49 +130,41 @@ class RepositoryDbTest {
         // then
         assertThat(exception).isInstanceOf(org.springframework.dao.DataIntegrityViolationException.class)
             .hasMessageContaining("uc_ingredientvariant_description_per_ingredient");
-
     }
 
-    private Ingredient getIngredient() {
-        return Ingredient.builder()
-            .name("ingredient")
+    @Test
+    void two_default_ingredient_variants_cannot_be_created() {
+        // given
+        final var ingredientVariant = IngredientVariant.builder()
+            .description("description")
+            .defaultVariant(true)
             .build();
-    }
-
-    private Ingredient getIngredientWithCustomUnit() {
-        final var customUnit = getCustomUnit();
         final var ingredient = Ingredient.builder()
             .name("ingredient")
-            .customUnits(List.of(customUnit))
-            .build();
-        customUnit.setIngredient(ingredient);
-        return ingredient;
-    }
-
-    private CustomUnit getCustomUnit() {
-        return CustomUnit.builder()
-            .name("unit")
-            .conversionUnit(GenericUnit.GRAM)
-            .conversionUnitToCustomUnitFactor(1.0)
-            .build();
-    }
-
-    private Ingredient getIngredientWithDefaultIngredientVariant() {
-        final var ingredientVariant = getIngredientVariant();
-        final var ingredient = Ingredient.builder()
-            .name("ingredient")
-            .defaultIngredientVariant(ingredientVariant)
             .ingredientVariants(List.of(ingredientVariant))
             .build();
         ingredientVariant.setIngredient(ingredient);
+        ingredientRepository.saveAndFlush(ingredient);
 
-        return ingredient;
-    }
-
-    private IngredientVariant getIngredientVariant() {
-        return IngredientVariant.builder()
-            .description("description")
+        final var secondIngredientVariant = IngredientVariant.builder()
+            .description("description2")
+            .defaultVariant(false)
             .build();
+        secondIngredientVariant.setIngredient(ingredient);
+        ingredientVariantRepository.saveAndFlush(secondIngredientVariant);
+
+        final var thirdIngredientVariant = IngredientVariant.builder()
+            .description("description3")
+            .defaultVariant(true)
+            .build();
+        thirdIngredientVariant.setIngredient(ingredient);
+
+        // when
+        final var exception = catchException(() -> ingredientVariantRepository.saveAndFlush(thirdIngredientVariant));
+
+        // then
+        assertThat(exception).isInstanceOf(org.springframework.dao.DataIntegrityViolationException.class)
+            .hasMessageContaining("idx_ingredientvariant_default_variant");
     }
 
 }
