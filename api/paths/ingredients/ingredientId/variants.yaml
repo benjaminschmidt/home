@@ -42,3 +42,7 @@ post:
             $ref: '../../../components/ingredients/IngredientVariantDto.yaml'
     '404':
       description: Ingredient not found
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/errors/ErrorDto.yaml'

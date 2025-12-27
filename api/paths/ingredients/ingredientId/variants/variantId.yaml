@@ -23,6 +23,10 @@ get:
             $ref: '../../../../components/ingredients/IngredientVariantDto.yaml'
     '404':
       description: Ingredient or variant not found
+      content:
+        application/json:
+          schema:
+            $ref: '../../../../components/errors/ErrorDto.yaml'
 put:
   summary: Update an ingredient variant
   operationId: updateIngredientVariant
@@ -54,6 +58,10 @@ put:
             $ref: '../../../../components/ingredients/IngredientVariantDto.yaml'
     '404':
       description: Ingredient or variant not found
+      content:
+        application/json:
+          schema:
+            $ref: '../../../../components/errors/ErrorDto.yaml'
 delete:
   summary: Remove an ingredient variant
   operationId: deleteIngredientVariant
@@ -75,3 +83,7 @@ delete:
       description: Ingredient variant deleted
     '404':
       description: Ingredient not found
+      content:
+        application/json:
+          schema:
+            $ref: '../../../../components/errors/ErrorDto.yaml'

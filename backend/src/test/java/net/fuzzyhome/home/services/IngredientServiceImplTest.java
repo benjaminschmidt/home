@@ -10,6 +10,7 @@ import net.fuzzyhome.home.database.entities.IngredientVariant;
 import net.fuzzyhome.home.database.repositories.CustomUnitRepository;
 import net.fuzzyhome.home.database.repositories.IngredientRepository;
 import net.fuzzyhome.home.database.repositories.IngredientVariantRepository;
+import net.fuzzyhome.home.services.errors.BadRequestException;
 import net.fuzzyhome.home.services.errors.NotFoundException;
 import net.fuzzyhome.home.services.mappers.CustomUnitMapper;
 import net.fuzzyhome.home.services.mappers.IngredientMapper;
@@ -81,7 +82,9 @@ class IngredientServiceImplTest {
     void creates_ingredients() {
         // given
         final var ingredient = Instancio.of(Ingredient.class).create();
-        final var ingredientDto = Instancio.of(IngredientDto.class).create();
+        final var ingredientDto = Instancio.of(IngredientDto.class)
+            .set(field(IngredientVariantDto::getDefaultVariant), false)
+            .create();
 
         when(ingredientRepository.save(any())).thenReturn(ingredient);
         when(ingredientMapper.mapDtoToIngredient(any())).thenReturn(ingredient);
@@ -93,6 +96,44 @@ class IngredientServiceImplTest {
         // then
         assertThat(result).isEqualTo(ingredientDto);
         verify(ingredientRepository).save(ingredient);
+    }
+
+    @Test
+    void fails_to_create_ingredient_due_to_duplicate_variant() {
+        // given
+        final var ingredientVariantDtos = Instancio.ofList(IngredientVariantDto.class)
+            .size(2)
+            .set(field(IngredientVariantDto::getDescription), "description")
+            .create();
+        final var ingredientDto = Instancio.of(IngredientDto.class)
+            .set(field(IngredientDto::getIngredientVariants), ingredientVariantDtos)
+            .create();
+
+        // when
+        final var exception = catchException(() -> ingredientServiceImpl.createIngredient(ingredientDto));
+
+        // then
+        assertThat(exception).isInstanceOf(BadRequestException.class)
+            .hasMessage("Duplicate ingredient variants found");
+    }
+
+    @Test
+    void fails_to_create_ingredient_due_to_duplicate_custom_unit() {
+        // given
+        final var customUnitDtos = Instancio.ofList(CustomUnitDto.class)
+            .size(2)
+            .set(field(CustomUnitDto::getName), "name")
+            .create();
+        final var ingredientDto = Instancio.of(IngredientDto.class)
+            .set(field(IngredientDto::getCustomUnits), customUnitDtos)
+            .create();
+
+        // when
+        final var exception = catchException(() -> ingredientServiceImpl.createIngredient(ingredientDto));
+
+        // then
+        assertThat(exception).isInstanceOf(BadRequestException.class)
+            .hasMessage("Duplicate custom units found");
     }
 
     @Test
@@ -143,6 +184,7 @@ class IngredientServiceImplTest {
             .create();
         final var ingredientDto = Instancio.of(IngredientDto.class)
             .set(field(IngredientDto::getId), id)
+            .set(field(IngredientVariantDto::getDefaultVariant), false)
             .create();
         when(ingredientRepository.findById(any())).thenReturn(Optional.of(ingredient));
         when(ingredientRepository.save(any())).thenReturn(ingredient);
@@ -156,6 +198,26 @@ class IngredientServiceImplTest {
         verify(ingredientRepository).findById(id);
         verify(ingredientRepository).save(updatedIngredient);
         assertThat(result).isEqualTo(ingredientDto);
+    }
+
+    @Test
+    void fails_to_update_ingredient_due_to_multiple_default_variants() {
+        // given
+        final var ingredientId = UUID.randomUUID();
+        final var ingredientVariantDtos = Instancio.ofList(IngredientVariantDto.class)
+            .size(2)
+            .set(field(IngredientVariantDto::getDefaultVariant), true)
+            .create();
+        final var ingredientDto = Instancio.of(IngredientDto.class)
+            .set(field(IngredientDto::getIngredientVariants), ingredientVariantDtos)
+            .create();
+
+        // when
+        final var exception = catchException(() -> ingredientServiceImpl.updateIngredient(ingredientId, ingredientDto));
+
+        // then
+        assertThat(exception).isInstanceOf(BadRequestException.class)
+            .hasMessage("More than one default ingredient variant found");
     }
 
     @Test

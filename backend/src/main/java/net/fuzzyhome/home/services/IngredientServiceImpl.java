@@ -1,6 +1,7 @@
 package net.fuzzyhome.home.services;
 
 import jakarta.transaction.Transactional;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -9,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import net.fuzzyhome.home.database.repositories.CustomUnitRepository;
 import net.fuzzyhome.home.database.repositories.IngredientRepository;
 import net.fuzzyhome.home.database.repositories.IngredientVariantRepository;
+import net.fuzzyhome.home.services.errors.BadRequestException;
 import net.fuzzyhome.home.services.errors.NotFoundException;
 import net.fuzzyhome.home.services.mappers.CustomUnitMapper;
 import net.fuzzyhome.home.services.mappers.IngredientMapper;
@@ -43,6 +45,7 @@ public class IngredientServiceImpl implements IngredientService {
     @NonNull
     @Override
     public IngredientDto createIngredient(@NonNull final IngredientDto ingredientDto) {
+        validateIngredientDto(ingredientDto);
         return ingredientMapper.mapIngredientToDto(
             ingredientRepository.save(ingredientMapper.mapDtoToIngredient(ingredientDto))
         );
@@ -62,6 +65,7 @@ public class IngredientServiceImpl implements IngredientService {
         @NonNull final UUID ingredientId,
         @NonNull final IngredientDto ingredientDto
     ) {
+        validateIngredientDto(ingredientDto);
         return ingredientRepository.findById(ingredientId)
             .map(ingredient -> ingredientMapper.updateIngredientFromDto(ingredient, ingredientDto))
             .map(ingredientRepository::save)
@@ -218,5 +222,32 @@ public class IngredientServiceImpl implements IngredientService {
             .ifPresent(customUnits -> customUnits.removeIf(customUnit -> Objects.equals(customUnit.getId(), unitId)));
 
         ingredientRepository.save(ingredient);
+    }
+
+    private void validateIngredientDto(@NonNull final IngredientDto ingredientDto) {
+        final var ingredientVariantDtos = Optional.ofNullable(ingredientDto.getIngredientVariants()).orElse(List.of());
+        final var ingredientVariantDescriptions = ingredientVariantDtos.stream()
+            .map(IngredientVariantDto::getDescription)
+            .toList();
+        final var customUnitDescriptions = Optional.ofNullable(ingredientDto.getCustomUnits())
+            .orElse(List.of())
+            .stream()
+            .map(CustomUnitDto::getName)
+            .toList();
+
+        if (ingredientVariantDescriptions.size() != (new HashSet<>(ingredientVariantDescriptions)).size()) {
+            throw new BadRequestException("Duplicate ingredient variants found");
+        }
+
+        if (customUnitDescriptions.size() != (new HashSet<>(customUnitDescriptions)).size()) {
+            throw new BadRequestException("Duplicate custom units found");
+        }
+
+        if (ingredientVariantDtos.stream()
+                .map(IngredientVariantDto::getDefaultVariant)
+                .filter(Boolean.TRUE::equals)
+                .count() > 1) {
+            throw new BadRequestException("More than one default ingredient variant found");
+        }
     }
 }

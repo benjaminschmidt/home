@@ -23,6 +23,10 @@ get:
             $ref: '../../../../components/ingredients/CustomUnitDto.yaml'
     '404':
       description: Ingredient or unit not found
+      content:
+        application/json:
+          schema:
+            $ref: '../../../../components/errors/ErrorDto.yaml'
 put:
   summary: Update a custom unit
   operationId: updateCustomUnit
@@ -54,6 +58,10 @@ put:
             $ref: '../../../../components/ingredients/CustomUnitDto.yaml'
     '404':
       description: Ingredient or unit not found
+      content:
+        application/json:
+          schema:
+            $ref: '../../../../components/errors/ErrorDto.yaml'
 delete:
   summary: Remove a custom unit
   operationId: deleteCustomUnit
@@ -75,3 +83,7 @@ delete:
       description: Custom unit successfully removed
     '404':
       description: Ingredient not found
+      content:
+        application/json:
+          schema:
+            $ref: '../../../../components/errors/ErrorDto.yaml'

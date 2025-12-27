@@ -42,3 +42,7 @@ post:
             $ref: '../../../components/ingredients/CustomUnitDto.yaml'
     '404':
       description: Ingredient or unit not found
+      content:
+        application/json:
+          schema:
+            $ref: '../../../components/errors/ErrorDto.yaml'
