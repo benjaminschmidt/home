@@ -45,6 +45,8 @@ ALTER TABLE ingredient
 ALTER TABLE ingredient_variant
     ADD CONSTRAINT uc_ingredientvariant_description_per_ingredient UNIQUE (ingredient_id, description);
 
+CREATE INDEX idx_ingredient_name ON ingredient (name);
+
 CREATE UNIQUE INDEX idx_ingredientvariant_default_variant ON ingredient_variant (ingredient_id, default_variant)
     WHERE ("default_variant" IS true);
 

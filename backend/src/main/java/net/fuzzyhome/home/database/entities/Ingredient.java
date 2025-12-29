@@ -9,6 +9,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import java.util.List;
@@ -30,7 +31,11 @@ import org.jspecify.annotations.Nullable;
 @Getter
 @NoArgsConstructor
 @Setter
-@Table
+@Table(
+    indexes = {
+        @Index(name = "idx_ingredient_name", columnList = "name")
+    }
+)
 public class Ingredient {
     @Column(nullable = false)
     @GeneratedValue(strategy = GenerationType.UUID)

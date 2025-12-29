@@ -11,6 +11,8 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.data.jpa.test.autoconfigure.DataJpaTest;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchException;
@@ -18,7 +20,7 @@ import static org.instancio.Select.field;
 
 @AutoConfigureEmbeddedDatabase
 @DataJpaTest
-class RepositoryDbTest {
+class IngredientsDbTest {
 
     @Autowired
     private CustomUnitRepository customUnitRepository;
@@ -224,6 +226,34 @@ class RepositoryDbTest {
         // then
         assertThat(result).singleElement()
             .isEqualTo(customUnit);
+    }
+
+    @Test
+    void retrieve_ingredients_with_search() {
+        // given
+        final var ingredient = Instancio.of(Ingredient.class)
+            .ignore(field(Ingredient::getId))
+            .ignore(field(Ingredient::getIngredientVariants))
+            .ignore(field(Ingredient::getCustomUnits))
+            .set(field(Ingredient::getName), "testIngredient")
+            .create();
+        ingredientRepository.saveAndFlush(ingredient);
+        ingredientRepository.saveAllAndFlush(Instancio.ofList(Ingredient.class)
+            .size(4)
+            .ignore(field(Ingredient::getId))
+            .ignore(field(Ingredient::getIngredientVariants))
+            .ignore(field(Ingredient::getCustomUnits))
+            .create());
+
+        // when
+        final var result = ingredientRepository.findByNameContainingIgnoreCase(
+            "tingredi",
+            PageRequest.of(0, 10, Sort.by("name"))
+        );
+
+        // then
+        assertThat(result.getContent()).singleElement()
+            .isEqualTo(ingredient);
     }
 
 }

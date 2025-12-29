@@ -3,13 +3,18 @@ package net.fuzzyhome.home.services;
 import java.util.List;
 import java.util.UUID;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.openapitools.model.CustomUnitDto;
 import org.openapitools.model.IngredientDto;
 import org.openapitools.model.IngredientVariantDto;
 
 public interface IngredientService {
     @NonNull
-    List<IngredientDto> getAllIngredients();
+    List<IngredientDto> getAllIngredients(
+        @NonNull final Integer page,
+        @NonNull final Integer size,
+        @Nullable final String search
+    );
 
     @NonNull
     IngredientDto createIngredient(@NonNull final IngredientDto ingredientDto);

@@ -15,10 +15,14 @@ import net.fuzzyhome.home.services.errors.NotFoundException;
 import net.fuzzyhome.home.services.mappers.CustomUnitMapper;
 import net.fuzzyhome.home.services.mappers.IngredientMapper;
 import net.fuzzyhome.home.services.mappers.IngredientVariantMapper;
+import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.openapitools.model.CustomUnitDto;
 import org.openapitools.model.IngredientDto;
 import org.openapitools.model.IngredientVariantDto;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 @RequiredArgsConstructor
@@ -35,8 +39,17 @@ public class IngredientServiceImpl implements IngredientService {
 
     @NonNull
     @Override
-    public List<IngredientDto> getAllIngredients() {
-        return ingredientRepository.findAll()
+    public List<IngredientDto> getAllIngredients(
+        @NonNull final Integer page,
+        @NonNull final Integer size,
+        @Nullable final String search
+    ) {
+        return Optional.ofNullable(StringUtils.trimToNull(search))
+            .map(s -> ingredientRepository.findByNameContainingIgnoreCase(
+                s,
+                PageRequest.of(page, size, Sort.by("name"))
+            ))
+            .orElseGet(() -> ingredientRepository.findAll(PageRequest.of(page, size, Sort.by("name"))))
             .stream()
             .map(ingredientMapper::mapIngredientToDto)
             .toList();

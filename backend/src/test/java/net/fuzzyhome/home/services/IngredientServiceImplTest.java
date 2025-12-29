@@ -24,6 +24,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.openapitools.model.CustomUnitDto;
 import org.openapitools.model.IngredientDto;
 import org.openapitools.model.IngredientVariantDto;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.Pageable;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchException;
@@ -65,16 +67,16 @@ class IngredientServiceImplTest {
         final var ingredientDtos = Instancio.ofList(IngredientDto.class)
             .size(2)
             .create();
-        when(ingredientRepository.findAll()).thenReturn(ingredients);
+        when(ingredientRepository.findAll(any(Pageable.class))).thenReturn(new PageImpl<>(ingredients));
         when(ingredientMapper.mapIngredientToDto(any(Ingredient.class)))
             .thenReturn(ingredientDtos.get(0))
             .thenReturn(ingredientDtos.get(1));
 
         // when
-        final var result = ingredientServiceImpl.getAllIngredients();
+        final var result = ingredientServiceImpl.getAllIngredients(1, 2, null);
 
         // then
-        verify(ingredientRepository).findAll();
+        verify(ingredientRepository).findAll(any(Pageable.class));
         assertThat(result).containsExactlyElementsOf(ingredientDtos);
     }
 

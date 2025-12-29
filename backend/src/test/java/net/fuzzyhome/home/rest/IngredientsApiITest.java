@@ -93,6 +93,42 @@ class IngredientsApiITest {
 
     @SneakyThrows
     @Test
+    void listIngredients_second_page_with_search() {
+        // given
+        final var ingredients = Instancio.ofList(Ingredient.class)
+            .size(3)
+            .ignore(field(Ingredient::getId))
+            .ignore(field(Ingredient::getCustomUnits))
+            .ignore(field(Ingredient::getIngredientVariants))
+            .create();
+
+        ingredients.get(0).setName("name");
+        ingredients.get(1).setName("test1");
+        ingredients.get(2).setName("test2");
+
+        ingredientRepository.saveAllAndFlush(ingredients);
+
+        // when
+        final var result = mockMvc.perform(get("/ingredients")
+                .queryParam("page", "1")
+                .queryParam("size", "1")
+                .queryParam("search", "test"))
+            .andExpect(status().isOk())
+            .andReturn();
+
+        // then
+        final var response = objectMapper.readValue(
+            result.getResponse().getContentAsString(),
+            new TypeReference<List<IngredientDto>>() {
+            }
+        );
+        assertThat(response).singleElement()
+            .extracting(IngredientDto::getId)
+            .isEqualTo(ingredients.get(2).getId());
+    }
+
+    @SneakyThrows
+    @Test
     void createIngredient() {
         // given
         final var ingredientDto = Instancio.of(IngredientDto.class)

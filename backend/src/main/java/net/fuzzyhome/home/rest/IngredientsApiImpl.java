@@ -5,6 +5,7 @@ import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import net.fuzzyhome.home.services.IngredientService;
 import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.Nullable;
 import org.openapitools.api.IngredientsApi;
 import org.openapitools.model.CustomUnitDto;
 import org.openapitools.model.IngredientDto;
@@ -21,9 +22,13 @@ public class IngredientsApiImpl implements IngredientsApi {
 
     @NonNull
     @Override
-    public ResponseEntity<@NonNull List<IngredientDto>> listIngredients() {
+    public ResponseEntity<@NonNull List<IngredientDto>> listIngredients(
+        @NonNull final Integer page,
+        @NonNull final Integer size,
+        @Nullable final String search
+    ) {
         return ResponseEntity.status(HttpStatus.OK)
-            .body(ingredientService.getAllIngredients());
+            .body(ingredientService.getAllIngredients(page, size, search));
     }
 
     @NonNull
