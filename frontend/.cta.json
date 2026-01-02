@@ -1,8 +1,8 @@
 {
   "projectName": "home",
-  "mode": "code-router",
+  "mode": "file-router",
   "typescript": true,
-  "tailwind": true,
+  "tailwind": false,
   "packageManager": "npm",
   "addOnOptions": {},
   "git": true,

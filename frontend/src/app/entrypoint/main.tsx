@@ -1,36 +1,17 @@
-import {
-	createRootRoute,
-	createRoute,
-	createRouter,
-	Outlet,
-	RouterProvider,
-} from "@tanstack/react-router";
-import { TanStackRouterDevtools } from "@tanstack/react-router-devtools";
+import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
+import reportWebVitals from "@/app/analytics/reportWebVitals.ts";
 
-import "./styles.css";
+import "@fontsource/roboto/300.css";
+import "@fontsource/roboto/400.css";
+import "@fontsource/roboto/500.css";
+import "@fontsource/roboto/700.css";
 
-import App from "./App.tsx";
-import reportWebVitals from "./reportWebVitals.ts";
+// Import the generated route tree
+import { routeTree } from "./routeTree.gen";
 
-const rootRoute = createRootRoute({
-	component: () => (
-		<>
-			<Outlet />
-			<TanStackRouterDevtools />
-		</>
-	),
-});
-
-const indexRoute = createRoute({
-	getParentRoute: () => rootRoute,
-	path: "/",
-	component: App,
-});
-
-const routeTree = rootRoute.addChildren([indexRoute]);
-
+// Create a new router instance
 const router = createRouter({
 	routeTree,
 	context: {},
@@ -40,6 +21,7 @@ const router = createRouter({
 	defaultPreloadStaleTime: 0,
 });
 
+// Register the router instance for type safety
 declare module "@tanstack/react-router" {
 	interface Register {
 		router: typeof router;
@@ -57,6 +39,6 @@ if (rootElement && !rootElement.innerHTML) {
 }
 
 // If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
+// to log results (for example, reportWebVitals(console.log))
 // or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
 reportWebVitals();
