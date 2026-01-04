@@ -1,3 +1,1 @@
-import Construction from "./ui/Construction.tsx";
-
-export default Construction;
+export { Construction } from "./ui/Construction.tsx";

@@ -12,11 +12,12 @@ interface MuiThemeProviderProps {
 	children: ReactNode;
 }
 
-export function MuiThemeProvider({ children }: MuiThemeProviderProps) {
+const MuiThemeProvider = ({ children }: MuiThemeProviderProps) => {
 	return (
 		<ThemeProvider theme={themeDark} defaultMode="dark">
 			<CssBaseline />
 			{children}
 		</ThemeProvider>
 	);
-}
+};
+export { MuiThemeProvider, type MuiThemeProviderProps };

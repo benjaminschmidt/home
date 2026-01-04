@@ -4,8 +4,10 @@ import ListItemButton, {
 import { createLink } from "@tanstack/react-router";
 import { forwardRef } from "react";
 
-export const RouterListItemButton = createLink(
+const RouterListItemButton = createLink(
 	forwardRef<HTMLButtonElement, ListItemButtonProps>((props, ref) => {
 		return <ListItemButton ref={ref} component="button" {...props} />;
 	}),
 );
+
+export { RouterListItemButton };

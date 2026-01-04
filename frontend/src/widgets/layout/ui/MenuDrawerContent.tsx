@@ -14,7 +14,7 @@ const getCurrent = (location: ParsedLocation) => {
 	else if (location.pathname.startsWith("/ingredients")) return "ingredients";
 };
 
-export default () => {
+const MenuDrawerContent = () => {
 	const location = useLocation();
 	const value = getCurrent(location);
 
@@ -47,3 +47,5 @@ export default () => {
 		</List>
 	);
 };
+
+export { MenuDrawerContent };

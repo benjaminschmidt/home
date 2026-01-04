@@ -6,13 +6,13 @@ import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import { type ReactNode, useState } from "react";
 import { drawerWidth } from "../config/drawerConfig.ts";
-import MenuDrawer from "./MenuDrawer.tsx";
+import { MenuDrawer } from "./MenuDrawer.tsx";
 
-export interface LayoutProps {
+type LayoutProps = {
 	children: ReactNode;
-}
+};
 
-export default ({ children }: LayoutProps) => {
+const Layout = ({ children }: LayoutProps) => {
 	const [mobileOpen, setMobileOpen] = useState(false);
 	const [isClosing, setIsClosing] = useState(false);
 
@@ -70,3 +70,5 @@ export default ({ children }: LayoutProps) => {
 		</Box>
 	);
 };
+
+export { type LayoutProps, Layout };

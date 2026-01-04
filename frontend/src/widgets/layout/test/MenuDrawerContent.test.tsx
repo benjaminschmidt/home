@@ -2,7 +2,7 @@ import { cleanup, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import "@testing-library/jest-dom/vitest";
 import type { ReactNode } from "react";
-import MenuDrawerContent from "../ui/MenuDrawerContent.tsx";
+import { MenuDrawerContent } from "../ui/MenuDrawerContent.tsx";
 
 let mockPathname: string;
 

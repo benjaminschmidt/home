@@ -1,7 +1,7 @@
 import { render, screen } from "@testing-library/react";
 import type { ReactNode } from "react";
 import { describe, expect, test, vi } from "vitest";
-import Construction from "@/pages/construction/ui/Construction.tsx";
+import { Construction } from "../ui/Construction.tsx";
 
 // noinspection JSUnusedGlobalSymbols
 vi.mock("@tanstack/react-router", () => ({

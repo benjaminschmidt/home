@@ -2,7 +2,7 @@ import { cleanup, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import "@testing-library/jest-dom/vitest";
 import type { ReactNode } from "react";
-import MenuDrawer from "../ui/MenuDrawer.tsx";
+import { MenuDrawer } from "../ui/MenuDrawer.tsx";
 
 // noinspection JSUnusedGlobalSymbols
 vi.mock("@tanstack/react-router", () => ({

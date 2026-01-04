@@ -1,7 +1,7 @@
 import { Chip, Grid } from "@mui/material";
-import Layout from "@/widgets/layout/ui/Layout.tsx";
+import { Layout } from "@/widgets/layout";
 
-function Construction() {
+const Construction = () => {
 	return (
 		<Layout>
 			<Grid
@@ -14,6 +14,6 @@ function Construction() {
 			</Grid>
 		</Layout>
 	);
-}
+};
 
-export default Construction;
+export { Construction };

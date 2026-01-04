@@ -1,7 +1,7 @@
 import { createRouter, RouterProvider } from "@tanstack/react-router";
 import { StrictMode } from "react";
 import ReactDOM from "react-dom/client";
-import reportWebVitals from "@/app/analytics/reportWebVitals.ts";
+import { reportWebVitals } from "@/app/analytics/reportWebVitals.ts";
 
 import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";

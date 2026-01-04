@@ -1,15 +1,15 @@
 import Drawer from "@mui/material/Drawer";
 import Toolbar from "@mui/material/Toolbar";
 import { drawerWidth } from "@/widgets/layout/config/drawerConfig.ts";
-import MenuDrawerContent from "@/widgets/layout/ui/MenuDrawerContent.tsx";
+import { MenuDrawerContent } from "@/widgets/layout/ui/MenuDrawerContent.tsx";
 
-export interface MenuDrawerProps {
+type MenuDrawerProps = {
 	mobileOpen: boolean;
 	setMobileOpen: (open: boolean) => void;
 	setIsClosing: (closing: boolean) => void;
-}
+};
 
-export default ({
+const MenuDrawer = ({
 	mobileOpen,
 	setMobileOpen,
 	setIsClosing,
@@ -71,3 +71,5 @@ export default ({
 		</>
 	);
 };
+
+export { MenuDrawer, type MenuDrawerProps };
