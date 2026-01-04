@@ -8,9 +8,9 @@ const themeDark = createTheme({
 	},
 });
 
-interface MuiThemeProviderProps {
+type MuiThemeProviderProps = {
 	children: ReactNode;
-}
+};
 
 const MuiThemeProvider = ({ children }: MuiThemeProviderProps) => {
 	return (

@@ -1,9 +1,9 @@
 import { TanStackDevtools } from "@tanstack/react-devtools";
 import { createRootRoute, Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
-import { MuiThemeProvider } from "@/shared/config/ThemeProvider.tsx";
+import { MuiThemeProvider } from "@/shared/config";
 
-export const Route = createRootRoute({
+const Route = createRootRoute({
 	component: () => (
 		<MuiThemeProvider>
 			<TanStackDevtools
@@ -21,3 +21,5 @@ export const Route = createRootRoute({
 		</MuiThemeProvider>
 	),
 });
+
+export { Route };

@@ -79,6 +79,9 @@ jobs:
       - name: Check code formatting
         working-directory: frontend
         run: npm run biome-ci
+      - name: Check feature sliced design architecture
+        working-directory: frontend
+        run: npm run steiger
       - name: Run tests
         working-directory: frontend
         run: npm run test
