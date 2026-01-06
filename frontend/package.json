@@ -20,7 +20,7 @@
     "@mui/icons-material": "7.3.6",
     "@mui/material": "7.3.6",
     "@tanstack/react-devtools": "0.9.0",
-    "@tanstack/react-router": "1.144.0",
+    "@tanstack/react-router": "1.145.7",
     "@tanstack/react-router-devtools": "1.144.0",
     "@tanstack/router-plugin": "1.145.4",
     "react": "19.2.3",
