@@ -10,9 +10,10 @@ jobs:
     name: Detect changed paths
     runs-on: ubuntu-latest
     outputs:
+      api: ${{ steps.filter.outputs.api }}
       backend: ${{ steps.filter.outputs.backend }}
-      maven: ${{ steps.filter.outputs.maven }}
       frontend: ${{ steps.filter.outputs.frontend }}
+      maven: ${{ steps.filter.outputs.maven }}
       workflow: ${{ steps.filter.outputs.workflow }}
     steps:
       - name: Check out repository code
@@ -21,17 +22,19 @@ jobs:
         uses: https://github.com/dorny/paths-filter@v3
         with:
           filters: |
+            api:
+              - 'api/**'
             backend:
               - 'backend/**'
-            maven:
-              - 'maven/**'
             frontend:
               - 'frontend/**'
+            maven:
+              - 'maven/**'
             workflow:
               - '.forgejo/workflows/pull-request.yaml'
   build-maven-container:
     needs: changes
-    if: ${{ needs.changes.outputs.workflow == 'true' || needs.changes.outputs.backend == 'true' || needs.changes.outputs.maven == 'true' }}
+    if: ${{ needs.changes.outputs.backend == 'true' || needs.changes.outputs.maven == 'true' || needs.changes.outputs.workflow == 'true'}}
     runs-on: ubuntu-latest
     steps:
       - name: Check out repository code
@@ -54,7 +57,7 @@ jobs:
           tags: ${{ vars.SERVER_DOMAIN }}/${{ github.repository }}-maven:latest,
   run-backend-tests:
     needs: [ changes, build-maven-container ]
-    if: ${{ needs.changes.outputs.workflow == 'true' || needs.changes.outputs.backend == 'true' || needs.changes.outputs.maven == 'true' }}
+    if: ${{ needs.changes.outputs.backend == 'true' || needs.changes.outputs.maven == 'true' || needs.changes.outputs.workflow == 'true' }}
     runs-on: ubuntu-latest
     container:
       image: ${{ vars.SERVER_DOMAIN }}/${{ github.repository }}-maven:latest
@@ -67,12 +70,18 @@ jobs:
           mvn clean verify
   run-frontend-tests:
     needs: changes
-    if: ${{ needs.changes.outputs.workflow == 'true' || needs.changes.outputs.frontend == 'true' }}
+    if: ${{ needs.changes.outputs.api == 'true' || needs.changes.outputs.frontend == 'true' || needs.changes.outputs.workflow == 'true' }}
     runs-on: ubuntu-latest
     container: docker.io/library/node:24.13.0-slim
     steps:
       - name: Check out repository code
         uses: actions/checkout@v6
+      - name: Install dependencies of api library
+        working-directory: api
+        run: npm ci
+      - name: Build api library
+        working-directory: api
+        run: npm run clean-build
       - name: Install dependencies
         working-directory: frontend
         run: npm ci

@@ -1,0 +1,23 @@
+{
+  "name": "home-api",
+  "description": "Home app api client",
+  "license": "AGPL-3.0-or-later",
+  "author": {
+    "name": "Benjamin Schmidt",
+    "email": "bschmidt.contact@gmail.com",
+    "url": "https://benjamin.fuzzyhome.net/"
+  },
+  "private": true,
+  "type": "module",
+  "repository": "github:benjaminschmidt/home",
+  "scripts": {
+    "build": "openapi-ts && tsc",
+    "clean": "rimraf dist && rimraf src ",
+    "clean-build": "rimraf dist && rimraf src && openapi-ts && tsc"
+  },
+  "devDependencies": {
+    "@hey-api/openapi-ts": "0.90.2",
+    "rimraf": "6.1.2",
+    "typescript": "5.9.3"
+  }
+}
