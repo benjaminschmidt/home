@@ -22,7 +22,7 @@
     "@tanstack/react-devtools": "0.9.1",
     "@tanstack/react-router": "1.146.0",
     "@tanstack/react-router-devtools": "1.145.7",
-    "@tanstack/router-plugin": "1.145.10",
+    "@tanstack/router-plugin": "1.146.0",
     "react": "19.2.3",
     "react-dom": "19.2.3"
   },
