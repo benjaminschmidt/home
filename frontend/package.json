@@ -18,7 +18,7 @@
     "@emotion/styled": "11.14.1",
     "@fontsource/roboto": "5.2.9",
     "@mui/icons-material": "7.3.6",
-    "@mui/material": "7.3.6",
+    "@mui/material": "7.3.7",
     "@tanstack/react-devtools": "0.9.1",
     "@tanstack/react-router": "1.145.7",
     "@tanstack/react-router-devtools": "1.145.7",
