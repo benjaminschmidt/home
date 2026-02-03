@@ -29,7 +29,7 @@
     "@mui/icons-material": "7.3.7",
     "@mui/material": "7.3.7",
     "@tanstack/react-devtools": "0.9.4",
-    "@tanstack/react-router": "1.157.16",
+    "@tanstack/react-router": "1.157.17",
     "@tanstack/react-router-devtools": "1.157.16",
     "@tanstack/router-plugin": "1.157.16",
     "home-api": "file:../api/dist/src",
