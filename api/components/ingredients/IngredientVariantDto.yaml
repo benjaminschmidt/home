@@ -10,8 +10,10 @@ properties:
     readOnly: true
   description:
     type: string
+    nullable: false
   defaultVariant:
     type: boolean
+    nullable: false
   unit:
     $ref: './GenericUnitDto.yaml'
   servingSize:

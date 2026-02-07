@@ -1,18 +1,22 @@
-import { Chip, Grid } from "@mui/material";
-import { Layout } from "@/widgets/layout";
+import List from "@mui/material/List";
+import ListItem from "@mui/material/ListItem";
+import type { IngredientDtoRoot } from "home-api/dist/src";
 
-const IngredientList = () => {
+type IngredientListProps = {
+	ingredients: IngredientDtoRoot[];
+};
+
+const IngredientList = ({ ingredients }: IngredientListProps) => {
 	return (
-		<Layout>
-			<Grid
-				container
-				justifyContent="center"
-				alignItems="center"
-				minHeight="80vh"
-			>
-				<Chip label="Ingredient List (Under construction)" />
-			</Grid>
-		</Layout>
+		<List>
+			{ingredients.length === 0 ? (
+				<ListItem>No ingredients found"</ListItem>
+			) : (
+				ingredients.map((ingredient: IngredientDtoRoot, index: number) => (
+					<ListItem key={ingredient.id ?? index}>{ingredient.name}</ListItem>
+				))
+			)}
+		</List>
 	);
 };
 

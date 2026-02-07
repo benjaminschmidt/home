@@ -2,6 +2,7 @@ import { TanStackDevtools } from "@tanstack/react-devtools";
 import { createRootRoute, Outlet } from "@tanstack/react-router";
 import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
 import { MuiThemeProvider } from "@/shared/config";
+import { Layout } from "@/widgets/layout";
 
 const Route = createRootRoute({
 	component: () => (
@@ -17,7 +18,9 @@ const Route = createRootRoute({
 					},
 				]}
 			/>
-			<Outlet />
+			<Layout>
+				<Outlet />
+			</Layout>
 		</MuiThemeProvider>
 	),
 });

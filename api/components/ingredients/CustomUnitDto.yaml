@@ -10,6 +10,7 @@ properties:
     readOnly: true
   name:
     type: string
+    nullable: false
   conversionUnitToCustomUnitFactor:
     type: number
     format: double

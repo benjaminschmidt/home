@@ -8,8 +8,16 @@ import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
 
+import { client } from "home-api/dist/src/client.gen";
+
 // Import the generated route tree
 import { routeTree } from "./routeTree.gen";
+
+// Initialize client for backend fetching
+console.log("Using the api at", import.meta.env.VITE_API_BASE_URL);
+client.setConfig({
+	baseUrl: import.meta.env.VITE_API_BASE_URL,
+});
 
 // Create a new router instance
 const router = createRouter({
