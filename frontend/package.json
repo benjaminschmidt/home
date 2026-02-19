@@ -30,13 +30,13 @@
     "@tanstack/react-devtools": "0.9.5",
     "@tanstack/react-router": "1.160.0",
     "@tanstack/react-router-devtools": "1.160.0",
-    "@tanstack/router-plugin": "1.160.0",
+    "@tanstack/router-plugin": "1.160.1",
     "home-api": "file:../api",
     "react": "19.2.4",
     "react-dom": "19.2.4"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.4.0",
+    "@biomejs/biome": "2.4.1",
     "@feature-sliced/steiger-plugin": "0.5.7",
     "@tanstack/devtools-vite": "0.5.1",
     "@testing-library/dom": "10.4.1",
