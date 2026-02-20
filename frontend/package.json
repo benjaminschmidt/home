@@ -27,7 +27,7 @@
     "@fontsource/roboto": "5.2.9",
     "@mui/icons-material": "7.3.8",
     "@mui/material": "7.3.8",
-    "@tanstack/react-devtools": "0.9.5",
+    "@tanstack/react-devtools": "0.9.6",
     "@tanstack/react-router": "1.160.2",
     "@tanstack/react-router-devtools": "1.160.2",
     "@tanstack/router-plugin": "1.160.2",
