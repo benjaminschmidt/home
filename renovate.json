@@ -7,7 +7,7 @@
     {
       "matchManagers": ["mise"],
       "matchDatasources": ["java-version"],
-      "minimumReleaseAgeBehavior": "timestamp-optional",
+      "minimumReleaseAgeBehaviour": "timestamp-optional",
       "automerge": false
     },
     {
