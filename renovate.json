@@ -5,15 +5,15 @@
   "prConcurrentLimit": 10,
   "packageRules": [
     {
+      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "automerge": true,
+      "groupName": "non-major"
+    },
+    {
       "matchManagers": ["mise"],
       "matchDatasources": ["java-version"],
       "minimumReleaseAgeBehaviour": "timestamp-optional",
       "automerge": false
-    },
-    {
-      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
-      "automerge": true,
-      "groupName": "non-major"
     }
   ],
   "customManagers": [
