@@ -28,9 +28,9 @@
     "@mui/icons-material": "7.3.9",
     "@mui/material": "7.3.9",
     "@tanstack/react-devtools": "0.9.10",
-    "@tanstack/react-router": "1.166.2",
-    "@tanstack/react-router-devtools": "1.166.2",
-    "@tanstack/router-plugin": "1.166.2",
+    "@tanstack/react-router": "1.166.3",
+    "@tanstack/react-router-devtools": "1.166.3",
+    "@tanstack/router-plugin": "1.166.3",
     "home-api": "file:../api",
     "react": "19.2.4",
     "react-dom": "19.2.4"
