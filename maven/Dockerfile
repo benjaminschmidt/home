@@ -1,4 +1,4 @@
-FROM docker.io/library/maven:3.9.13-eclipse-temurin-25-alpine
+FROM docker.io/library/maven:3.9.14-eclipse-temurin-25-alpine
 
 RUN apk add --no-cache git
 
