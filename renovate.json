@@ -14,6 +14,13 @@
       "matchDatasources": ["java-version"],
       "minimumReleaseAgeBehaviour": "timestamp-optional",
       "automerge": false
+    },
+    {
+      "matchManagers": ["mise"],
+      "matchDatasources": ["github-releases"],
+      "matchPackageNames": ["apache/maven"],
+      "automerge": true,
+      "extractVersion": "^maven-(?<version>.*)$"
     }
   ],
   "customManagers": [
