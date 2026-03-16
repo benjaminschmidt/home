@@ -20,4 +20,5 @@ const MuiThemeProvider = ({ children }: MuiThemeProviderProps) => {
 		</ThemeProvider>
 	);
 };
+
 export { MuiThemeProvider, type MuiThemeProviderProps };
