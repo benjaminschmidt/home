@@ -19,7 +19,7 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v6
       - id: filter
-        uses: https://github.com/dorny/paths-filter@v3
+        uses: https://github.com/dorny/paths-filter@v4
         with:
           filters: |
             api:
