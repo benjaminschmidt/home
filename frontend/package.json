@@ -11,15 +11,16 @@
   "type": "module",
   "repository": "github:benjaminschmidt/home",
   "scripts": {
-    "dev": "cd ../api && npm run build && cd - && vite --port 3000",
-    "build": "cd ../api && npm run build && cd - && vite build && tsc",
-    "serve": "cd ../api && npm run build && cd - && vite preview",
-    "test": "cd ../api && npm run build && cd - && vitest run",
+    "dev": "cd ../api && pnpm run build && cd - && vite --port 3000",
+    "build": "cd ../api && pnpm run build && cd - && vite build && tsc",
+    "serve": "cd ../api && pnpm run build && cd - && vite preview",
+    "test": "cd ../api && pnpm run build && cd - && vitest run",
     "format": "biome format",
     "lint": "biome lint",
     "check": "biome check",
     "biome-ci": "biome ci",
-    "steiger": "steiger ./src"
+    "steiger": "steiger ./src",
+    "preinstall": "npx only-allow pnpm"
   },
   "dependencies": {
     "@emotion/react": "11.14.0",
@@ -31,7 +32,7 @@
     "@tanstack/react-router": "1.168.7",
     "@tanstack/react-router-devtools": "1.166.11",
     "@tanstack/router-plugin": "1.167.8",
-    "home-api": "file:../api",
+    "home-api": "link:../api",
     "react": "19.2.4",
     "react-dom": "19.2.4"
   },

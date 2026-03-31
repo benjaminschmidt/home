@@ -13,7 +13,8 @@
   "scripts": {
     "build": "openapi-ts && tsc",
     "clean": "rimraf dist && rimraf src ",
-    "clean-build": "rimraf dist && rimraf src && openapi-ts && tsc"
+    "clean-build": "rimraf dist && rimraf src && openapi-ts && tsc",
+    "preinstall": "npx only-allow pnpm"
   },
   "devDependencies": {
     "@hey-api/openapi-ts": "0.94.5",

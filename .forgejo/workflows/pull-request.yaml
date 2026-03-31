@@ -77,21 +77,25 @@ jobs:
     steps:
       - name: Check out repository code
         uses: actions/checkout@v6
+      - uses: pnpm/action-setup@v5
+        name: Install pnpm
+        with:
+          version: 10
       - name: Install dependencies of api library
         working-directory: api
-        run: npm ci
+        run: CI=true pnpm install
       - name: Install dependencies
         working-directory: frontend
-        run: npm ci
+        run: CI=true pnpm install
       - name: Check code formatting
         working-directory: frontend
-        run: npm run biome-ci
+        run: pnpm run biome-ci
       - name: Check feature sliced design architecture
         working-directory: frontend
-        run: npm run steiger
+        run: pnpm run steiger
       - name: Run tests
         working-directory: frontend
-        run: npm run test
+        run: pnpm run test
   check-commit-messages:
     runs-on: ubuntu-latest
     steps:
