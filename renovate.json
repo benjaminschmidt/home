@@ -1,7 +1,7 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["workarounds:javaLTSVersions"],
-  "minimumReleaseAge": "3 days",
+  "minimumReleaseAge": "5 days",
   "prHourlyLimit": 10,
   "prConcurrentLimit": 10,
   "packageRules": [
