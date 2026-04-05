@@ -104,6 +104,6 @@ jobs:
         with:
           fetch-depth: 0
       - name: Obtain next version
-        uses: https://github.com/benjaminschmidt/simple-semantic-release@1.2.2
+        uses: https://github.com/benjaminschmidt/simple-semantic-release@1.3.0
         with:
           create-release: false
