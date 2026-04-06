@@ -1,4 +1,1 @@
-export {
-	MuiThemeProvider,
-	type MuiThemeProviderProps,
-} from "./ThemeProvider.tsx";
+export { MuiThemeProvider } from "./ThemeProvider.tsx";

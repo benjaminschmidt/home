@@ -71,4 +71,4 @@ const Layout = ({ children }: LayoutProps) => {
 	);
 };
 
-export { Layout, type LayoutProps };
+export { Layout };

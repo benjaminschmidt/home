@@ -6,6 +6,9 @@ const themeDark = createTheme({
 	colorSchemes: {
 		dark: true,
 	},
+	shape: {
+		borderRadius: 12,
+	},
 });
 
 type MuiThemeProviderProps = {
@@ -21,4 +24,4 @@ const MuiThemeProvider = ({ children }: MuiThemeProviderProps) => {
 	);
 };
 
-export { MuiThemeProvider, type MuiThemeProviderProps };
+export { MuiThemeProvider };
