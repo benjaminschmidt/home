@@ -4,9 +4,7 @@ const Construction = () => {
 	return (
 		<Grid
 			container
-			justifyContent="center"
-			alignItems="center"
-			minHeight="80vh"
+			sx={{ justifyContent: "center", alignItems: "center", minHeight: "80vh" }}
 		>
 			<Chip label="Under construction" />
 		</Grid>

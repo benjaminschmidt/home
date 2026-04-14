@@ -1,11 +1,10 @@
-import { Apple } from "@mui/icons-material";
+import Apple from "@mui/icons-material/Apple";
 import RestaurantMenuIcon from "@mui/icons-material/RestaurantMenu";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
-import { useLocation } from "@tanstack/react-router";
-import type { ParsedLocation } from "@tanstack/router-core";
+import { type ParsedLocation, useLocation } from "@tanstack/react-router";
 import { RouterListItemButton } from "@/shared/ui/RouterListItemButton.tsx";
 
 const getCurrent = (location: ParsedLocation) => {

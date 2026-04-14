@@ -12,7 +12,7 @@
   "repository": "github:benjaminschmidt/home",
   "scripts": {
     "build": "openapi-ts && tsc",
-    "clean": "rimraf dist && rimraf src ",
+    "clean": "rimraf dist && rimraf src",
     "clean-build": "rimraf dist && rimraf src && openapi-ts && tsc",
     "preinstall": "npx only-allow pnpm"
   },
