@@ -58,7 +58,7 @@ jobs:
           tags: ${{ vars.SERVER_DOMAIN }}/${{ github.repository }}-maven:latest,
   run-backend-tests:
     needs: [ changes, build-maven-container ]
-    if: ${{ needs.changes.outputs.backend == 'true' || needs.changes.outputs.maven == 'true' || needs.changes.outputs.workflow == 'true' }}
+    if: ${{ needs.changes.outputs.api == 'true' || needs.changes.outputs.backend == 'true' || needs.changes.outputs.maven == 'true' || needs.changes.outputs.workflow == 'true' }}
     runs-on: ubuntu-latest
     container:
       image: ${{ vars.SERVER_DOMAIN }}/${{ github.repository }}-maven:latest
