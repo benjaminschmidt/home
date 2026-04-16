@@ -30,11 +30,11 @@ importers:
         specifier: 0.10.2
         version: 0.10.2(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(csstype@3.2.3)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(solid-js@1.9.12)
       '@tanstack/react-query':
-        specifier: 5.97.0
-        version: 5.97.0(react@19.2.5)
+        specifier: 5.98.0
+        version: 5.98.0(react@19.2.5)
       '@tanstack/react-query-devtools':
-        specifier: 5.97.0
-        version: 5.97.0(@tanstack/react-query@5.97.0(react@19.2.5))(react@19.2.5)
+        specifier: 5.98.0
+        version: 5.98.0(@tanstack/react-query@5.98.0(react@19.2.5))(react@19.2.5)
       '@tanstack/react-router':
         specifier: 1.168.15
         version: 1.168.15(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
@@ -856,11 +856,11 @@ packages:
     resolution: {integrity: sha512-NaOGLRrddszbQj9upGat6HG/4TKvXLvu+osAIgfxPYA+eIvYKv8GKDJOrY2D3/U9MRnKfMWD7bU4jeD4xmqyIg==}
     engines: {node: '>=20.19'}
 
-  '@tanstack/query-core@5.97.0':
-    resolution: {integrity: sha512-QdpLP5VzVMgo4VtaPppRA2W04UFjIqX+bxke/ZJhE5cfd5UPkRzqIAJQt9uXkQJjqE8LBOMbKv7f8HCsZltXlg==}
+  '@tanstack/query-core@5.98.0':
+    resolution: {integrity: sha512-v1g54qnirFVWMicVO6hurxez+YrJG3h9AQ6RZqlBhUZfNLRJjjxjjYcriL1s2xLGGNvE2IXpYlUzm22GXa1BQA==}
 
-  '@tanstack/query-devtools@5.97.0':
-    resolution: {integrity: sha512-ZMjAuYhQCKwKLKFMrD+HJDehHwWBVTGOuWBf4vEjR9unO+UGUjQ1mw2TuVbQKoLN/eRwB7qtlPsWBqobBoRBMQ==}
+  '@tanstack/query-devtools@5.98.0':
+    resolution: {integrity: sha512-6W2YE5L5Tj1VY0pgzdesvssh/50pdbPIC+5BVf9IXbcuwG+aAV/FRUVy45p7t+sxb8xUs4zSK3yEXbjx2b1QPQ==}
 
   '@tanstack/react-devtools@0.10.2':
     resolution: {integrity: sha512-1BmZyxOrI5SqmRJ5MgkYZNNdnlLsJxQRI2YgorrAvcF2MxK6x5RcuStvD8+YlXoMw3JtNukPxoITirKAnKYDQA==}
@@ -871,14 +871,14 @@ packages:
       react: '>=16.8'
       react-dom: '>=16.8'
 
-  '@tanstack/react-query-devtools@5.97.0':
-    resolution: {integrity: sha512-X4/VZKCbBIRj8cVD/oZCKTwwPmFXrY1VOfwUT5qI/+/JZYAUS+8vGNMqwBXbaAu1ZsVzzDzkT/wtBE/5OtQYGg==}
+  '@tanstack/react-query-devtools@5.98.0':
+    resolution: {integrity: sha512-VW0jv3lBfc57DM6x64JwkmV83ttMKK4kTt2rOP/EbsO9d31iTOYl/EvB3SvnmET06O02msn1gFQH69zqEawVZg==}
     peerDependencies:
-      '@tanstack/react-query': ^5.97.0
+      '@tanstack/react-query': ^5.98.0
       react: ^18 || ^19
 
-  '@tanstack/react-query@5.97.0':
-    resolution: {integrity: sha512-y4So4eGcQoK2WVMAcDNZE9ofB/p5v1OlKvtc1F3uqHwrtifobT7q+ZnXk2mRkc8E84HKYSlAE9z6HXl2V0+ySQ==}
+  '@tanstack/react-query@5.98.0':
+    resolution: {integrity: sha512-HnXce1ckrBH+ORRFtP5YQOYSFzb91KOhKw+UUSxI+sDr89wMfwUmyG0Ayc5EGRVJld40h65F6YzXaMucUXyU6g==}
     peerDependencies:
       react: ^18 || ^19
 
@@ -2933,9 +2933,9 @@ snapshots:
 
   '@tanstack/history@1.161.6': {}
 
-  '@tanstack/query-core@5.97.0': {}
+  '@tanstack/query-core@5.98.0': {}
 
-  '@tanstack/query-devtools@5.97.0': {}
+  '@tanstack/query-devtools@5.98.0': {}
 
   '@tanstack/react-devtools@0.10.2(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(csstype@3.2.3)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(solid-js@1.9.12)':
     dependencies:
@@ -2950,15 +2950,15 @@ snapshots:
       - solid-js
       - utf-8-validate
 
-  '@tanstack/react-query-devtools@5.97.0(@tanstack/react-query@5.97.0(react@19.2.5))(react@19.2.5)':
+  '@tanstack/react-query-devtools@5.98.0(@tanstack/react-query@5.98.0(react@19.2.5))(react@19.2.5)':
     dependencies:
-      '@tanstack/query-devtools': 5.97.0
-      '@tanstack/react-query': 5.97.0(react@19.2.5)
+      '@tanstack/query-devtools': 5.98.0
+      '@tanstack/react-query': 5.98.0(react@19.2.5)
       react: 19.2.5
 
-  '@tanstack/react-query@5.97.0(react@19.2.5)':
+  '@tanstack/react-query@5.98.0(react@19.2.5)':
     dependencies:
-      '@tanstack/query-core': 5.97.0
+      '@tanstack/query-core': 5.98.0
       react: 19.2.5
 
   '@tanstack/react-router-devtools@1.166.13(@tanstack/react-router@1.168.15(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@tanstack/router-core@1.168.11)(csstype@3.2.3)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)':
