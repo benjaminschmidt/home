@@ -30,11 +30,11 @@ importers:
         specifier: 0.10.2
         version: 0.10.2(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(csstype@3.2.3)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(solid-js@1.9.12)
       '@tanstack/react-query':
-        specifier: 5.100.1
-        version: 5.100.1(react@19.2.5)
+        specifier: 5.100.3
+        version: 5.100.3(react@19.2.5)
       '@tanstack/react-query-devtools':
-        specifier: 5.100.1
-        version: 5.100.1(@tanstack/react-query@5.100.1(react@19.2.5))(react@19.2.5)
+        specifier: 5.100.3
+        version: 5.100.3(@tanstack/react-query@5.100.3(react@19.2.5))(react@19.2.5)
       '@tanstack/react-router':
         specifier: 1.168.24
         version: 1.168.24(react-dom@19.2.5(react@19.2.5))(react@19.2.5)
@@ -856,11 +856,11 @@ packages:
     resolution: {integrity: sha512-NaOGLRrddszbQj9upGat6HG/4TKvXLvu+osAIgfxPYA+eIvYKv8GKDJOrY2D3/U9MRnKfMWD7bU4jeD4xmqyIg==}
     engines: {node: '>=20.19'}
 
-  '@tanstack/query-core@5.100.1':
-    resolution: {integrity: sha512-awvQhOO/2TrSCHE5LKKsXcvvj6WSBncwEcMFCB/ez0Qs0b17iyyivoGArNV3HFfXryZwCpnb/olsaBBKrIbtSw==}
+  '@tanstack/query-core@5.100.3':
+    resolution: {integrity: sha512-oMO1imV4qStH+GqddafkI7Q7r2ktPL7/0Mu74W1XEhfHHd3oTIrwP3OOIsbtpnnbe8y/IU+8Lm7Bi2LlMhVdNA==}
 
-  '@tanstack/query-devtools@5.100.1':
-    resolution: {integrity: sha512-jZLV2l7XjYxXCrXHj9pj15gZuY8Te+idoSPS2hIh3+SxOd20Gn0rfUoqEw9vc+us/b16hi0/DWqpzx9O1ZsyIQ==}
+  '@tanstack/query-devtools@5.100.3':
+    resolution: {integrity: sha512-RfLRX0R9yXYNbtt1OIIN4mObzTT8/jteljgioTMwSKRw6C84xrLjnDRIyIzMhUZxbCJHrgkXiD9IA8owiYFA9A==}
 
   '@tanstack/react-devtools@0.10.2':
     resolution: {integrity: sha512-1BmZyxOrI5SqmRJ5MgkYZNNdnlLsJxQRI2YgorrAvcF2MxK6x5RcuStvD8+YlXoMw3JtNukPxoITirKAnKYDQA==}
@@ -871,14 +871,14 @@ packages:
       react: '>=16.8'
       react-dom: '>=16.8'
 
-  '@tanstack/react-query-devtools@5.100.1':
-    resolution: {integrity: sha512-JuLinBUl/BlZhm0WVX83fJgE2a3YSbuEdxf3fgP+THg92hX7YfwuH5DzT35a6sL/rifZsPr0yJ9itB6jDOcdRg==}
+  '@tanstack/react-query-devtools@5.100.3':
+    resolution: {integrity: sha512-0h2rTSS8mwLDL5m7d2seKs4Gg3XShGiLXBfSDDYNrbJcxX6AHuiqbg9xBi2bWCNyhq0dGRIMay3sE6xn1SSCOQ==}
     peerDependencies:
-      '@tanstack/react-query': ^5.100.1
+      '@tanstack/react-query': ^5.100.3
       react: ^18 || ^19
 
-  '@tanstack/react-query@5.100.1':
-    resolution: {integrity: sha512-UgWRLhQKprC37SsO6y1zRabOqDmM2gsdTNPbqTT35yl7kOOhwXU4nyfOiGHXPwoEFJV1IpSk85hjIFjNFWVpzw==}
+  '@tanstack/react-query@5.100.3':
+    resolution: {integrity: sha512-8Fgb4vKmBHllRHUjz3ZOwgV0v9b7cxCdN5T0iFQvvWJJVs6xvaxHERO1BclTL03bbK8vZAuXVKN3IeVS1sUdeQ==}
     peerDependencies:
       react: ^18 || ^19
 
@@ -2918,9 +2918,9 @@ snapshots:
 
   '@tanstack/history@1.161.6': {}
 
-  '@tanstack/query-core@5.100.1': {}
+  '@tanstack/query-core@5.100.3': {}
 
-  '@tanstack/query-devtools@5.100.1': {}
+  '@tanstack/query-devtools@5.100.3': {}
 
   '@tanstack/react-devtools@0.10.2(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(csstype@3.2.3)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)(solid-js@1.9.12)':
     dependencies:
@@ -2935,15 +2935,15 @@ snapshots:
       - solid-js
       - utf-8-validate
 
-  '@tanstack/react-query-devtools@5.100.1(@tanstack/react-query@5.100.1(react@19.2.5))(react@19.2.5)':
+  '@tanstack/react-query-devtools@5.100.3(@tanstack/react-query@5.100.3(react@19.2.5))(react@19.2.5)':
     dependencies:
-      '@tanstack/query-devtools': 5.100.1
-      '@tanstack/react-query': 5.100.1(react@19.2.5)
+      '@tanstack/query-devtools': 5.100.3
+      '@tanstack/react-query': 5.100.3(react@19.2.5)
       react: 19.2.5
 
-  '@tanstack/react-query@5.100.1(react@19.2.5)':
+  '@tanstack/react-query@5.100.3(react@19.2.5)':
     dependencies:
-      '@tanstack/query-core': 5.100.1
+      '@tanstack/query-core': 5.100.3
       react: 19.2.5
 
   '@tanstack/react-router-devtools@1.166.13(@tanstack/react-router@1.168.24(react-dom@19.2.5(react@19.2.5))(react@19.2.5))(@tanstack/router-core@1.168.16)(csstype@3.2.3)(react-dom@19.2.5(react@19.2.5))(react@19.2.5)':
