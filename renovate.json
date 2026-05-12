@@ -1,9 +1,6 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": [
-    "workarounds:javaLTSVersions",
-    "helpers:pinGitHubActionDigests"
-  ],
+  "extends": ["workarounds:javaLTSVersions"],
   "minimumReleaseAge": "14 days",
   "prHourlyLimit": 10,
   "prConcurrentLimit": 10,
