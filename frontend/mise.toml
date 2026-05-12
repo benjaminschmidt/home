@@ -1,2 +1,5 @@
 [tools]
 node = "24.15.0"
+
+[settings]
+install_before = "14d"

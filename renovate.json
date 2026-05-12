@@ -1,13 +1,13 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
   "extends": ["workarounds:javaLTSVersions"],
-  "minimumReleaseAge": "5 days",
+  "minimumReleaseAge": "14 days",
   "prHourlyLimit": 10,
   "prConcurrentLimit": 10,
   "packageRules": [
     {
       "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
-      "automerge": false,
+      "automerge": true,
       "groupName": "non-major"
     },
     {
@@ -20,7 +20,7 @@
       "matchManagers": ["mise"],
       "matchDatasources": ["github-releases"],
       "matchPackageNames": ["apache/maven"],
-      "automerge": false,
+      "automerge": true,
       "extractVersion": "^maven-(?<version>.*)$"
     }
   ],
