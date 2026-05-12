@@ -7,7 +7,7 @@
   "packageRules": [
     {
       "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
-      "automerge": true,
+      "automerge": false,
       "groupName": "non-major"
     },
     {
@@ -20,7 +20,7 @@
       "matchManagers": ["mise"],
       "matchDatasources": ["github-releases"],
       "matchPackageNames": ["apache/maven"],
-      "automerge": true,
+      "automerge": false,
       "extractVersion": "^maven-(?<version>.*)$"
     }
   ],
