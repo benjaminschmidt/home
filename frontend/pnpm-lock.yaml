@@ -53,10 +53,16 @@ importers:
       react-dom:
         specifier: 19.2.6
         version: 19.2.6(react@19.2.6)
+      zod:
+        specifier: ^4.4.3
+        version: 4.4.3
     devDependencies:
       '@biomejs/biome':
         specifier: 2.4.15
         version: 2.4.15
+      '@faker-js/faker':
+        specifier: ^10.4.0
+        version: 10.4.0
       '@feature-sliced/steiger-plugin':
         specifier: 0.5.7
         version: 0.5.7(typescript@6.0.3)
@@ -84,6 +90,9 @@ importers:
       '@vitejs/plugin-react':
         specifier: 6.0.1
         version: 6.0.1(vite@8.0.12(@types/node@24.12.4)(jiti@2.7.0))
+      fishery:
+        specifier: ^2.4.0
+        version: 2.4.0
       jsdom:
         specifier: 29.1.1
         version: 29.1.1
@@ -388,6 +397,10 @@ packages:
     peerDependenciesMeta:
       '@noble/hashes':
         optional: true
+
+  '@faker-js/faker@10.4.0':
+    resolution: {integrity: sha512-sDBWI3yLy8EcDzgobvJTWq1MJYzAkQdpjXuPukga9wXonhpMRvd1Izuo2Qgwey2OiEoRIBr35RMU9HJRoOHzpw==}
+    engines: {node: ^20.19.0 || ^22.13.0 || ^23.5.0 || >=24.0.0, npm: '>=10'}
 
   '@feature-sliced/filesystem@3.0.1':
     resolution: {integrity: sha512-RlrfjhaX81o6E5OBc2A0tOLG/cZSOvcM+FpPlzEhTraIzBz8JmhxgwrYQbafMqiC+TOrqhd2pTLkU7PFQG1QdQ==}
@@ -1413,6 +1426,9 @@ packages:
   find-root@1.1.0:
     resolution: {integrity: sha512-NKfW6bec6GfKc0SGx1e07QZY9PE99u0Bft/0rzSD5k3sO/vwkVUpDUKVm5Gpp5Ue3YfShPFTX2070tDs5kB9Ng==}
 
+  fishery@2.4.0:
+    resolution: {integrity: sha512-QgeTlvgNhVGuMztrfAhlSIBs3rD3l9RMjl9I15yb/lnrx3njrOhvegr2L3LWdqvXwYfQjdQGpglyAfHH2J8DRA==}
+
   fsevents@2.3.3:
     resolution: {integrity: sha512-5xoDfX+fL7faATnagmWPpbFtwh/R77WmMMqqHGS65C3vvB0YHrgF+B1YmZ3441tMj5n63k0212XNoJwzlhffQw==}
     engines: {node: ^8.16.0 || ^10.6.0 || >=11.0.0}
@@ -1633,6 +1649,9 @@ packages:
 
   lodash-es@4.18.1:
     resolution: {integrity: sha512-J8xewKD/Gk22OZbhpOVSwcs60zhd95ESDwezOFuA3/099925PdHJ7OFHNTGtajL3AlZkykD32HykiMo+BIBI8A==}
+
+  lodash.mergewith@4.6.2:
+    resolution: {integrity: sha512-GK3g5RPZWTRSeLSpgP8Xhra+pnjBC56q9FZYe1d5RN3TJ35dbkGy3YqBSMbyCrlbi+CM9Z3Jk5yTL7RCsqboyQ==}
 
   loose-envify@1.4.0:
     resolution: {integrity: sha512-lyuxPGr/Wfhrlem2CL/UcnUc1zcqKAImBDzukY7Y5F/yQiNdko6+fRLevlw1HgMySw7f611UIY408EtxRSoK3Q==}
@@ -2202,6 +2221,9 @@ packages:
   zod@3.25.76:
     resolution: {integrity: sha512-gzUt/qt81nXsFGKIFcC3YnfEAx5NkunCfnDlvuBSSFS02bcXu4Lmea0AFIUwbLWxWPx3d9p8S5QoaujKcNQxcQ==}
 
+  zod@4.4.3:
+    resolution: {integrity: sha512-ytENFjIJFl2UwYglde2jchW2Hwm4GJFLDiSXWdTrJQBIN9Fcyp7n4DhxJEiWNAJMV1/BqWfW/kkg71UDcHJyTQ==}
+
 snapshots:
 
   '@adobe/css-tools@4.4.4': {}
@@ -2519,6 +2541,8 @@ snapshots:
   '@emotion/weak-memoize@0.4.0': {}
 
   '@exodus/bytes@1.15.0': {}
+
+  '@faker-js/faker@10.4.0': {}
 
   '@feature-sliced/filesystem@3.0.1':
     dependencies:
@@ -3482,6 +3506,10 @@ snapshots:
 
   find-root@1.1.0: {}
 
+  fishery@2.4.0:
+    dependencies:
+      lodash.mergewith: 4.6.2
+
   fsevents@2.3.3:
     optional: true
 
@@ -3667,6 +3695,8 @@ snapshots:
   lines-and-columns@1.2.4: {}
 
   lodash-es@4.18.1: {}
+
+  lodash.mergewith@4.6.2: {}
 
   loose-envify@1.4.0:
     dependencies:
@@ -4169,3 +4199,5 @@ snapshots:
       zod: 3.25.76
 
   zod@3.25.76: {}
+
+  zod@4.4.3: {}

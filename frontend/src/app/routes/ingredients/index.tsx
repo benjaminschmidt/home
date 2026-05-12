@@ -23,7 +23,7 @@ const IngredientsPage = () => {
 	);
 };
 
-const Route = createFileRoute("/ingredients")({
+const Route = createFileRoute("/ingredients/")({
 	component: IngredientsPage,
 	loader: ({ context: { queryClient } }) =>
 		queryClient.ensureInfiniteQueryData(ingredientsQueryOptions),

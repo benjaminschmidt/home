@@ -5,7 +5,7 @@ const unitSymbols: Record<GenericUnitDtoRoot, string> = {
 	MILLIGRAM: "mg",
 	KILOGRAM: "kg",
 	OUNCE: "oz",
-	POUND: "lb",
+	POUND: "lbs",
 	MILLILITER: "ml",
 	LITER: "l",
 	FLUID_OUNCE: "fl oz",

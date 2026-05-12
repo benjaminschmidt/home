@@ -1,5 +1,5 @@
 import type { IngredientVariantDtoRoot } from "home-api/dist/src";
-import { formatUnit } from "@/shared/lib/units";
+import { formatUnit } from "@/entities/ingredients";
 
 const getIngredientVariantDetail = (
 	label: string,

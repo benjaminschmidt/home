@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatUnit } from "@/shared/lib/units/formatUnit.ts";
+import { formatUnit } from "@/entities/ingredients/lib/formatUnit.ts";
 
 describe("formatUnit", () => {
 	it("returns undefined when called with no argument", () => {
@@ -23,7 +23,7 @@ describe("formatUnit", () => {
 	});
 
 	it("returns 'lb' for POUND", () => {
-		expect(formatUnit("POUND")).toBe("lb");
+		expect(formatUnit("POUND")).toBe("lbs");
 	});
 
 	it("returns 'ml' for MILLILITER", () => {

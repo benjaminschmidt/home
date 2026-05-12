@@ -20,6 +20,7 @@ properties:
     $ref: './VolumeUnitDto.yaml'
   ingredientVariants:
     type: array
+    description: "List of variants. Note: At most one variant in this list should have 'defaultVariant' set to true."
     items:
       $ref: './IngredientVariantDto.yaml'
   customUnits:
