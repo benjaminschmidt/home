@@ -104,6 +104,6 @@ jobs:
         with:
           fetch-depth: 0
       - name: Obtain next version
-        uses: https://forgejo.fuzzyhome.net/phaib/simple-semantic-release@1.3.0
+        uses: https://forgejo.fuzzyhome.net/phaib/simple-semantic-release@1.3.3
         with:
           create-release: false
