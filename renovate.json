@@ -1,25 +1,50 @@
 {
   "$schema": "https://docs.renovatebot.com/renovate-schema.json",
-  "extends": ["workarounds:javaLTSVersions"],
+  "extends": [
+    "workarounds:javaLTSVersions"
+  ],
   "minimumReleaseAge": "14 days",
+  "minimumReleaseAgeBehaviour": "timestamp-required",
   "prHourlyLimit": 10,
   "prConcurrentLimit": 10,
   "packageRules": [
     {
-      "matchUpdateTypes": ["minor", "patch", "pin", "digest"],
+      "matchUpdateTypes": [
+        "minor",
+        "patch",
+        "pin",
+        "digest"
+      ],
       "automerge": true,
       "groupName": "non-major"
     },
     {
-      "matchManagers": ["mise"],
-      "matchDatasources": ["java-version"],
+      "matchRegistryUrls": [
+        "https://forgejo.fuzzyhome.net/**"
+      ],
+      "minimumReleaseAge": "0 days",
+      "minimumReleaseAgeBehaviour": "timestamp-optional"
+    },
+    {
+      "matchManagers": [
+        "mise"
+      ],
+      "matchDatasources": [
+        "java-version"
+      ],
       "minimumReleaseAgeBehaviour": "timestamp-optional",
       "automerge": false
     },
     {
-      "matchManagers": ["mise"],
-      "matchDatasources": ["github-releases"],
-      "matchPackageNames": ["apache/maven"],
+      "matchManagers": [
+        "mise"
+      ],
+      "matchDatasources": [
+        "github-releases"
+      ],
+      "matchPackageNames": [
+        "apache/maven"
+      ],
       "automerge": true,
       "extractVersion": "^maven-(?<version>.*)$"
     }
