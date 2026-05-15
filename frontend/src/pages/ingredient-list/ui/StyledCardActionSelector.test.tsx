@@ -1,6 +1,6 @@
 import { render } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
-import { StyledCardActionSelector } from "./StyledCardActionSelector.tsx";
+import { StyledCardActionSelector } from "@/pages/ingredient-list/ui/StyledCardActionSelector.tsx";
 
 describe("StyledCardActionSelector", () => {
 	test("renders null when options is empty", () => {

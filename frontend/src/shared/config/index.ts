@@ -1,1 +1,1 @@
-export { MuiThemeProvider } from "./ThemeProvider.tsx";
+export { MuiThemeProvider } from "@/shared/config/ThemeProvider.tsx";

@@ -9,9 +9,7 @@ import "@fontsource/roboto/300.css";
 import "@fontsource/roboto/400.css";
 import "@fontsource/roboto/500.css";
 import "@fontsource/roboto/700.css";
-
-// Import the generated route tree
-import { routeTree } from "./routeTree.gen";
+import { routeTree } from "@/app/entrypoint/routeTree.gen.ts";
 
 // Initialize client for backend fetching
 console.log("Using the api at", import.meta.env.VITE_API_BASE_URL);

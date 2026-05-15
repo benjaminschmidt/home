@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { formatUnit } from "./formatUnit.ts";
+import { formatUnit } from "@/shared/lib/units/formatUnit.ts";
 
 describe("formatUnit", () => {
 	it("returns undefined when called with no argument", () => {

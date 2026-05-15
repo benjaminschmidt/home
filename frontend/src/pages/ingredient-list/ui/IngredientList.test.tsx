@@ -2,7 +2,7 @@ import { render, screen } from "@testing-library/react";
 import type { IngredientDtoRoot } from "home-api/dist/src";
 import type { ReactNode } from "react";
 import { describe, expect, test, vi } from "vitest";
-import { IngredientList } from "../ui/IngredientList.tsx";
+import { IngredientList } from "@/pages/ingredient-list";
 
 // noinspection JSUnusedGlobalSymbols
 vi.mock("@tanstack/react-router", () => ({

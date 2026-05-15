@@ -5,8 +5,8 @@ import IconButton from "@mui/material/IconButton";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import { type ReactNode, useState } from "react";
-import { drawerWidth } from "../config/drawerConfig.ts";
-import { MenuDrawer } from "./MenuDrawer.tsx";
+import { drawerWidth } from "@/widgets/layout/config/drawerConfig.ts";
+import { MenuDrawer } from "@/widgets/layout/ui/MenuDrawer.tsx";
 
 type LayoutProps = {
 	children: ReactNode;

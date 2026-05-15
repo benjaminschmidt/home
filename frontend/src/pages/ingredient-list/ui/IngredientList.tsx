@@ -1,7 +1,7 @@
 import List from "@mui/material/List";
 import type { IngredientDtoRoot } from "home-api/dist/src";
 import type { RefObject } from "react";
-import { IngredientListItem } from "./IngredientListItem";
+import { IngredientListItem } from "@/pages/ingredient-list/ui/IngredientListItem.tsx";
 
 type IngredientListProps = {
 	ingredients: IngredientDtoRoot[];

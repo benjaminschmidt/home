@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getIngredientVariantDetailArray } from "./details.ts";
+import { getIngredientVariantDetailArray } from "@/pages/ingredient-list/lib/details.ts";
 
 describe("getIngredientVariantDetailArray", () => {
 	it("returns em-dashes for all fields when called with no argument", () => {

@@ -1,6 +1,6 @@
 import { render } from "@testing-library/react";
 import { describe, expect, test } from "vitest";
-import { DetailGrid } from "./DetailGrid.tsx";
+import { DetailGrid } from "@/pages/ingredient-list/ui/DetailGrid.tsx";
 
 describe("DetailGrid", () => {
 	test("renders a single row", () => {

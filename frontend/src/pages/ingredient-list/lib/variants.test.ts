@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { getIngredientVariantOptions } from "./variants.ts";
+import { getIngredientVariantOptions } from "@/pages/ingredient-list/lib/variants.ts";
 
 describe("getIngredientVariantOptions", () => {
 	it("maps a single variant to the correct option shape", () => {

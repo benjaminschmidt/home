@@ -1,6 +1,6 @@
 import { render } from "@testing-library/react";
 import { describe, expect, test } from "vitest";
-import { StyledCardHeader } from "./StyledCardHeader.tsx";
+import { StyledCardHeader } from "@/pages/ingredient-list/ui/StyledCardHeader.tsx";
 
 describe("StyledCardHeader", () => {
 	test("renders the title text", () => {

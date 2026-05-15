@@ -7,11 +7,11 @@ import type {
 	IngredientVariantDtoRoot,
 } from "home-api/dist/src";
 import { useState } from "react";
-import { getIngredientVariantDetailArray } from "../lib/details.ts";
-import { getIngredientVariantOptions } from "../lib/variants.ts";
-import { DetailGrid } from "./DetailGrid.tsx";
-import { StyledCardActionSelector } from "./StyledCardActionSelector.tsx";
-import { StyledCardHeader } from "./StyledCardHeader.tsx";
+import { getIngredientVariantDetailArray } from "@/pages/ingredient-list/lib/details.ts";
+import { getIngredientVariantOptions } from "@/pages/ingredient-list/lib/variants.ts";
+import { DetailGrid } from "@/pages/ingredient-list/ui/DetailGrid.tsx";
+import { StyledCardActionSelector } from "@/pages/ingredient-list/ui/StyledCardActionSelector.tsx";
+import { StyledCardHeader } from "@/pages/ingredient-list/ui/StyledCardHeader.tsx";
 
 type IngredientListItemProps = {
 	ingredient: IngredientDtoRoot;

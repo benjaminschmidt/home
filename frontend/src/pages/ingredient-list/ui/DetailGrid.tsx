@@ -1,5 +1,5 @@
 import Stack from "@mui/material/Stack";
-import { DetailRow } from "./DetailRow.tsx";
+import { DetailRow } from "@/pages/ingredient-list/ui/DetailRow.tsx";
 
 type DetailGridProps = {
 	detailArray: {

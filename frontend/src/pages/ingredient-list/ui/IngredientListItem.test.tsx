@@ -1,6 +1,6 @@
 import { render } from "@testing-library/react";
 import { describe, expect, test } from "vitest";
-import { IngredientListItem } from "./IngredientListItem.tsx";
+import { IngredientListItem } from "@/pages/ingredient-list/ui/IngredientListItem.tsx";
 
 describe("IngredientListItem", () => {
 	test("renders the ingredient name", () => {
