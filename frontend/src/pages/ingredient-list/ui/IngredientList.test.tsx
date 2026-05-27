@@ -12,6 +12,7 @@ vi.mock("@tanstack/react-router", () => ({
 
 describe("IngredientList", () => {
 	test("renders", () => {
+		// given
 		const ingredients: IngredientDtoRoot[] = [
 			{
 				name: "Ingredient 1",
@@ -21,7 +22,10 @@ describe("IngredientList", () => {
 			},
 		];
 
+		// when
 		render(<IngredientList ingredients={ingredients} />);
+
+		// then
 		expect(screen.getByText("Ingredient 1")).toBeDefined();
 		expect(screen.getByText("Ingredient 2")).toBeDefined();
 	});

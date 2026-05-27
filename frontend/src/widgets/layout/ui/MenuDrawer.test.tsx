@@ -16,6 +16,7 @@ describe("MenuDrawer", () => {
 	});
 
 	it("renders mobile drawer", async () => {
+		// when
 		render(
 			<MenuDrawer
 				mobileOpen={true}
@@ -24,10 +25,12 @@ describe("MenuDrawer", () => {
 			/>,
 		);
 
+		// then
 		expect(await screen.findByLabelText("mobile-navigation")).toBeVisible();
 	});
 
 	it("mobile drawer is hidden", async () => {
+		// when
 		render(
 			<MenuDrawer
 				mobileOpen={false}
@@ -36,6 +39,7 @@ describe("MenuDrawer", () => {
 			/>,
 		);
 
+		// then
 		expect(await screen.findByLabelText("mobile-navigation")).toHaveAttribute(
 			"aria-hidden",
 			"true",
@@ -43,6 +47,7 @@ describe("MenuDrawer", () => {
 	});
 
 	it("desktop drawer is visible", async () => {
+		// when
 		render(
 			<MenuDrawer
 				mobileOpen={false}
@@ -51,6 +56,7 @@ describe("MenuDrawer", () => {
 			/>,
 		);
 
+		// then
 		expect(await screen.findByLabelText("desktop-navigation")).toBeVisible();
 	});
 });

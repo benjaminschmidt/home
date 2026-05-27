@@ -4,22 +4,30 @@ import { DetailGrid } from "@/pages/ingredient-list/ui/DetailGrid.tsx";
 
 describe("DetailGrid", () => {
 	test("renders a single row", () => {
+		// when
 		const { container } = render(
 			<DetailGrid detailArray={[{ label: "Calories", value: "250 kcal" }]} />,
 		);
+
+		// then
 		expect(container.querySelector("dt")?.textContent).toBe("Calories:");
 		expect(container.querySelector("dd")?.textContent).toBe("250 kcal");
 	});
 
 	test("renders all rows for multiple items", () => {
+		// given
 		const detailArray = [
 			{ label: "Calories", value: "250 kcal" },
 			{ label: "Fat", value: "5 g" },
 			{ label: "Protein", value: "10 g" },
 		];
+
+		// when
 		const { container } = render(<DetailGrid detailArray={detailArray} />);
 		const dts = container.querySelectorAll("dt");
 		const dds = container.querySelectorAll("dd");
+
+		// then
 		expect(dts).toHaveLength(3);
 		expect(dds).toHaveLength(3);
 		expect(dts[0].textContent).toBe("Calories:");

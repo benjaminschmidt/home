@@ -19,9 +19,13 @@ describe("MenuDrawerContent", () => {
 	});
 
 	it('selects the Recipes tab for "/recipes"', async () => {
+		// given
 		mockPathname = "/recipes";
+
+		// when
 		render(<MenuDrawerContent />);
 
+		// then
 		expect(screen.getByRole("link", { name: /recipes/i })).toHaveAttribute(
 			"aria-selected",
 			"true",
@@ -33,9 +37,13 @@ describe("MenuDrawerContent", () => {
 	});
 
 	it('selects the Recipes tab for "/"', async () => {
+		// given
 		mockPathname = "/";
+
+		// when
 		render(<MenuDrawerContent />);
 
+		// then
 		expect(screen.getByRole("link", { name: /recipes/i })).toHaveAttribute(
 			"aria-selected",
 			"true",
@@ -47,9 +55,13 @@ describe("MenuDrawerContent", () => {
 	});
 
 	it('selects the Ingredients tab for "/ingredients"', async () => {
+		// given
 		mockPathname = "/ingredients";
+
+		// when
 		render(<MenuDrawerContent />);
 
+		// then
 		expect(screen.getByRole("link", { name: /recipes/i })).toHaveAttribute(
 			"aria-selected",
 			"false",

@@ -4,7 +4,10 @@ import { StyledCardHeader } from "@/pages/ingredient-list/ui/StyledCardHeader.ts
 
 describe("StyledCardHeader", () => {
 	test("renders the title text", () => {
+		// when
 		const { container } = render(<StyledCardHeader title="Chicken Breast" />);
+
+		// then
 		expect(container.textContent).toContain("Chicken Breast");
 	});
 });

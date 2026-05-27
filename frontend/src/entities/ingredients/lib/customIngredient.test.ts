@@ -8,11 +8,13 @@ import {
 
 describe("getCustomIngredient", () => {
 	it("returns ingredient with only name when no variants exist", () => {
+		// given
 		const ingredient = ingredientFactory.build({
 			ingredientVariants: [],
 		});
 		const errorContext: string[] = [];
 
+		// when
 		const result = getCustomIngredient(
 			ingredient,
 			undefined,
@@ -21,6 +23,7 @@ describe("getCustomIngredient", () => {
 			errorContext,
 		);
 
+		// then
 		expect(result.name).toBe(ingredient.name);
 		expect(result.servingSize).toBeUndefined();
 		expect(result.unit).toBeUndefined();
@@ -30,6 +33,7 @@ describe("getCustomIngredient", () => {
 
 	describe("when variant has missing data", () => {
 		it("copies ingredient when variant servingSize is missing", () => {
+			// given
 			const variant = ingredientVariantFactory.build({
 				servingSize: undefined,
 			});
@@ -38,6 +42,7 @@ describe("getCustomIngredient", () => {
 			});
 			const errorContext: string[] = [];
 
+			// when
 			const result = getCustomIngredient(
 				ingredient,
 				variant.id,
@@ -46,6 +51,7 @@ describe("getCustomIngredient", () => {
 				errorContext,
 			);
 
+			// then
 			expect(result.name).toBe(ingredient.name);
 			expect(result.servingSize).toBeUndefined();
 			expect(errorContext).toContain(
@@ -54,12 +60,14 @@ describe("getCustomIngredient", () => {
 		});
 
 		it("copies ingredient when variant servingSize is 0", () => {
+			// given
 			const variant = ingredientVariantFactory.build({ servingSize: 0 });
 			const ingredient = ingredientFactory.build({
 				ingredientVariants: [variant],
 			});
 			const errorContext: string[] = [];
 
+			// when
 			const result = getCustomIngredient(
 				ingredient,
 				variant.id,
@@ -68,6 +76,7 @@ describe("getCustomIngredient", () => {
 				errorContext,
 			);
 
+			// then
 			expect(result.name).toBe(ingredient.name);
 			expect(result.servingSize).toBe(0);
 			expect(errorContext).toContain(
@@ -76,12 +85,14 @@ describe("getCustomIngredient", () => {
 		});
 
 		it("copies ingredient when variant unit is missing", () => {
+			// given
 			const variant = ingredientVariantFactory.build({ unit: undefined });
 			const ingredient = ingredientFactory.build({
 				ingredientVariants: [variant],
 			});
 			const errorContext: string[] = [];
 
+			// when
 			const result = getCustomIngredient(
 				ingredient,
 				variant.id,
@@ -90,6 +101,7 @@ describe("getCustomIngredient", () => {
 				errorContext,
 			);
 
+			// then
 			expect(result.name).toBe(ingredient.name);
 			expect(errorContext).toContain("Unit is missing on ingredient variant.");
 		});
@@ -97,6 +109,7 @@ describe("getCustomIngredient", () => {
 
 	describe("when using default variant values", () => {
 		it("returns recalculated ingredient with variant's serving size and unit", () => {
+			// given
 			const variant = ingredientVariantFactory.build({
 				unit: "GRAM",
 				servingSize: 100,
@@ -107,6 +120,7 @@ describe("getCustomIngredient", () => {
 			});
 			const errorContext: string[] = [];
 
+			// when
 			const result = getCustomIngredient(
 				ingredient,
 				variant.id,
@@ -115,6 +129,7 @@ describe("getCustomIngredient", () => {
 				errorContext,
 			);
 
+			// then
 			expect(result.name).toBe(ingredient.name);
 			expect(result.servingSize).toBe(100);
 			expect(result.unit).toBe("GRAM");
@@ -123,6 +138,7 @@ describe("getCustomIngredient", () => {
 		});
 
 		it("uses default variant when no variantId is provided", () => {
+			// given
 			const variant = ingredientVariantFactory.build({
 				defaultVariant: true,
 				unit: "GRAM",
@@ -134,6 +150,7 @@ describe("getCustomIngredient", () => {
 			});
 			const errorContext: string[] = [];
 
+			// when
 			const result = getCustomIngredient(
 				ingredient,
 				undefined,
@@ -142,6 +159,7 @@ describe("getCustomIngredient", () => {
 				errorContext,
 			);
 
+			// then
 			expect(result.name).toBe(ingredient.name);
 			expect(result.calories).toBeCloseTo(150);
 			expect(errorContext).toHaveLength(0);
@@ -149,6 +167,7 @@ describe("getCustomIngredient", () => {
 	});
 
 	it("scales nutrients proportionally to a custom serving size", () => {
+		// given
 		const variant = ingredientVariantFactory.build({
 			unit: "GRAM",
 			servingSize: 100,
@@ -160,6 +179,7 @@ describe("getCustomIngredient", () => {
 		});
 		const errorContext: string[] = [];
 
+		// when
 		const result = getCustomIngredient(
 			ingredient,
 			variant.id,
@@ -168,6 +188,7 @@ describe("getCustomIngredient", () => {
 			errorContext,
 		);
 
+		// then
 		expect(result.servingSize).toBe(50);
 		expect(result.calories).toBeCloseTo(100);
 		expect(result.protein).toBeCloseTo(5);
@@ -176,6 +197,7 @@ describe("getCustomIngredient", () => {
 
 	describe("when using a generic unit conversion", () => {
 		it("converts nutrients when switching from GRAM to KILOGRAM", () => {
+			// given
 			const variant = ingredientVariantFactory.build({
 				unit: "GRAM",
 				servingSize: 100,
@@ -186,6 +208,7 @@ describe("getCustomIngredient", () => {
 			});
 			const errorContext: string[] = [];
 
+			// when
 			const result = getCustomIngredient(
 				ingredient,
 				variant.id,
@@ -194,6 +217,7 @@ describe("getCustomIngredient", () => {
 				errorContext,
 			);
 
+			// then
 			expect(result.unit).toBe("KILOGRAM");
 			expect(result.servingSize).toBe(2);
 			expect(result.calories).toBeCloseTo(4000);
@@ -201,6 +225,7 @@ describe("getCustomIngredient", () => {
 		});
 
 		it("returns copied ingredient when cross-category unit conversion is requested", () => {
+			// given
 			const variant = ingredientVariantFactory.build({
 				unit: "GRAM",
 				servingSize: 100,
@@ -211,6 +236,7 @@ describe("getCustomIngredient", () => {
 			});
 			const errorContext: string[] = [];
 
+			// when
 			const result = getCustomIngredient(
 				ingredient,
 				variant.id,
@@ -219,6 +245,7 @@ describe("getCustomIngredient", () => {
 				errorContext,
 			);
 
+			// then
 			expect(result.name).toBe(ingredient.name);
 			expect(result.calories).toBe(variant.calories);
 			expect(errorContext).contains(
@@ -229,6 +256,7 @@ describe("getCustomIngredient", () => {
 
 	describe("when using a custom unit", () => {
 		it("recalculates nutrients using the custom unit conversion factor", () => {
+			// given
 			const customUnit = customUnitFactory.build({
 				name: "slice",
 				conversionUnit: "GRAM",
@@ -245,6 +273,7 @@ describe("getCustomIngredient", () => {
 			});
 			const errorContext: string[] = [];
 
+			// when
 			const result = getCustomIngredient(
 				ingredient,
 				variant.id,
@@ -253,6 +282,7 @@ describe("getCustomIngredient", () => {
 				errorContext,
 			);
 
+			// then
 			expect(result.unit).toBe("slice");
 			expect(result.servingSize).toBe(1);
 			expect(result.calories).toBeCloseTo(60);
@@ -260,6 +290,7 @@ describe("getCustomIngredient", () => {
 		});
 
 		it("returns copied ingredient when custom unit is not found", () => {
+			// given
 			const variant = ingredientVariantFactory.build({
 				unit: "GRAM",
 				servingSize: 100,
@@ -271,6 +302,7 @@ describe("getCustomIngredient", () => {
 			});
 			const errorContext: string[] = [];
 
+			// when
 			const result = getCustomIngredient(
 				ingredient,
 				variant.id,
@@ -279,6 +311,7 @@ describe("getCustomIngredient", () => {
 				errorContext,
 			);
 
+			// then
 			expect(result.calories).toBe(variant.calories);
 			expect(errorContext).contains(
 				"Custom unit non-existent-unit is missing.",

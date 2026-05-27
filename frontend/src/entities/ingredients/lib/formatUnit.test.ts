@@ -3,50 +3,98 @@ import { formatUnit } from "@/entities/ingredients/lib/formatUnit.ts";
 
 describe("formatUnit", () => {
 	it("returns undefined when called with no argument", () => {
-		expect(formatUnit()).toBeUndefined();
+		// when
+		const result = formatUnit();
+
+		// then
+		expect(result).toBeUndefined();
 	});
 
 	it("returns 'g' for GRAM", () => {
-		expect(formatUnit("GRAM")).toBe("g");
+		// when
+		const result = formatUnit("GRAM");
+
+		// then
+		expect(result).toBe("g");
 	});
 
 	it("returns 'mg' for MILLIGRAM", () => {
-		expect(formatUnit("MILLIGRAM")).toBe("mg");
+		// when
+		const result = formatUnit("MILLIGRAM");
+
+		// then
+		expect(result).toBe("mg");
 	});
 
 	it("returns 'kg' for KILOGRAM", () => {
-		expect(formatUnit("KILOGRAM")).toBe("kg");
+		// when
+		const result = formatUnit("KILOGRAM");
+
+		// then
+		expect(result).toBe("kg");
 	});
 
 	it("returns 'oz' for OUNCE", () => {
-		expect(formatUnit("OUNCE")).toBe("oz");
+		// when
+		const result = formatUnit("OUNCE");
+
+		// then
+		expect(result).toBe("oz");
 	});
 
 	it("returns 'lb' for POUND", () => {
-		expect(formatUnit("POUND")).toBe("lbs");
+		// when
+		const result = formatUnit("POUND");
+
+		// then
+		expect(result).toBe("lbs");
 	});
 
 	it("returns 'ml' for MILLILITER", () => {
-		expect(formatUnit("MILLILITER")).toBe("ml");
+		// when
+		const result = formatUnit("MILLILITER");
+
+		// then
+		expect(result).toBe("ml");
 	});
 
 	it("returns 'l' for LITER", () => {
-		expect(formatUnit("LITER")).toBe("l");
+		// when
+		const result = formatUnit("LITER");
+
+		// then
+		expect(result).toBe("l");
 	});
 
 	it("returns 'fl oz' for FLUID_OUNCE", () => {
-		expect(formatUnit("FLUID_OUNCE")).toBe("fl oz");
+		// when
+		const result = formatUnit("FLUID_OUNCE");
+
+		// then
+		expect(result).toBe("fl oz");
 	});
 
 	it("returns 'tsp' for TEASPOON", () => {
-		expect(formatUnit("TEASPOON")).toBe("tsp");
+		// when
+		const result = formatUnit("TEASPOON");
+
+		// then
+		expect(result).toBe("tsp");
 	});
 
 	it("returns 'tbsp' for TABLESPOON", () => {
-		expect(formatUnit("TABLESPOON")).toBe("tbsp");
+		// when
+		const result = formatUnit("TABLESPOON");
+
+		// then
+		expect(result).toBe("tbsp");
 	});
 
 	it("returns 'cup' for CUP", () => {
-		expect(formatUnit("CUP")).toBe("cup");
+		// when
+		const result = formatUnit("CUP");
+
+		// then
+		expect(result).toBe("cup");
 	});
 });

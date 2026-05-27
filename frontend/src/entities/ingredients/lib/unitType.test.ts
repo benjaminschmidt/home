@@ -7,126 +7,246 @@ import {
 
 describe("isGenericUnit", () => {
 	it("returns true for GRAM", () => {
-		expect(isGenericUnit("GRAM")).toBe(true);
+		// when
+		const result = isGenericUnit("GRAM");
+
+		// then
+		expect(result).toBe(true);
 	});
 
 	it("returns true for MILLIGRAM", () => {
-		expect(isGenericUnit("MILLIGRAM")).toBe(true);
+		// when
+		const result = isGenericUnit("MILLIGRAM");
+
+		// then
+		expect(result).toBe(true);
 	});
 
 	it("returns true for KILOGRAM", () => {
-		expect(isGenericUnit("KILOGRAM")).toBe(true);
+		// when
+		const result = isGenericUnit("KILOGRAM");
+
+		// then
+		expect(result).toBe(true);
 	});
 
 	it("returns true for OUNCE", () => {
-		expect(isGenericUnit("OUNCE")).toBe(true);
+		// when
+		const result = isGenericUnit("OUNCE");
+
+		// then
+		expect(result).toBe(true);
 	});
 
 	it("returns true for POUND", () => {
-		expect(isGenericUnit("POUND")).toBe(true);
+		// when
+		const result = isGenericUnit("POUND");
+
+		// then
+		expect(result).toBe(true);
 	});
 
 	it("returns true for MILLILITER", () => {
-		expect(isGenericUnit("MILLILITER")).toBe(true);
+		// when
+		const result = isGenericUnit("MILLILITER");
+
+		// then
+		expect(result).toBe(true);
 	});
 
 	it("returns true for LITER", () => {
-		expect(isGenericUnit("LITER")).toBe(true);
+		// when
+		const result = isGenericUnit("LITER");
+
+		// then
+		expect(result).toBe(true);
 	});
 
 	it("returns true for FLUID_OUNCE", () => {
-		expect(isGenericUnit("FLUID_OUNCE")).toBe(true);
+		// when
+		const result = isGenericUnit("FLUID_OUNCE");
+
+		// then
+		expect(result).toBe(true);
 	});
 
 	it("returns true for TEASPOON", () => {
-		expect(isGenericUnit("TEASPOON")).toBe(true);
+		// when
+		const result = isGenericUnit("TEASPOON");
+
+		// then
+		expect(result).toBe(true);
 	});
 
 	it("returns true for TABLESPOON", () => {
-		expect(isGenericUnit("TABLESPOON")).toBe(true);
+		// when
+		const result = isGenericUnit("TABLESPOON");
+
+		// then
+		expect(result).toBe(true);
 	});
 
 	it("returns true for CUP", () => {
-		expect(isGenericUnit("CUP")).toBe(true);
+		// when
+		const result = isGenericUnit("CUP");
+
+		// then
+		expect(result).toBe(true);
 	});
 
 	it("returns false for an unknown value", () => {
-		expect(isGenericUnit("UNKNOWN")).toBe(false);
+		// when
+		const result = isGenericUnit("UNKNOWN");
+
+		// then
+		expect(result).toBe(false);
 	});
 
 	it("returns false for an empty string", () => {
-		expect(isGenericUnit("")).toBe(false);
+		// when
+		const result = isGenericUnit("");
+
+		// then
+		expect(result).toBe(false);
 	});
 });
 
 describe("isVolumeUnit", () => {
 	it("returns true for MILLILITER", () => {
-		expect(isVolumeUnit("MILLILITER")).toBe(true);
+		// when
+		const result = isVolumeUnit("MILLILITER");
+
+		// then
+		expect(result).toBe(true);
 	});
 
 	it("returns true for LITER", () => {
-		expect(isVolumeUnit("LITER")).toBe(true);
+		// when
+		const result = isVolumeUnit("LITER");
+
+		// then
+		expect(result).toBe(true);
 	});
 
 	it("returns true for FLUID_OUNCE", () => {
-		expect(isVolumeUnit("FLUID_OUNCE")).toBe(true);
+		// when
+		const result = isVolumeUnit("FLUID_OUNCE");
+
+		// then
+		expect(result).toBe(true);
 	});
 
 	it("returns true for TEASPOON", () => {
-		expect(isVolumeUnit("TEASPOON")).toBe(true);
+		// when
+		const result = isVolumeUnit("TEASPOON");
+
+		// then
+		expect(result).toBe(true);
 	});
 
 	it("returns true for TABLESPOON", () => {
-		expect(isVolumeUnit("TABLESPOON")).toBe(true);
+		// when
+		const result = isVolumeUnit("TABLESPOON");
+
+		// then
+		expect(result).toBe(true);
 	});
 
 	it("returns true for CUP", () => {
-		expect(isVolumeUnit("CUP")).toBe(true);
+		// when
+		const result = isVolumeUnit("CUP");
+
+		// then
+		expect(result).toBe(true);
 	});
 
 	it("returns false for GRAM", () => {
-		expect(isVolumeUnit("GRAM")).toBe(false);
+		// when
+		const result = isVolumeUnit("GRAM");
+
+		// then
+		expect(result).toBe(false);
 	});
 
 	it("returns false for an unknown value", () => {
-		expect(isVolumeUnit("UNKNOWN")).toBe(false);
+		// when
+		const result = isVolumeUnit("UNKNOWN");
+
+		// then
+		expect(result).toBe(false);
 	});
 
 	it("returns false for an empty string", () => {
-		expect(isVolumeUnit("")).toBe(false);
+		// when
+		const result = isVolumeUnit("");
+
+		// then
+		expect(result).toBe(false);
 	});
 });
 
 describe("isWeightUnit", () => {
 	it("returns true for GRAM", () => {
-		expect(isWeightUnit("GRAM")).toBe(true);
+		// when
+		const result = isWeightUnit("GRAM");
+
+		// then
+		expect(result).toBe(true);
 	});
 
 	it("returns true for MILLIGRAM", () => {
-		expect(isWeightUnit("MILLIGRAM")).toBe(true);
+		// when
+		const result = isWeightUnit("MILLIGRAM");
+
+		// then
+		expect(result).toBe(true);
 	});
 
 	it("returns true for KILOGRAM", () => {
-		expect(isWeightUnit("KILOGRAM")).toBe(true);
+		// when
+		const result = isWeightUnit("KILOGRAM");
+
+		// then
+		expect(result).toBe(true);
 	});
 
 	it("returns true for OUNCE", () => {
-		expect(isWeightUnit("OUNCE")).toBe(true);
+		// when
+		const result = isWeightUnit("OUNCE");
+
+		// then
+		expect(result).toBe(true);
 	});
 
 	it("returns true for POUND", () => {
-		expect(isWeightUnit("POUND")).toBe(true);
+		// when
+		const result = isWeightUnit("POUND");
+
+		// then
+		expect(result).toBe(true);
 	});
 
 	it("returns false for MILLILITER", () => {
-		expect(isWeightUnit("MILLILITER")).toBe(false);
+		// when
+		const result = isWeightUnit("MILLILITER");
+
+		// then
+		expect(result).toBe(false);
 	});
 
 	it("returns false for an unknown value", () => {
-		expect(isWeightUnit("UNKNOWN")).toBe(false);
+		// when
+		const result = isWeightUnit("UNKNOWN");
+
+		// then
+		expect(result).toBe(false);
 	});
 
 	it("returns false for an empty string", () => {
-		expect(isWeightUnit("")).toBe(false);
+		// when
+		const result = isWeightUnit("");
+
+		// then
+		expect(result).toBe(false);
 	});
 });

@@ -11,7 +11,10 @@ vi.mock("@tanstack/react-router", () => ({
 
 describe("Construction", () => {
 	test("renders", () => {
+		// when
 		render(<Construction />);
+
+		// then
 		expect(screen.getByText("Under construction")).toBeDefined();
 	});
 });
