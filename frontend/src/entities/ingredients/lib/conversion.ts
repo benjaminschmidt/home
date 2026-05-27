@@ -144,7 +144,7 @@ const calculateConversionFactorFromDefaultUnitToCustomUnit = (
 		return undefined;
 	}
 
-	if (customUnit.conversionUnitToCustomUnitFactor == null) {
+	if (customUnit.customUnitToConversionUnitFactor == null) {
 		errorContext.push("Conversion unit to custom unit factor is undefined.");
 		return undefined;
 	}
@@ -157,7 +157,7 @@ const calculateConversionFactorFromDefaultUnitToCustomUnit = (
 	);
 
 	return factor !== undefined
-		? factor * customUnit.conversionUnitToCustomUnitFactor
+		? factor / customUnit.customUnitToConversionUnitFactor
 		: undefined;
 };
 

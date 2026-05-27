@@ -9,5 +9,5 @@ To build the artifact with a non-snapshot version, one needs to explicitly add t
 # Running a local postgres development db:
 
 ```shell
-   podman kube play postgres.yaml --network=slirp4netns
+   podman kube play postgres.yaml
 ```

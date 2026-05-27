@@ -232,7 +232,7 @@ describe("getCustomIngredient", () => {
 			const customUnit = customUnitFactory.build({
 				name: "slice",
 				conversionUnit: "GRAM",
-				conversionUnitToCustomUnitFactor: 1 / 30,
+				customUnitToConversionUnitFactor: 30,
 			});
 			const variant = ingredientVariantFactory.build({
 				unit: "GRAM",

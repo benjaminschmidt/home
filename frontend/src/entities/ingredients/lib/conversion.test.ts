@@ -239,7 +239,7 @@ describe("calculateConversionFactorFromDefaultUnitToCustomUnit", () => {
 		const ingredient = ingredientFactory.build();
 		const customUnit = customUnitFactory.build({
 			conversionUnit: "GRAM",
-			conversionUnitToCustomUnitFactor: 2,
+			customUnitToConversionUnitFactor: 1 / 2,
 		});
 		const errorContext: string[] = [];
 		const result = calculateConversionFactorFromDefaultUnitToCustomUnit(
@@ -269,7 +269,7 @@ describe("calculateConversionFactorFromDefaultUnitToCustomUnit", () => {
 		const ingredient = ingredientFactory.build();
 		const customUnit = customUnitFactory.build({
 			conversionUnit: null as never,
-			conversionUnitToCustomUnitFactor: 2,
+			customUnitToConversionUnitFactor: 1 / 2,
 		});
 		const errorContext: string[] = [];
 		const result = calculateConversionFactorFromDefaultUnitToCustomUnit(
@@ -282,11 +282,11 @@ describe("calculateConversionFactorFromDefaultUnitToCustomUnit", () => {
 		expect(errorContext).toContain("Conversion unit is undefined.");
 	});
 
-	it("returns undefined and pushes error when customUnit.conversionUnitToCustomUnitFactor is null", () => {
+	it("returns undefined and pushes error when customUnit.customUnitToConversionUnitFactor is null", () => {
 		const ingredient = ingredientFactory.build();
 		const customUnit = customUnitFactory.build({
 			conversionUnit: "GRAM",
-			conversionUnitToCustomUnitFactor: null as never,
+			customUnitToConversionUnitFactor: null as never,
 		});
 		const errorContext: string[] = [];
 		const result = calculateConversionFactorFromDefaultUnitToCustomUnit(
@@ -305,7 +305,7 @@ describe("calculateConversionFactorFromDefaultUnitToCustomUnit", () => {
 		const ingredient = ingredientFactory.build();
 		const customUnit = customUnitFactory.build({
 			conversionUnit: "GRAM",
-			conversionUnitToCustomUnitFactor: 5,
+			customUnitToConversionUnitFactor: 1 / 5,
 		});
 		const errorContext: string[] = [];
 		const result = calculateConversionFactorFromDefaultUnitToCustomUnit(
@@ -322,7 +322,7 @@ describe("calculateConversionFactorFromDefaultUnitToCustomUnit", () => {
 		const ingredient = ingredientFactory.build();
 		const customUnit = customUnitFactory.build({
 			conversionUnit: "GRAM",
-			conversionUnitToCustomUnitFactor: 2,
+			customUnitToConversionUnitFactor: 1 / 2,
 		});
 		const errorContext: string[] = [];
 		const result = calculateConversionFactorFromDefaultUnitToCustomUnit(
@@ -343,7 +343,7 @@ describe("calculateConversionFactorFromDefaultUnitToCustomUnit", () => {
 		});
 		const customUnit = customUnitFactory.build({
 			conversionUnit: "MILLILITER",
-			conversionUnitToCustomUnitFactor: 3,
+			customUnitToConversionUnitFactor: 1 / 3,
 		});
 		const errorContext: string[] = [];
 		const result = calculateConversionFactorFromDefaultUnitToCustomUnit(

@@ -24,7 +24,7 @@ const GENERIC_UNITS: GenericUnitDtoRoot[] = [
 export const customUnitFactory = Factory.define<CustomUnitDtoRoot>(() => ({
 	id: faker.string.uuid(),
 	name: faker.lorem.word(),
-	conversionUnitToCustomUnitFactor: faker.number.float({ min: 0.1, max: 100 }),
+	customUnitToConversionUnitFactor: faker.number.float({ min: 0.1, max: 100 }),
 	conversionUnit: faker.helpers.arrayElement(GENERIC_UNITS),
 }));
 

@@ -55,8 +55,8 @@ class CustomUnitMapperTest {
         final var result = customUnitMapper.mapCustomUnitToDto(customUnit);
 
         // then
-        assertThat(result).extracting(CustomUnitDto::getConversionUnitToCustomUnitFactor)
-            .isEqualTo(customUnit.getConversionUnitToCustomUnitFactor());
+        assertThat(result).extracting(CustomUnitDto::getCustomUnitToConversionUnitFactor)
+            .isEqualTo(customUnit.getCustomUnitToConversionUnitFactor());
     }
 
     @Test
@@ -112,8 +112,8 @@ class CustomUnitMapperTest {
         final var result = customUnitMapper.mapDtoToCustomUnit(customUnitDto, ingredient);
 
         // then
-        assertThat(result).extracting(CustomUnit::getConversionUnitToCustomUnitFactor)
-            .isEqualTo(customUnitDto.getConversionUnitToCustomUnitFactor());
+        assertThat(result).extracting(CustomUnit::getCustomUnitToConversionUnitFactor)
+            .isEqualTo(customUnitDto.getCustomUnitToConversionUnitFactor());
     }
 
     @Test
@@ -170,8 +170,8 @@ class CustomUnitMapperTest {
         final var result = customUnitMapper.updateCustomUnitFromDto(customUnit, customUnitDto);
 
         // then
-        assertThat(result).extracting(CustomUnit::getConversionUnitToCustomUnitFactor)
-            .isEqualTo(customUnitDto.getConversionUnitToCustomUnitFactor());
+        assertThat(result).extracting(CustomUnit::getCustomUnitToConversionUnitFactor)
+            .isEqualTo(customUnitDto.getCustomUnitToConversionUnitFactor());
     }
 
     @Test

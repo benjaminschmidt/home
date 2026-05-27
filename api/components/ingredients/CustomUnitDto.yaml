@@ -11,7 +11,7 @@ properties:
   name:
     type: string
     nullable: false
-  conversionUnitToCustomUnitFactor:
+  customUnitToConversionUnitFactor:
     type: number
     format: double
   conversionUnit:

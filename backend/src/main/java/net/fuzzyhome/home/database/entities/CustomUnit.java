@@ -49,7 +49,7 @@ public class CustomUnit {
     private String name;
 
     @Nullable
-    private Double conversionUnitToCustomUnitFactor;
+    private Double customUnitToConversionUnitFactor;
 
     @Enumerated(EnumType.STRING)
     @Nullable

@@ -2,7 +2,7 @@ CREATE TABLE custom_unit
 (
     id                                    UUID         NOT NULL,
     name                                  VARCHAR(255) NOT NULL,
-    conversion_unit_to_custom_unit_factor DOUBLE PRECISION,
+    custom_unit_to_conversion_unit_factor DOUBLE PRECISION,
     conversion_unit                       VARCHAR(255),
     ingredient_id                         UUID         NOT NULL,
     CONSTRAINT pk_customunit PRIMARY KEY (id)
@@ -54,6 +54,23 @@ ALTER TABLE custom_unit
     ADD CONSTRAINT FK_CUSTOMUNIT_ON_INGREDIENT FOREIGN KEY (ingredient_id) REFERENCES ingredient (id);
 
 CREATE INDEX idx_customunit_ingredient ON custom_unit (ingredient_id);
+
+ALTER TABLE custom_unit
+    ADD CONSTRAINT check_custom_unit_name_not_generic CHECK (
+        UPPER(name) NOT IN (
+                            'GRAM',
+                            'MILLIGRAM',
+                            'KILOGRAM',
+                            'OUNCE',
+                            'POUND',
+                            'MILLILITER',
+                            'LITER',
+                            'FLUID_OUNCE',
+                            'TEASPOON',
+                            'TABLESPOON',
+                            'CUP'
+            )
+        );
 
 ALTER TABLE ingredient_variant
     ADD CONSTRAINT FK_INGREDIENTVARIANT_ON_INGREDIENT FOREIGN KEY (ingredient_id) REFERENCES ingredient (id);

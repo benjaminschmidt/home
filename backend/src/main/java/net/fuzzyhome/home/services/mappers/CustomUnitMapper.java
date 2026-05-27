@@ -16,7 +16,7 @@ public class CustomUnitMapper {
         return CustomUnitDto.builder()
             .id(customUnit.getId())
             .name(customUnit.getName())
-            .conversionUnitToCustomUnitFactor(customUnit.getConversionUnitToCustomUnitFactor())
+            .customUnitToConversionUnitFactor(customUnit.getCustomUnitToConversionUnitFactor())
             .conversionUnit(UnitUtils.mapGenericUnitToDto(customUnit.getConversionUnit()))
             .build();
     }
@@ -28,7 +28,7 @@ public class CustomUnitMapper {
     ) {
         return CustomUnit.builder()
             .name(customUnitDto.getName())
-            .conversionUnitToCustomUnitFactor(customUnitDto.getConversionUnitToCustomUnitFactor())
+            .customUnitToConversionUnitFactor(customUnitDto.getCustomUnitToConversionUnitFactor())
             .conversionUnit(UnitUtils.mapDtoToGenericUnit(customUnitDto.getConversionUnit()))
             .ingredient(ingredient)
             .build();
@@ -40,7 +40,7 @@ public class CustomUnitMapper {
         @NonNull final CustomUnitDto customUnitDto
     ) {
         customUnit.setName(customUnitDto.getName());
-        customUnit.setConversionUnitToCustomUnitFactor(customUnitDto.getConversionUnitToCustomUnitFactor());
+        customUnit.setCustomUnitToConversionUnitFactor(customUnitDto.getCustomUnitToConversionUnitFactor());
         customUnit.setConversionUnit(UnitUtils.mapDtoToGenericUnit(customUnitDto.getConversionUnit()));
         return customUnit;
     }
