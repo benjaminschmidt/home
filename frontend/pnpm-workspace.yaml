@@ -1,5 +1,5 @@
 allowBuilds:
   esbuild: true
-minimumReleaseAge: 4320
+minimumReleaseAge: 18720
 overrides:
   home-api: link:../api
