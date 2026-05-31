@@ -33,7 +33,7 @@
     "@tanstack/react-query-devtools": "5.100.10",
     "@tanstack/react-router": "1.170.3",
     "@tanstack/react-router-devtools": "1.167.0",
-    "@tanstack/router-plugin": "1.168.4",
+    "@tanstack/router-plugin": "1.168.5",
     "home-api": "link:../api",
     "react": "19.2.6",
     "react-dom": "19.2.6",
