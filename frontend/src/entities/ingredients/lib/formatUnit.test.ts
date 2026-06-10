@@ -97,4 +97,12 @@ describe("formatUnit", () => {
 		// then
 		expect(result).toBe("cup");
 	});
+
+	it("returns custom unit names unchanged", () => {
+		// when
+		const result = formatUnit("slice");
+
+		// then
+		expect(result).toBe("slice");
+	});
 });

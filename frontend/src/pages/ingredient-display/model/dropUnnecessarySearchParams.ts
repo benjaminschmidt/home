@@ -1,11 +1,11 @@
-import type { IngredientDtoRoot } from "home-api/dist/src";
+import type { IngredientDto } from "home-api/dist/src";
 import {
 	findIngredientVariant,
 	getDefaultIngredientVariant,
 } from "@/entities/ingredients";
 
 const dropUnnecessarySearchParams = (
-	ingredient: IngredientDtoRoot,
+	ingredient: IngredientDto,
 	variantId: string | undefined,
 	servingSize: number | undefined,
 	unit: string | undefined,

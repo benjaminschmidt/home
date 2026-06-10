@@ -1,10 +1,10 @@
 import List from "@mui/material/List";
-import type { IngredientDtoRoot } from "home-api/dist/src";
+import type { IngredientDto } from "home-api/dist/src";
 import type { RefObject } from "react";
 import { IngredientListItem } from "@/pages/ingredient-list/ui/IngredientListItem.tsx";
 
 type IngredientListProps = {
-	ingredients: IngredientDtoRoot[];
+	ingredients: IngredientDto[];
 	sentinelRef?: RefObject<HTMLDivElement | null>;
 };
 
@@ -18,7 +18,7 @@ const IngredientList = ({ ingredients, sentinelRef }: IngredientListProps) => {
 					gap: 2,
 				}}
 			>
-				{ingredients.map((ingredient: IngredientDtoRoot, index: number) => (
+				{ingredients.map((ingredient: IngredientDto, index: number) => (
 					<IngredientListItem
 						key={ingredient.id ?? index}
 						ingredient={ingredient}

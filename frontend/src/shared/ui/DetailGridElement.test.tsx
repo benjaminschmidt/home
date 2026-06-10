@@ -1,22 +1,22 @@
 import { render } from "@testing-library/react";
 import { describe, expect, test } from "vitest";
-import { DetailRow } from "@/pages/ingredient-list/ui/DetailRow.tsx";
+import { DetailGridElement } from "@/shared/ui/DetailGridElement.tsx";
 
-describe("DetailRow", () => {
-	test("renders label with colon", () => {
+describe("DetailGridElement", () => {
+	test("renders label", () => {
 		// when
 		const { container } = render(
-			<DetailRow label="Calories" value="250 kcal" />,
+			<DetailGridElement label="Calories" value="250 kcal" />,
 		);
 
 		// then
-		expect(container.querySelector("dt")?.textContent).toBe("Calories:");
+		expect(container.querySelector("dt")?.textContent).toBe("Calories");
 	});
 
 	test("renders value", () => {
 		// when
 		const { container } = render(
-			<DetailRow label="Calories" value="250 kcal" />,
+			<DetailGridElement label="Calories" value="250 kcal" />,
 		);
 
 		// then

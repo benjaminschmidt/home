@@ -1,10 +1,10 @@
 import type {
-	GenericUnitDtoRoot,
-	VolumeUnitDtoRoot,
-	WeightUnitDtoRoot,
+	GenericUnitDto,
+	VolumeUnitDto,
+	WeightUnitDto,
 } from "home-api/dist/src";
 
-const genericUnitDtoRootObject: Record<GenericUnitDtoRoot, undefined> = {
+const genericUnitDtoObject: Record<GenericUnitDto, undefined> = {
 	GRAM: undefined,
 	MILLIGRAM: undefined,
 	KILOGRAM: undefined,
@@ -17,9 +17,9 @@ const genericUnitDtoRootObject: Record<GenericUnitDtoRoot, undefined> = {
 	TABLESPOON: undefined,
 	CUP: undefined,
 };
-const genericUnitDtoRootArray = Object.keys(genericUnitDtoRootObject);
+const genericUnitDtoArray = Object.keys(genericUnitDtoObject);
 
-const volumeUnitDtoRootObject: Record<VolumeUnitDtoRoot, undefined> = {
+const volumeUnitDtoObject: Record<VolumeUnitDto, undefined> = {
 	MILLILITER: undefined,
 	LITER: undefined,
 	FLUID_OUNCE: undefined,
@@ -27,24 +27,24 @@ const volumeUnitDtoRootObject: Record<VolumeUnitDtoRoot, undefined> = {
 	TABLESPOON: undefined,
 	CUP: undefined,
 };
-const volumeUnitDtoRootArray = Object.keys(volumeUnitDtoRootObject);
+const volumeUnitDtoArray = Object.keys(volumeUnitDtoObject);
 
-const weightUnitDtoRootObject: Record<WeightUnitDtoRoot, undefined> = {
+const weightUnitDtoObject: Record<WeightUnitDto, undefined> = {
 	GRAM: undefined,
 	MILLIGRAM: undefined,
 	KILOGRAM: undefined,
 	OUNCE: undefined,
 	POUND: undefined,
 };
-const weightUnitDtoRootArray = Object.keys(weightUnitDtoRootObject);
+const weightUnitDtoArray = Object.keys(weightUnitDtoObject);
 
-const isGenericUnit = (value: string): value is GenericUnitDtoRoot =>
-	genericUnitDtoRootArray.includes(value);
+const isGenericUnit = (value: string): value is GenericUnitDto =>
+	genericUnitDtoArray.includes(value);
 
-const isVolumeUnit = (value: string): value is VolumeUnitDtoRoot =>
-	volumeUnitDtoRootArray.includes(value);
+const isVolumeUnit = (value: string): value is VolumeUnitDto =>
+	volumeUnitDtoArray.includes(value);
 
-const isWeightUnit = (value: string): value is WeightUnitDtoRoot =>
-	weightUnitDtoRootArray.includes(value);
+const isWeightUnit = (value: string): value is WeightUnitDto =>
+	weightUnitDtoArray.includes(value);
 
 export { isGenericUnit, isVolumeUnit, isWeightUnit };

@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import type { IngredientDtoRoot } from "home-api/dist/src";
+import type { IngredientDto } from "home-api/dist/src";
 import type { ReactNode } from "react";
 import { describe, expect, test, vi } from "vitest";
 import { IngredientList } from "@/pages/ingredient-list";
@@ -13,7 +13,7 @@ vi.mock("@tanstack/react-router", () => ({
 describe("IngredientList", () => {
 	test("renders", () => {
 		// given
-		const ingredients: IngredientDtoRoot[] = [
+		const ingredients: IngredientDto[] = [
 			{
 				name: "Ingredient 1",
 			},

@@ -1,7 +1,7 @@
-import type { IngredientVariantDtoRoot } from "home-api/dist/src";
+import type { IngredientVariantDto } from "home-api/dist/src";
 
 const getIngredientVariantOptions = (
-	ingredientVariants: IngredientVariantDtoRoot[],
+	ingredientVariants: IngredientVariantDto[],
 ) => {
 	return ingredientVariants.map((ingredientVariant) => ({
 		default: ingredientVariant.defaultVariant,

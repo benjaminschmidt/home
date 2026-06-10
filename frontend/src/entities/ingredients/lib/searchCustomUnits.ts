@@ -1,7 +1,7 @@
-import type { CustomUnitDtoRoot } from "home-api/dist/src";
+import type { CustomUnitDto } from "home-api/dist/src";
 
 const findCustomUnit = (
-	customUnits: CustomUnitDtoRoot[],
+	customUnits: CustomUnitDto[],
 	unit: string,
 	errorContext?: string[],
 ) => {

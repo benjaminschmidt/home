@@ -1,6 +1,7 @@
-import type { GenericUnitDtoRoot } from "home-api/dist/src";
+import type { GenericUnitDto } from "home-api/dist/src";
+import { isGenericUnit } from "@/entities/ingredients/lib/unitType.ts";
 
-const unitSymbols: Record<GenericUnitDtoRoot, string> = {
+const unitSymbols: Record<GenericUnitDto, string> = {
 	GRAM: "g",
 	MILLIGRAM: "mg",
 	KILOGRAM: "kg",
@@ -14,7 +15,10 @@ const unitSymbols: Record<GenericUnitDtoRoot, string> = {
 	CUP: "cup",
 };
 
-const formatUnit = (unit?: GenericUnitDtoRoot) =>
-	unit ? unitSymbols[unit] : undefined;
+const formatUnit = (unit?: string) => {
+	if (unit === undefined) return undefined;
+
+	return isGenericUnit(unit) ? unitSymbols[unit] : unit;
+};
 
 export { formatUnit };

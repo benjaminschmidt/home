@@ -1,6 +1,6 @@
 import { render } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
-import { StyledCardActionSelector } from "@/pages/ingredient-list/ui/StyledCardActionSelector.tsx";
+import { StyledCardActionSelector } from "@/shared/ui/StyledCardActionSelector.tsx";
 
 describe("StyledCardActionSelector", () => {
 	test("renders null when options is empty", () => {
@@ -9,6 +9,7 @@ describe("StyledCardActionSelector", () => {
 			<StyledCardActionSelector
 				selectedIndex={0}
 				setSelectedIndex={vi.fn()}
+				forceCompact
 				options={[]}
 			/>,
 		);
@@ -37,6 +38,7 @@ describe("StyledCardActionSelector", () => {
 			<StyledCardActionSelector
 				selectedIndex={1}
 				setSelectedIndex={vi.fn()}
+				forceCompact
 				options={[
 					{ default: false, id: "1", value: "Whole" },
 					{ default: false, id: "2", value: "Sliced" },
@@ -68,6 +70,7 @@ describe("StyledCardActionSelector", () => {
 			<StyledCardActionSelector
 				selectedIndex={0}
 				setSelectedIndex={vi.fn()}
+				forceCompact
 				options={[{ default: false, id: "1", value: "Whole" }]}
 			/>,
 		);

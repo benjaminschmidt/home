@@ -1,7 +1,4 @@
-import type {
-	IngredientDtoRoot,
-	IngredientVariantDtoRoot,
-} from "home-api/dist/src";
+import type { IngredientDto, IngredientVariantDto } from "home-api/dist/src";
 import { findIngredientVariant } from "@/entities/ingredients";
 import {
 	calculateConversionFactorFromDefaultUnitToCustomUnit,
@@ -37,7 +34,7 @@ const recalculateValue = (
 
 const recalculateIngredient = (
 	name: string,
-	variant: IngredientVariantDtoRoot,
+	variant: IngredientVariantDto,
 	conversionFactor: number,
 	defaultServingSize: number,
 	servingSize: number,
@@ -64,7 +61,7 @@ const recalculateIngredient = (
 
 const copyIngredient = (
 	name: string,
-	variant?: IngredientVariantDtoRoot,
+	variant?: IngredientVariantDto,
 ): Ingredient => {
 	return {
 		name,
@@ -78,7 +75,7 @@ const copyIngredient = (
 };
 
 const getCustomIngredient = (
-	ingredient: IngredientDtoRoot,
+	ingredient: IngredientDto,
 	variantId?: string,
 	rawServingSize?: number,
 	rawUnit?: string,

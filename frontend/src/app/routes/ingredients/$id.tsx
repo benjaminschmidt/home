@@ -10,6 +10,7 @@ import {
 const Component = () => {
 	const { id } = Route.useParams();
 	const { variantId, servingSize, unit } = Route.useSearch();
+	const navigate = Route.useNavigate();
 	const { data } = useSuspenseQuery(createIngredientIdQueryOptions(id));
 
 	return (
@@ -18,6 +19,18 @@ const Component = () => {
 			rawVariantId={variantId}
 			rawServingSize={servingSize}
 			rawUnit={unit}
+			onVariantIdChange={(selectedVariantId) => {
+				navigate({
+					to: "/ingredients/$id",
+					params: { id: data.id },
+					search: {
+						variantId: selectedVariantId,
+						servingSize,
+						unit,
+					},
+					replace: true,
+				});
+			}}
 		/>
 	);
 };

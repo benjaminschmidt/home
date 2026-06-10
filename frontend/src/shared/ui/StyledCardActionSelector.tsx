@@ -5,6 +5,7 @@ import Select from "@mui/material/Select";
 type StyledCardActionSelectorProps = {
 	selectedIndex: number;
 	setSelectedIndex: (index: number) => void;
+	forceCompact?: boolean;
 	options: {
 		default: boolean;
 		id?: string;
@@ -15,6 +16,7 @@ type StyledCardActionSelectorProps = {
 const StyledCardActionSelector = ({
 	selectedIndex,
 	setSelectedIndex,
+	forceCompact = false,
 	options,
 }: StyledCardActionSelectorProps) => {
 	if (options.length === 0) {
@@ -22,7 +24,12 @@ const StyledCardActionSelector = ({
 	}
 
 	return (
-		<CardActions sx={{ px: 1.5, py: 0.5 }}>
+		<CardActions
+			sx={{
+				px: forceCompact ? 1.5 : { xs: 1.5, sm: 2.5 },
+				py: forceCompact ? 0.5 : { xs: 0.5, sm: 1 },
+			}}
+		>
 			<Select
 				value={selectedIndex}
 				onChange={(e) => setSelectedIndex(Number(e.target.value))}
@@ -30,18 +37,16 @@ const StyledCardActionSelector = ({
 				disableUnderline
 				fullWidth
 				sx={{
-					fontSize: "0.7rem",
-					color: "text.disabled",
+					fontSize: forceCompact ? "0.7rem" : { xs: "0.7rem", sm: "1.05rem" },
 					"& .MuiSelect-select": {
 						overflow: "hidden",
 						textOverflow: "ellipsis",
 						whiteSpace: "nowrap",
-						py: 0,
+						py: forceCompact ? 0 : { xs: 0, sm: 0.5 },
 						textAlign: "center",
 					},
 					"& .MuiSelect-icon": {
-						color: "text.disabled",
-						fontSize: "1rem",
+						fontSize: forceCompact ? "1rem" : { xs: "1rem", sm: "1.25rem" },
 					},
 				}}
 			>

@@ -1,10 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { getIngredientVariantDetailArray } from "@/pages/ingredient-list/lib/details.ts";
+import { getIngredientVariantDetailArray } from "@/entities/ingredients";
 
 describe("getIngredientVariantDetailArray", () => {
 	it("returns em-dashes for all fields when called with no argument", () => {
 		// given / when
-		const result = getIngredientVariantDetailArray();
+		const result = getIngredientVariantDetailArray({});
 
 		// then
 		expect(result).toHaveLength(8);
@@ -14,28 +14,26 @@ describe("getIngredientVariantDetailArray", () => {
 	});
 
 	it("returns correct labels in order", () => {
-		// given / when
-		const result = getIngredientVariantDetailArray();
+		// when
+		const result = getIngredientVariantDetailArray({});
 		const labels = result.map((r) => r.label);
 
 		// then
 		expect(labels).toEqual([
 			"Serving",
 			"Calories",
-			"Carbs",
 			"Protein",
+			"Carbs",
 			"Fat",
-			"Sat. Fat",
+			"Saturated fat",
 			"Sodium",
 			"Sugar",
 		]);
 	});
 
 	it("formats serving size with unit symbol", () => {
-		// given / when
+		// when
 		const result = getIngredientVariantDetailArray({
-			description: "ingredientVariant",
-			defaultVariant: false,
 			servingSize: 100,
 			unit: "GRAM",
 		});
@@ -45,10 +43,8 @@ describe("getIngredientVariantDetailArray", () => {
 	});
 
 	it("formats serving size without unit when unit is absent", () => {
-		// given / when
+		// when
 		const result = getIngredientVariantDetailArray({
-			description: "ingredientVariant",
-			defaultVariant: false,
 			servingSize: 50,
 		});
 
@@ -57,10 +53,8 @@ describe("getIngredientVariantDetailArray", () => {
 	});
 
 	it("formats calories with kcal unit", () => {
-		// given / when
+		// when
 		const result = getIngredientVariantDetailArray({
-			description: "ingredientVariant",
-			defaultVariant: false,
 			calories: 250,
 		});
 
@@ -69,34 +63,28 @@ describe("getIngredientVariantDetailArray", () => {
 	});
 
 	it("formats carbohydrate with g unit", () => {
-		// given / when
+		// when
 		const result = getIngredientVariantDetailArray({
-			description: "ingredientVariant",
-			defaultVariant: false,
 			carbohydrate: 30,
 		});
 
 		// then
-		expect(result[2]).toEqual({ label: "Carbs", value: "30 g" });
+		expect(result[3]).toEqual({ label: "Carbs", value: "30 g" });
 	});
 
 	it("formats protein with g unit", () => {
-		// given / when
+		// when
 		const result = getIngredientVariantDetailArray({
-			description: "ingredientVariant",
-			defaultVariant: false,
 			protein: 10,
 		});
 
 		// then
-		expect(result[3]).toEqual({ label: "Protein", value: "10 g" });
+		expect(result[2]).toEqual({ label: "Protein", value: "10 g" });
 	});
 
 	it("formats fat with g unit", () => {
-		// given / when
+		// when
 		const result = getIngredientVariantDetailArray({
-			description: "ingredientVariant",
-			defaultVariant: false,
 			fat: 5,
 		});
 
@@ -105,22 +93,18 @@ describe("getIngredientVariantDetailArray", () => {
 	});
 
 	it("formats saturated fat with g unit", () => {
-		// given / when
+		// when
 		const result = getIngredientVariantDetailArray({
-			description: "ingredientVariant",
-			defaultVariant: false,
 			saturatedFat: 2,
 		});
 
 		// then
-		expect(result[5]).toEqual({ label: "Sat. Fat", value: "2 g" });
+		expect(result[5]).toEqual({ label: "Saturated fat", value: "2 g" });
 	});
 
 	it("formats sodium with g unit", () => {
-		// given / when
+		// when
 		const result = getIngredientVariantDetailArray({
-			description: "ingredientVariant",
-			defaultVariant: false,
 			sodium: 0.5,
 		});
 
@@ -129,10 +113,8 @@ describe("getIngredientVariantDetailArray", () => {
 	});
 
 	it("formats sugar with g unit", () => {
-		// given / when
+		// when
 		const result = getIngredientVariantDetailArray({
-			description: "ingredientVariant",
-			defaultVariant: false,
 			sugar: 12,
 		});
 
@@ -141,10 +123,8 @@ describe("getIngredientVariantDetailArray", () => {
 	});
 
 	it("shows em-dash for missing optional fields alongside present ones", () => {
-		// given / when
+		// when
 		const result = getIngredientVariantDetailArray({
-			description: "ingredientVariant",
-			defaultVariant: false,
 			servingSize: 100,
 			unit: "GRAM",
 			calories: 200,
@@ -158,10 +138,8 @@ describe("getIngredientVariantDetailArray", () => {
 	});
 
 	it("handles zero values as present (not em-dash)", () => {
-		// given / when
+		// when
 		const result = getIngredientVariantDetailArray({
-			description: "ingredientVariant",
-			defaultVariant: false,
 			calories: 0,
 			fat: 0,
 			sugar: 0,

@@ -1,5 +1,5 @@
 import { faker } from "@faker-js/faker";
-import type { IngredientDtoRoot } from "home-api/dist/src";
+import type { IngredientDto } from "home-api/dist/src";
 import { describe, expect, it } from "vitest";
 import { dropUnnecessarySearchParams } from "@/pages/ingredient-display";
 import { ingredientFactory, ingredientVariantFactory } from "@/shared/testing";
@@ -409,7 +409,7 @@ describe("dropUnnecessarySearchParams", () => {
 
 		it("handles ingredient with undefined ingredientVariants", () => {
 			// given
-			const ingredient: IngredientDtoRoot = { name: "Test Ingredient" };
+			const ingredient: IngredientDto = { name: "Test Ingredient" };
 
 			// when
 			const result = dropUnnecessarySearchParams(

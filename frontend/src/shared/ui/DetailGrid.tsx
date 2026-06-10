@@ -1,5 +1,5 @@
 import Stack from "@mui/material/Stack";
-import { DetailRow } from "@/pages/ingredient-list/ui/DetailRow.tsx";
+import { DetailGridElement } from "@/shared/ui/DetailGridElement.tsx";
 
 type DetailGridProps = {
 	detailArray: {
@@ -14,13 +14,14 @@ const DetailGrid = ({ detailArray }: DetailGridProps) => {
 			component="dl"
 			sx={{
 				display: "grid",
+				rowGap: { xs: 1, sm: 1.5 },
+				columnGap: { xs: 1, sm: 1.5 },
 				gridTemplateColumns: "1fr 1fr",
-				gap: "4px 8px",
 				m: 0,
 			}}
 		>
 			{detailArray.map(({ label, value }) => (
-				<DetailRow key={label} label={label} value={value} />
+				<DetailGridElement key={label} label={label} value={value} />
 			))}
 		</Stack>
 	);

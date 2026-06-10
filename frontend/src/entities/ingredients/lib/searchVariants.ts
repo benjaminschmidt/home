@@ -1,7 +1,7 @@
-import type { IngredientVariantDtoRoot } from "home-api/dist/src";
+import type { IngredientVariantDto } from "home-api/dist/src";
 
 const getDefaultIngredientVariant = (
-	ingredientVariants: IngredientVariantDtoRoot[],
+	ingredientVariants: IngredientVariantDto[],
 ) => {
 	if (ingredientVariants.length === 0) {
 		return undefined;
@@ -21,11 +21,11 @@ const getDefaultIngredientVariant = (
 };
 
 const findIngredientVariant = (
-	variants: IngredientVariantDtoRoot[],
+	variants: IngredientVariantDto[],
 	variantId?: string,
 	errorContext?: string[],
 ) => {
-	let variant: IngredientVariantDtoRoot | undefined;
+	let variant: IngredientVariantDto | undefined;
 
 	if (variantId !== undefined) {
 		const matchingVariants = variants.filter((v) => v.id === variantId);

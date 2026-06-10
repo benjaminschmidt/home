@@ -1,16 +1,16 @@
 import type {
-	CustomUnitDtoRoot,
-	GenericUnitDtoRoot,
-	IngredientDtoRoot,
-	VolumeUnitDtoRoot,
-	WeightUnitDtoRoot,
+	CustomUnitDto,
+	GenericUnitDto,
+	IngredientDto,
+	VolumeUnitDto,
+	WeightUnitDto,
 } from "home-api/dist/src";
 import {
 	isVolumeUnit,
 	isWeightUnit,
 } from "@/entities/ingredients/lib/unitType.ts";
 
-const weightToGramConversionFactors: Record<WeightUnitDtoRoot, number> = {
+const weightToGramConversionFactors: Record<WeightUnitDto, number> = {
 	GRAM: 1,
 	MILLIGRAM: 0.001,
 	KILOGRAM: 1000,
@@ -18,7 +18,7 @@ const weightToGramConversionFactors: Record<WeightUnitDtoRoot, number> = {
 	POUND: 453.592,
 };
 
-const volumeToMlConversionFactors: Record<VolumeUnitDtoRoot, number> = {
+const volumeToMlConversionFactors: Record<VolumeUnitDto, number> = {
 	MILLILITER: 1,
 	LITER: 1000,
 	FLUID_OUNCE: 29.5735,
@@ -28,8 +28,8 @@ const volumeToMlConversionFactors: Record<VolumeUnitDtoRoot, number> = {
 };
 
 const calculateConversionFactorFromVolumeUnitAToB = (
-	unitA: VolumeUnitDtoRoot,
-	unitB: VolumeUnitDtoRoot,
+	unitA: VolumeUnitDto,
+	unitB: VolumeUnitDto,
 ) => {
 	return (
 		volumeToMlConversionFactors[unitA] / volumeToMlConversionFactors[unitB]
@@ -37,11 +37,11 @@ const calculateConversionFactorFromVolumeUnitAToB = (
 };
 
 const calculateConversionFactorFromWeightUnitAToVolumeUnitB = (
-	unitA: WeightUnitDtoRoot,
-	unitB: VolumeUnitDtoRoot,
+	unitA: WeightUnitDto,
+	unitB: VolumeUnitDto,
 	weightToVolumeConversionFactor: number,
-	conversionWeightUnit: WeightUnitDtoRoot,
-	conversionVolumeUnit: VolumeUnitDtoRoot,
+	conversionWeightUnit: WeightUnitDto,
+	conversionVolumeUnit: VolumeUnitDto,
 ) => {
 	return (
 		calculateConversionFactorFromWeightUnitAToB(unitA, conversionWeightUnit) *
@@ -51,8 +51,8 @@ const calculateConversionFactorFromWeightUnitAToVolumeUnitB = (
 };
 
 const calculateConversionFactorFromWeightUnitAToB = (
-	unitA: WeightUnitDtoRoot,
-	unitB: WeightUnitDtoRoot,
+	unitA: WeightUnitDto,
+	unitB: WeightUnitDto,
 ) => {
 	return (
 		weightToGramConversionFactors[unitA] / weightToGramConversionFactors[unitB]
@@ -60,11 +60,11 @@ const calculateConversionFactorFromWeightUnitAToB = (
 };
 
 const calculateConversionFactorFromVolumeUnitAToWeightUnitB = (
-	unitA: VolumeUnitDtoRoot,
-	unitB: WeightUnitDtoRoot,
+	unitA: VolumeUnitDto,
+	unitB: WeightUnitDto,
 	weightToVolumeConversionFactor: number,
-	conversionWeightUnit: WeightUnitDtoRoot,
-	conversionVolumeUnit: VolumeUnitDtoRoot,
+	conversionWeightUnit: WeightUnitDto,
+	conversionVolumeUnit: VolumeUnitDto,
 ) => {
 	return (
 		(calculateConversionFactorFromVolumeUnitAToB(unitA, conversionVolumeUnit) /
@@ -74,9 +74,9 @@ const calculateConversionFactorFromVolumeUnitAToWeightUnitB = (
 };
 
 const calculateConversionFactorFromUnitAToB = (
-	ingredient: IngredientDtoRoot,
-	unitA: GenericUnitDtoRoot,
-	unitB: GenericUnitDtoRoot,
+	ingredient: IngredientDto,
+	unitA: GenericUnitDto,
+	unitB: GenericUnitDto,
 	errorContext: string[],
 ): number | undefined => {
 	if (isWeightUnit(unitA) && isWeightUnit(unitB)) {
@@ -124,9 +124,9 @@ const calculateConversionFactorFromUnitAToB = (
 };
 
 const calculateConversionFactorFromDefaultUnitToCustomUnit = (
-	ingredient: IngredientDtoRoot,
-	defaultUnit: GenericUnitDtoRoot | undefined,
-	customUnit: CustomUnitDtoRoot | undefined,
+	ingredient: IngredientDto,
+	defaultUnit: GenericUnitDto | undefined,
+	customUnit: CustomUnitDto | undefined,
 	errorContext: string[],
 ) => {
 	if (defaultUnit === undefined) {
