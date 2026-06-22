@@ -23,6 +23,11 @@ export default defineConfig({
         },
     },
     test: {
-        environment: 'jsdom'
+        environment: 'jsdom',
+        server: {
+            deps: {
+                inline: ['@mui/material', 'react-transition-group'],
+            },
+        },
     },
 })
