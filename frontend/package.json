@@ -41,7 +41,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "2.5.0",
-    "@faker-js/faker": "^10.4.0",
+    "@faker-js/faker": "10.5.0",
     "@feature-sliced/steiger-plugin": "0.6.0",
     "@tanstack/devtools-vite": "0.7.0",
     "@testing-library/dom": "10.4.1",
@@ -51,7 +51,7 @@
     "@types/react": "19.2.17",
     "@types/react-dom": "19.2.3",
     "@vitejs/plugin-react": "6.0.2",
-    "fishery": "^2.4.0",
+    "fishery": "2.4.0",
     "jsdom": "29.1.1",
     "steiger": "0.5.13",
     "typescript": "6.0.3",
