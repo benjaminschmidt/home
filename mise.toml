@@ -1,0 +1,30 @@
+monorepo_root = true
+
+[monorepo]
+config_roots = [
+    "api",
+    "backend",
+    "frontend",
+]
+lockfile = true
+
+[settings]
+install_before = "13d"
+
+[tasks.check]
+depends = [
+    "//frontend:check",
+    "//backend:check"
+]
+
+[tasks.ci]
+depends = [
+    "//frontend:ci",
+    "//backend:ci"
+]
+
+[tasks.dev]
+depends = [
+    "//backend:dev",
+    "//frontend:dev"
+]

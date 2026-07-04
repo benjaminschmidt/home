@@ -4,17 +4,17 @@
   "license": "AGPL-3.0-or-later",
   "author": {
     "name": "Benjamin Schmidt",
-    "email": "public@benjamin.fuzzyhome.net",
+    "email": "benjamin.schmidt@fuzzyhome.net",
     "url": "https://benjamin.fuzzyhome.net/"
   },
   "private": true,
   "type": "module",
   "repository": "github:benjaminschmidt/home",
   "scripts": {
-    "dev": "cd ../api && pnpm install && pnpm run build && cd - && vite --port 3000",
-    "build": "cd ../api && pnpm install && pnpm run build && cd - && vite build && tsc",
-    "serve": "cd ../api && pnpm install && pnpm run build && cd - && vite preview",
-    "test": "cd ../api && pnpm install && pnpm run build && cd - && vitest run",
+    "dev": "vite --port 3000",
+    "build": "vite build && tsc",
+    "serve": "vite preview",
+    "test": "vitest run",
     "format": "biome format",
     "lint": "biome lint",
     "check": "biome check",

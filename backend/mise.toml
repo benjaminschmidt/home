@@ -2,5 +2,60 @@
 java = "temurin-25.0.3+9.0.LTS"
 maven = "3.9.16"
 
-[settings]
-install_before = "14d"
+[tasks.dev]
+depends = ["db-up"]
+description = "Start local Postgres and Spring boot dev server"
+run = '''
+set -e
+
+cleanup() {
+  echo
+  echo "Stopping local Postgres..."
+  podman kube down postgres.yaml
+}
+
+trap cleanup EXIT INT TERM
+
+echo "Waiting for Postgres..."
+until podman exec postgres-home-pod-postgres-home-container pg_isready -U postgres >/dev/null 2>&1; do
+  sleep 1
+done
+
+echo "Postgres is ready."
+mvn spring-boot:run -Dspring-boot.run.profiles=local
+'''
+
+[tasks.check]
+run = "mvn clean verify"
+
+[tasks.ci]
+run = "mvn -B clean verify"
+
+[tasks.db-delete]
+description = "Stop and remove local Postgres including volume"
+run = '''
+set -e
+
+podman kube down postgres.yaml
+podman volume rm postgres-home-data-volume-claim || true
+'''
+
+[tasks.db-down]
+description = "Stop and remove local Postgres"
+run = '''
+set -e
+
+podman kube down postgres.yaml
+'''
+
+[tasks.db-up]
+description = "Start local Postgres"
+run = '''
+set -e
+
+if podman pod exists postgres-home-pod; then
+  podman pod start postgres-home-pod
+else
+  podman kube play postgres.yaml
+fi
+'''

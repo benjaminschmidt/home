@@ -1,5 +1,35 @@
 [tools]
 node = "24.17.0"
+pnpm = "11.8.0"
 
-[settings]
-install_before = "14d"
+[tasks.install]
+depends = ["//api:build"]
+run = "pnpm install --frozen-lockfile"
+
+[tasks.dev]
+depends = [":install"]
+run = "pnpm run dev"
+
+[tasks.build]
+depends = [":install"]
+run = "pnpm run build"
+
+[tasks.check]
+depends = [":install"]
+run = [
+    "pnpm run check",
+    "pnpm run steiger",
+    "pnpm run build",
+    "pnpm tsc",
+    "pnpm run test"
+]
+
+[tasks.ci]
+depends = [":install"]
+run = [
+    "pnpm run biome-ci",
+    "pnpm run steiger",
+    "pnpm run build",
+    "pnpm tsc",
+    "pnpm run test"
+]

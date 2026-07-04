@@ -24,7 +24,7 @@
     <developers>
         <developer>
             <name>Benjamin Schmidt</name>
-            <email>public@benjamin.fuzzyhome.net</email>
+            <email>benjamin.schmidt@fuzzyhome.net</email>
             <url>https://benjamin.fuzzyhome.net/</url>
         </developer>
     </developers>
@@ -98,7 +98,7 @@
         </dependency>
         <dependency>
             <groupId>io.zonky.test.postgres</groupId>
-            <artifactId>embedded-postgres-binaries-linux-arm64v8-alpine</artifactId>
+            <artifactId>embedded-postgres-binaries-linux-arm64v8</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
