@@ -1,0 +1,10 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+script_dir="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+frontend_dir="$(cd -- "$script_dir/.." && pwd)"
+biome_bin="$frontend_dir/node_modules/@biomejs/biome/bin/biome"
+
+cd "$frontend_dir"
+exec mise exec -- node "$biome_bin" "$@"

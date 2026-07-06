@@ -1,16 +1,26 @@
 import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
+import { z } from "zod";
 import {
 	createIngredientsQueryOptions,
-	IngredientList,
+	IngredientListPage,
 	useInfiniteScroll,
 } from "@/pages/ingredient-list";
 
-const ingredientsQueryOptions = createIngredientsQueryOptions(10);
-
 const IngredientsPage = () => {
+	const { search } = Route.useSearch();
+	const navigate = Route.useNavigate();
+	const ingredientsQueryOptions = createIngredientsQueryOptions(search);
 	const { data, isFetchingNextPage, fetchNextPage, hasNextPage } =
 		useSuspenseInfiniteQuery(ingredientsQueryOptions);
+	const handleSearchChange = (nextSearch: string) => {
+		navigate({
+			search: {
+				search: nextSearch || undefined,
+			},
+			replace: true,
+		});
+	};
 
 	const sentinelRef = useInfiniteScroll({
 		fetchNextPage,
@@ -19,14 +29,31 @@ const IngredientsPage = () => {
 	});
 
 	return (
-		<IngredientList ingredients={data.pages.flat()} sentinelRef={sentinelRef} />
+		<IngredientListPage
+			ingredients={data.pages.flat()}
+			search={search ?? ""}
+			onSearchChange={handleSearchChange}
+			sentinelRef={sentinelRef}
+		/>
 	);
 };
 
 const Route = createFileRoute("/ingredients/")({
 	component: IngredientsPage,
-	loader: ({ context: { queryClient } }) =>
-		queryClient.ensureInfiniteQueryData(ingredientsQueryOptions),
+	validateSearch: (search) => {
+		return z
+			.object({
+				search: z.string().optional(),
+			})
+			.parse(search);
+	},
+	loaderDeps: ({ search }) => ({
+		search: search.search,
+	}),
+	loader: ({ context: { queryClient }, deps }) =>
+		queryClient.ensureInfiniteQueryData(
+			createIngredientsQueryOptions(deps.search),
+		),
 });
 
 export { Route };
