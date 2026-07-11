@@ -34,13 +34,18 @@ const getIngredientDetail = (label: string, value?: number, unit?: string) => {
 	};
 };
 
-const getIngredientVariantDetailArray = (ingredient: IngredientNutrition) => {
+const getIngredientServingDetail = (ingredient?: IngredientNutrition) => {
+	return getIngredientDetail(
+		"Serving",
+		ingredient?.servingSize,
+		formatUnit(ingredient?.unit),
+	);
+};
+
+const getIngredientNutritionDetailArray = (
+	ingredient?: IngredientNutrition,
+) => {
 	return [
-		getIngredientDetail(
-			"Serving",
-			ingredient?.servingSize,
-			formatUnit(ingredient?.unit),
-		),
 		getIngredientDetail("Calories", ingredient?.calories, "kcal"),
 		getIngredientDetail("Protein", ingredient?.protein, "g"),
 		getIngredientDetail("Carbs", ingredient?.carbohydrate, "g"),
@@ -51,4 +56,4 @@ const getIngredientVariantDetailArray = (ingredient: IngredientNutrition) => {
 	];
 };
 
-export { getIngredientVariantDetailArray };
+export { getIngredientNutritionDetailArray, getIngredientServingDetail };

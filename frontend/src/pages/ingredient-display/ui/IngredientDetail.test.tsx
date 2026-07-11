@@ -1,7 +1,15 @@
-import { render } from "@testing-library/react";
-import { describe, expect, test } from "vitest";
+import {
+	cleanup,
+	fireEvent,
+	render,
+	screen,
+	waitFor,
+} from "@testing-library/react";
+import { afterEach, describe, expect, test, vi } from "vitest";
 import { IngredientDetail } from "@/pages/ingredient-display/ui/IngredientDetail.tsx";
 import { ingredientFactory, ingredientVariantFactory } from "@/shared/testing";
+
+afterEach(cleanup);
 
 describe("IngredientDetail", () => {
 	test("renders the selected ingredient detail card", () => {
@@ -67,5 +75,39 @@ describe("IngredientDetail", () => {
 
 		// then
 		expect(container.querySelector("input")).not.toBeNull();
+	});
+
+	test("applies serving changes", async () => {
+		// given
+		const onServingChange = vi.fn();
+		const variant = ingredientVariantFactory.build({
+			defaultVariant: true,
+			unit: "GRAM",
+			servingSize: 100,
+		});
+		const ingredient = ingredientFactory.build({
+			ingredientVariants: [variant],
+		});
+
+		// when
+		render(
+			<IngredientDetail
+				ingredientDto={ingredient}
+				rawVariantId={variant.id}
+				onServingChange={onServingChange}
+			/>,
+		);
+		fireEvent.click(screen.getByLabelText("Change serving"));
+		fireEvent.change(screen.getByLabelText("Amount"), {
+			target: { value: "250" },
+		});
+		fireEvent.click(screen.getByRole("button", { name: "Apply" }));
+
+		// then
+		expect(onServingChange).toHaveBeenCalledWith({
+			servingSize: 250,
+			unit: "GRAM",
+		});
+		await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
 	});
 });

@@ -7,10 +7,12 @@ import Stack from "@mui/material/Stack";
 import type { IngredientDto } from "home-api/dist/src";
 import {
 	getCustomIngredient,
-	getIngredientVariantDetailArray,
+	getIngredientNutritionDetailArray,
 	getIngredientVariantOptions,
 } from "@/entities/ingredients";
+import { ServingGridElement } from "@/pages/ingredient-display/ui/ServingGridElement.tsx";
 import { DetailGrid } from "@/shared/ui/DetailGrid.tsx";
+import { DetailGridElement } from "@/shared/ui/DetailGridElement.tsx";
 import { StyledCardActionSelector } from "@/shared/ui/StyledCardActionSelector.tsx";
 import { StyledCardHeader } from "@/shared/ui/StyledCardHeader.tsx";
 
@@ -20,6 +22,7 @@ type IngredientDetailProps = {
 	rawServingSize?: number;
 	rawUnit?: string;
 	onVariantIdChange?: (variantId?: string) => void;
+	onServingChange?: (next: { servingSize?: number; unit?: string }) => void;
 };
 
 const IngredientDetail = ({
@@ -28,6 +31,7 @@ const IngredientDetail = ({
 	rawServingSize,
 	rawUnit,
 	onVariantIdChange,
+	onServingChange,
 }: IngredientDetailProps) => {
 	const ingredientVariants = ingredientDto.ingredientVariants ?? [];
 	const defaultIndex = (() => {
@@ -52,7 +56,7 @@ const IngredientDetail = ({
 		rawUnit,
 		errorContext,
 	);
-	const detailArray = getIngredientVariantDetailArray(ingredient);
+	const nutritionDetailArray = getIngredientNutritionDetailArray(ingredient);
 	const options = getIngredientVariantOptions(ingredientVariants);
 
 	return (
@@ -78,7 +82,17 @@ const IngredientDetail = ({
 					<StyledCardHeader title={ingredient.name} />
 
 					<CardContent sx={{ pt: { xs: 1, sm: 1.5 }, px: { xs: 2, sm: 2.5 } }}>
-						<DetailGrid detailArray={detailArray} />
+						<DetailGrid>
+							<ServingGridElement
+								servingSize={ingredient.servingSize}
+								unit={ingredient.unit}
+								customUnits={ingredientDto.customUnits}
+								onServingChange={onServingChange}
+							/>
+							{nutritionDetailArray.map(({ label, value }) => (
+								<DetailGridElement key={label} label={label} value={value} />
+							))}
+						</DetailGrid>
 					</CardContent>
 
 					{ingredientVariants.length > 0 && (

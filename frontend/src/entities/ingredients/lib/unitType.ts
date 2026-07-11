@@ -47,4 +47,10 @@ const isVolumeUnit = (value: string): value is VolumeUnitDto =>
 const isWeightUnit = (value: string): value is WeightUnitDto =>
 	weightUnitDtoArray.includes(value);
 
-export { isGenericUnit, isVolumeUnit, isWeightUnit };
+export {
+	isGenericUnit,
+	isVolumeUnit,
+	isWeightUnit,
+	volumeUnitDtoArray,
+	weightUnitDtoArray,
+};

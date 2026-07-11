@@ -5,10 +5,12 @@ import ListItem from "@mui/material/ListItem";
 import type { IngredientDto, IngredientVariantDto } from "home-api/dist/src";
 import { useState } from "react";
 import {
-	getIngredientVariantDetailArray,
+	getIngredientNutritionDetailArray,
+	getIngredientServingDetail,
 	getIngredientVariantOptions,
 } from "@/entities/ingredients";
 import { OverviewGrid } from "@/shared/ui/OverviewGrid.tsx";
+import { OverviewGridElement } from "@/shared/ui/OverviewGridElement.tsx";
 import { RouterCardActionArea } from "@/shared/ui/RouterCardActionArea.tsx";
 import { StyledCardActionSelector } from "@/shared/ui/StyledCardActionSelector.tsx";
 import { StyledCardHeader } from "@/shared/ui/StyledCardHeader.tsx";
@@ -28,6 +30,9 @@ const IngredientListItem = ({ ingredient }: IngredientListItemProps) => {
 
 	const ingredientVariant: IngredientVariantDto | undefined =
 		ingredientVariants[selectedIndex];
+	const servingDetail = getIngredientServingDetail(ingredientVariant);
+	const nutritionDetailArray =
+		getIngredientNutritionDetailArray(ingredientVariant);
 
 	return (
 		<ListItem key={ingredient.id} disablePadding sx={{ display: "block" }}>
@@ -45,9 +50,15 @@ const IngredientListItem = ({ ingredient }: IngredientListItemProps) => {
 					<StyledCardHeader title={ingredient.name} forceCompact />
 
 					<CardContent sx={{ pt: 1, pb: 1.5, flexGrow: 1 }}>
-						<OverviewGrid
-							detailArray={getIngredientVariantDetailArray(ingredientVariant)}
-						/>
+						<OverviewGrid>
+							<OverviewGridElement
+								label={servingDetail.label}
+								value={servingDetail.value}
+							/>
+							{nutritionDetailArray.map(({ label, value }) => (
+								<OverviewGridElement key={label} label={label} value={value} />
+							))}
+						</OverviewGrid>
 					</CardContent>
 				</RouterCardActionArea>
 				<Divider />

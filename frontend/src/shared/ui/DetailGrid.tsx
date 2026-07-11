@@ -1,14 +1,11 @@
 import Stack from "@mui/material/Stack";
-import { DetailGridElement } from "@/shared/ui/DetailGridElement.tsx";
+import type { ReactNode } from "react";
 
 type DetailGridProps = {
-	detailArray: {
-		label: string;
-		value: string;
-	}[];
+	children: ReactNode;
 };
 
-const DetailGrid = ({ detailArray }: DetailGridProps) => {
+const DetailGrid = ({ children }: DetailGridProps) => {
 	return (
 		<Stack
 			component="dl"
@@ -20,9 +17,7 @@ const DetailGrid = ({ detailArray }: DetailGridProps) => {
 				m: 0,
 			}}
 		>
-			{detailArray.map(({ label, value }) => (
-				<DetailGridElement key={label} label={label} value={value} />
-			))}
+			{children}
 		</Stack>
 	);
 };

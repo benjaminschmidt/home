@@ -1,14 +1,11 @@
 import Stack from "@mui/material/Stack";
-import { OverviewGridElement } from "@/shared/ui/OverviewGridElement.tsx";
+import type { ReactNode } from "react";
 
 type OverviewGridProps = {
-	detailArray: {
-		label: string;
-		value: string;
-	}[];
+	children: ReactNode;
 };
 
-const OverviewGrid = ({ detailArray }: OverviewGridProps) => {
+const OverviewGrid = ({ children }: OverviewGridProps) => {
 	return (
 		<Stack
 			component="dl"
@@ -19,9 +16,7 @@ const OverviewGrid = ({ detailArray }: OverviewGridProps) => {
 				m: 0,
 			}}
 		>
-			{detailArray.map(({ label, value }) => (
-				<OverviewGridElement key={label} label={label} value={value} />
-			))}
+			{children}
 		</Stack>
 	);
 };

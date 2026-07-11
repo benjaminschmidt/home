@@ -31,6 +31,18 @@ const Component = () => {
 					replace: true,
 				});
 			}}
+			onServingChange={(selectedServing) => {
+				navigate({
+					to: "/ingredients/$id",
+					params: { id: data.id },
+					search: {
+						variantId,
+						servingSize: selectedServing.servingSize,
+						unit: selectedServing.unit,
+					},
+					replace: true,
+				});
+			}}
 		/>
 	);
 };
