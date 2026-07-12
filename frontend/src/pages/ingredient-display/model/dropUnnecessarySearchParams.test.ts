@@ -210,6 +210,54 @@ describe("dropUnnecessarySearchParams", () => {
 			expect(result.updatedServingSize).toBe(99);
 		});
 
+		it("drops servingSize when it matches the default variant converted to the selected unit", () => {
+			// given
+			const ingredient = ingredientFactory.build({
+				ingredientVariants: [
+					ingredientVariantFactory.build({
+						unit: "GRAM",
+						servingSize: 100,
+						defaultVariant: true,
+					}),
+				],
+			});
+
+			// when
+			const result = dropUnnecessarySearchParams(
+				ingredient,
+				undefined,
+				0.1,
+				"KILOGRAM",
+			);
+
+			// then
+			expect(result.updatedServingSize).toBeUndefined();
+		});
+
+		it("keeps servingSize when it differs from the default variant converted to the selected unit", () => {
+			// given
+			const ingredient = ingredientFactory.build({
+				ingredientVariants: [
+					ingredientVariantFactory.build({
+						unit: "GRAM",
+						servingSize: 100,
+						defaultVariant: true,
+					}),
+				],
+			});
+
+			// when
+			const result = dropUnnecessarySearchParams(
+				ingredient,
+				undefined,
+				2,
+				"KILOGRAM",
+			);
+
+			// then
+			expect(result.updatedServingSize).toBe(2);
+		});
+
 		it("drops unit when it matches the default variant", () => {
 			// given
 			const ingredient = ingredientFactory.build({

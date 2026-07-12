@@ -1,11 +1,6 @@
 import type { IngredientDto, IngredientVariantDto } from "home-api/dist/src";
 import { findIngredientVariant } from "@/entities/ingredients";
-import {
-	calculateConversionFactorFromDefaultUnitToCustomUnit,
-	calculateConversionFactorFromUnitAToB,
-} from "@/entities/ingredients/lib/conversion.ts";
-import { findCustomUnit } from "@/entities/ingredients/lib/searchCustomUnits.ts";
-import { isGenericUnit } from "@/entities/ingredients/lib/unitType.ts";
+import { calculateConversionFactorFromDefaultUnitToUnit } from "@/entities/ingredients/lib/conversion.ts";
 import type { Ingredient } from "@/entities/ingredients/model/ingredient.ts";
 
 const nutrientFields = [
@@ -127,29 +122,22 @@ const getCustomIngredient = (
 		return copyIngredient(ingredient, variant);
 	}
 
-	const servingSize = rawServingSize ?? variant.servingSize;
 	const unit = rawUnit ?? variant.unit;
+	const conversionFactor = calculateConversionFactorFromDefaultUnitToUnit(
+		ingredient,
+		variant.unit,
+		unit,
+		errorContext,
+	);
 
-	if (servingSize <= 0) {
-		errorContext.push("Serving size must be positive.");
+	if (conversionFactor === undefined) {
 		return copyIngredient(ingredient, variant);
 	}
 
-	const conversionFactor = isGenericUnit(unit)
-		? calculateConversionFactorFromUnitAToB(
-				ingredient,
-				variant.unit,
-				unit,
-				errorContext,
-			)
-		: calculateConversionFactorFromDefaultUnitToCustomUnit(
-				ingredient,
-				variant.unit,
-				findCustomUnit(ingredient.customUnits ?? [], unit, errorContext),
-				errorContext,
-			);
+	const servingSize = rawServingSize ?? variant.servingSize * conversionFactor;
 
-	if (conversionFactor === undefined) {
+	if (servingSize <= 0) {
+		errorContext.push("Serving size must be positive.");
 		return copyIngredient(ingredient, variant);
 	}
 

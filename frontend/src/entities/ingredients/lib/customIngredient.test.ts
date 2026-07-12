@@ -259,6 +259,62 @@ describe("getCustomIngredient", () => {
 		expect(errorContext).toHaveLength(0);
 	});
 
+	it("uses an equivalent serving size when only the unit changes", () => {
+		// given
+		const variant = ingredientVariantFactory.build({
+			unit: "GRAM",
+			servingSize: 100,
+			calories: 200,
+		});
+		const ingredient = ingredientFactory.build({
+			ingredientVariants: [variant],
+		});
+		const errorContext: string[] = [];
+
+		// when
+		const result = getCustomIngredient(
+			ingredient,
+			variant.id,
+			undefined,
+			"KILOGRAM",
+			errorContext,
+		);
+
+		// then
+		expect(result.unit).toBe("KILOGRAM");
+		expect(result.servingSize).toBeCloseTo(0.1);
+		expect(result.calories).toBeCloseTo(200);
+		expect(errorContext).toHaveLength(0);
+	});
+
+	it("keeps explicit serving size when the unit changes", () => {
+		// given
+		const variant = ingredientVariantFactory.build({
+			unit: "GRAM",
+			servingSize: 100,
+			calories: 200,
+		});
+		const ingredient = ingredientFactory.build({
+			ingredientVariants: [variant],
+		});
+		const errorContext: string[] = [];
+
+		// when
+		const result = getCustomIngredient(
+			ingredient,
+			variant.id,
+			2,
+			"KILOGRAM",
+			errorContext,
+		);
+
+		// then
+		expect(result.unit).toBe("KILOGRAM");
+		expect(result.servingSize).toBe(2);
+		expect(result.calories).toBeCloseTo(4000);
+		expect(errorContext).toHaveLength(0);
+	});
+
 	it("returns copied ingredient when custom serving size is 0", () => {
 		// given
 		const variant = ingredientVariantFactory.build({

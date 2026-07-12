@@ -36,6 +36,12 @@ describe("ServingDialog", () => {
 		// then
 		expect(screen.getByLabelText("Amount")).toBeTruthy();
 		expect(screen.getByRole("combobox", { name: "Unit" })).toBeTruthy();
+		expect(
+			screen
+				.getByRole("combobox", { name: "Unit" })
+				.compareDocumentPosition(screen.getByLabelText("Amount")) &
+				Node.DOCUMENT_POSITION_FOLLOWING,
+		).toBeTruthy();
 		expect(screen.getByRole("button", { name: "Reset" })).toBeTruthy();
 		expect(screen.getByRole("button", { name: "Cancel" })).toBeTruthy();
 		expect(screen.getByRole("button", { name: "Apply" })).toBeTruthy();
@@ -67,6 +73,75 @@ describe("ServingDialog", () => {
 
 		// then
 		expect(screen.getByRole("option", { name: "slice" })).toBeTruthy();
+	});
+
+	test("converts the amount when selecting another unit", () => {
+		// given
+		render(
+			<ServingDialog
+				ingredient={ingredient}
+				servingSize={100}
+				unit="GRAM"
+				onClose={vi.fn()}
+				onApply={vi.fn()}
+			/>,
+		);
+
+		// when
+		fireEvent.mouseDown(screen.getByRole("combobox", { name: "Unit" }));
+		fireEvent.click(screen.getByRole("option", { name: "kg" }));
+
+		// then
+		expect(screen.getByLabelText("Amount")).toHaveProperty("value", "0.1");
+	});
+
+	test("keeps an empty amount when selecting another unit", () => {
+		// given
+		render(
+			<ServingDialog
+				ingredient={ingredient}
+				servingSize={100}
+				unit="GRAM"
+				onClose={vi.fn()}
+				onApply={vi.fn()}
+			/>,
+		);
+
+		// when
+		fireEvent.change(screen.getByLabelText("Amount"), {
+			target: { value: "" },
+		});
+		fireEvent.mouseDown(screen.getByRole("combobox", { name: "Unit" }));
+		fireEvent.click(screen.getByRole("option", { name: "kg" }));
+
+		// then
+		expect(screen.getByLabelText("Amount")).toHaveProperty("value", "");
+	});
+
+	test("keeps an invalid amount when selecting another unit", () => {
+		// given
+		render(
+			<ServingDialog
+				ingredient={ingredient}
+				servingSize={100}
+				unit="GRAM"
+				onClose={vi.fn()}
+				onApply={vi.fn()}
+			/>,
+		);
+
+		// when
+		fireEvent.change(screen.getByLabelText("Amount"), {
+			target: { value: "abc" },
+		});
+		fireEvent.mouseDown(screen.getByRole("combobox", { name: "Unit" }));
+		fireEvent.click(screen.getByRole("option", { name: "kg" }));
+
+		// then
+		expect(screen.getByLabelText("Amount")).toHaveProperty("value", "abc");
+		expect(
+			screen.getByText("Amount must be a number greater than 0"),
+		).toBeTruthy();
 	});
 
 	test("applies the selected serving draft and closes", () => {

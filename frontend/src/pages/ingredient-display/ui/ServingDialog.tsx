@@ -11,7 +11,11 @@ import Select from "@mui/material/Select";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import { useState } from "react";
-import { getUnitOptions, type Ingredient } from "@/entities/ingredients";
+import {
+	calculateConversionFactorFromUnitToUnit,
+	getUnitOptions,
+	type Ingredient,
+} from "@/entities/ingredients";
 
 type ServingDialogProps = {
 	ingredient: Ingredient;
@@ -43,6 +47,9 @@ const parseServingSize = (draftServingSize: string) => {
 	return Number.isFinite(servingSize) ? servingSize : undefined;
 };
 
+const formatDraftServingSize = (servingSize: number) =>
+	`${Number(servingSize.toPrecision(12))}`;
+
 const ServingDialog = ({
 	ingredient,
 	servingSize,
@@ -59,32 +66,38 @@ const ServingDialog = ({
 	const amountEmpty = draftServingSize.trim() === "";
 	const amountInvalid =
 		!amountEmpty && (parsedServingSize === undefined || parsedServingSize <= 0);
+	const handleUnitChange = (nextUnit: string) => {
+		if (parsedServingSize !== undefined && parsedServingSize > 0) {
+			const conversionFactor = calculateConversionFactorFromUnitToUnit(
+				ingredient,
+				ingredient.defaultUnit,
+				selectedUnit,
+				nextUnit,
+				[],
+			);
+
+			if (conversionFactor !== undefined) {
+				setDraftServingSize(
+					formatDraftServingSize(parsedServingSize * conversionFactor),
+				);
+			}
+		}
+
+		setSelectedUnit(nextUnit);
+	};
 
 	return (
 		<Dialog open={true} onClose={onClose} fullWidth maxWidth="xs">
 			<DialogTitle>Serving</DialogTitle>
 			<DialogContent>
 				<Stack spacing={2} sx={{ pt: 0.5 }}>
-					<TextField
-						label="Amount"
-						type="text"
-						slotProps={{ htmlInput: { inputMode: "decimal" } }}
-						value={draftServingSize}
-						onChange={(event) => setDraftServingSize(event.target.value)}
-						error={amountInvalid}
-						helperText={
-							amountInvalid ? "Amount must be a number greater than 0" : " "
-						}
-						fullWidth
-					/>
-
 					<FormControl fullWidth>
 						<InputLabel id="serving-unit-label">Unit</InputLabel>
 						<Select
 							labelId="serving-unit-label"
 							label="Unit"
 							value={selectedUnit}
-							onChange={(event) => setSelectedUnit(event.target.value)}
+							onChange={(event) => handleUnitChange(event.target.value)}
 						>
 							{unitOptions.weight.length > 0 && (
 								<ListSubheader sx={unitGroupHeaderSx}>Weight</ListSubheader>
@@ -124,6 +137,19 @@ const ServingDialog = ({
 							))}
 						</Select>
 					</FormControl>
+
+					<TextField
+						label="Amount"
+						type="text"
+						slotProps={{ htmlInput: { inputMode: "decimal" } }}
+						value={draftServingSize}
+						onChange={(event) => setDraftServingSize(event.target.value)}
+						error={amountInvalid}
+						helperText={
+							amountInvalid ? "Amount must be a number greater than 0" : " "
+						}
+						fullWidth
+					/>
 				</Stack>
 			</DialogContent>
 			<DialogActions>

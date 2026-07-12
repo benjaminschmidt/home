@@ -5,7 +5,9 @@ import type {
 	VolumeUnitDto,
 	WeightUnitDto,
 } from "home-api/dist/src";
+import { findCustomUnit } from "@/entities/ingredients/lib/searchCustomUnits.ts";
 import {
+	isGenericUnit,
 	isVolumeUnit,
 	isWeightUnit,
 } from "@/entities/ingredients/lib/unitType.ts";
@@ -173,7 +175,59 @@ const calculateConversionFactorFromDefaultUnitToCustomUnit = (
 		: undefined;
 };
 
+const calculateConversionFactorFromDefaultUnitToUnit = (
+	ingredient: IngredientDto,
+	defaultUnit: GenericUnitDto | undefined,
+	targetUnit: string,
+	errorContext: string[],
+) => {
+	if (defaultUnit === undefined) {
+		errorContext.push("Default unit is undefined.");
+		return undefined;
+	}
+
+	return isGenericUnit(targetUnit)
+		? calculateConversionFactorFromUnitAToB(
+				ingredient,
+				defaultUnit,
+				targetUnit,
+				errorContext,
+			)
+		: calculateConversionFactorFromDefaultUnitToCustomUnit(
+				ingredient,
+				defaultUnit,
+				findCustomUnit(ingredient.customUnits ?? [], targetUnit, errorContext),
+				errorContext,
+			);
+};
+
+const calculateConversionFactorFromUnitToUnit = (
+	ingredient: IngredientDto,
+	defaultUnit: GenericUnitDto | undefined,
+	sourceUnit: string,
+	targetUnit: string,
+	errorContext: string[],
+) => {
+	const sourceFactor = calculateConversionFactorFromDefaultUnitToUnit(
+		ingredient,
+		defaultUnit,
+		sourceUnit,
+		errorContext,
+	);
+	const targetFactor = calculateConversionFactorFromDefaultUnitToUnit(
+		ingredient,
+		defaultUnit,
+		targetUnit,
+		errorContext,
+	);
+
+	return sourceFactor !== undefined && targetFactor !== undefined
+		? targetFactor / sourceFactor
+		: undefined;
+};
+
 export {
 	calculateConversionFactorFromDefaultUnitToCustomUnit,
-	calculateConversionFactorFromUnitAToB,
+	calculateConversionFactorFromDefaultUnitToUnit,
+	calculateConversionFactorFromUnitToUnit,
 };

@@ -1,11 +1,12 @@
 import { describe, expect, it } from "vitest";
 import {
 	calculateConversionFactorFromDefaultUnitToCustomUnit,
-	calculateConversionFactorFromUnitAToB,
+	calculateConversionFactorFromDefaultUnitToUnit,
+	calculateConversionFactorFromUnitToUnit,
 } from "@/entities/ingredients/lib/conversion.ts";
 import { customUnitFactory, ingredientFactory } from "@/shared/testing";
 
-describe("calculateConversionFactorFromUnitAToB", () => {
+describe("calculateConversionFactorFromDefaultUnitToUnit", () => {
 	describe("weight to weight", () => {
 		it("returns 1 when converting GRAM to GRAM", () => {
 			// given
@@ -13,7 +14,7 @@ describe("calculateConversionFactorFromUnitAToB", () => {
 			const errorContext: string[] = [];
 
 			// when
-			const result = calculateConversionFactorFromUnitAToB(
+			const result = calculateConversionFactorFromDefaultUnitToUnit(
 				ingredient,
 				"GRAM",
 				"GRAM",
@@ -31,7 +32,7 @@ describe("calculateConversionFactorFromUnitAToB", () => {
 			const errorContext: string[] = [];
 
 			// when
-			const result = calculateConversionFactorFromUnitAToB(
+			const result = calculateConversionFactorFromDefaultUnitToUnit(
 				ingredient,
 				"KILOGRAM",
 				"GRAM",
@@ -49,7 +50,7 @@ describe("calculateConversionFactorFromUnitAToB", () => {
 			const errorContext: string[] = [];
 
 			// when
-			const result = calculateConversionFactorFromUnitAToB(
+			const result = calculateConversionFactorFromDefaultUnitToUnit(
 				ingredient,
 				"POUND",
 				"GRAM",
@@ -67,7 +68,7 @@ describe("calculateConversionFactorFromUnitAToB", () => {
 			const errorContext: string[] = [];
 
 			// when
-			const result = calculateConversionFactorFromUnitAToB(
+			const result = calculateConversionFactorFromDefaultUnitToUnit(
 				ingredient,
 				"OUNCE",
 				"KILOGRAM",
@@ -87,7 +88,7 @@ describe("calculateConversionFactorFromUnitAToB", () => {
 			const errorContext: string[] = [];
 
 			// when
-			const result = calculateConversionFactorFromUnitAToB(
+			const result = calculateConversionFactorFromDefaultUnitToUnit(
 				ingredient,
 				"MILLILITER",
 				"MILLILITER",
@@ -105,7 +106,7 @@ describe("calculateConversionFactorFromUnitAToB", () => {
 			const errorContext: string[] = [];
 
 			// when
-			const result = calculateConversionFactorFromUnitAToB(
+			const result = calculateConversionFactorFromDefaultUnitToUnit(
 				ingredient,
 				"LITER",
 				"MILLILITER",
@@ -123,7 +124,7 @@ describe("calculateConversionFactorFromUnitAToB", () => {
 			const errorContext: string[] = [];
 
 			// when
-			const result = calculateConversionFactorFromUnitAToB(
+			const result = calculateConversionFactorFromDefaultUnitToUnit(
 				ingredient,
 				"CUP",
 				"TABLESPOON",
@@ -147,7 +148,7 @@ describe("calculateConversionFactorFromUnitAToB", () => {
 			const errorContext: string[] = [];
 
 			// when
-			const result = calculateConversionFactorFromUnitAToB(
+			const result = calculateConversionFactorFromDefaultUnitToUnit(
 				ingredient,
 				"GRAM",
 				"MILLILITER",
@@ -171,7 +172,7 @@ describe("calculateConversionFactorFromUnitAToB", () => {
 			const errorContext: string[] = [];
 
 			// when
-			const result = calculateConversionFactorFromUnitAToB(
+			const result = calculateConversionFactorFromDefaultUnitToUnit(
 				ingredient,
 				"GRAM",
 				"MILLILITER",
@@ -193,7 +194,7 @@ describe("calculateConversionFactorFromUnitAToB", () => {
 			const errorContext: string[] = [];
 
 			// when
-			const result = calculateConversionFactorFromUnitAToB(
+			const result = calculateConversionFactorFromDefaultUnitToUnit(
 				ingredient,
 				"GRAM",
 				"MILLILITER",
@@ -217,7 +218,7 @@ describe("calculateConversionFactorFromUnitAToB", () => {
 			const errorContext: string[] = [];
 
 			// when
-			const result = calculateConversionFactorFromUnitAToB(
+			const result = calculateConversionFactorFromDefaultUnitToUnit(
 				ingredient,
 				"GRAM",
 				"MILLILITER",
@@ -239,7 +240,7 @@ describe("calculateConversionFactorFromUnitAToB", () => {
 			const errorContext: string[] = [];
 
 			// when
-			const result = calculateConversionFactorFromUnitAToB(
+			const result = calculateConversionFactorFromDefaultUnitToUnit(
 				ingredient,
 				"GRAM",
 				"MILLILITER",
@@ -261,7 +262,7 @@ describe("calculateConversionFactorFromUnitAToB", () => {
 			const errorContext: string[] = [];
 
 			// when
-			const result = calculateConversionFactorFromUnitAToB(
+			const result = calculateConversionFactorFromDefaultUnitToUnit(
 				ingredient,
 				"KILOGRAM",
 				"LITER",
@@ -285,7 +286,7 @@ describe("calculateConversionFactorFromUnitAToB", () => {
 			const errorContext: string[] = [];
 
 			// when
-			const result = calculateConversionFactorFromUnitAToB(
+			const result = calculateConversionFactorFromDefaultUnitToUnit(
 				ingredient,
 				"MILLILITER",
 				"GRAM",
@@ -307,7 +308,7 @@ describe("calculateConversionFactorFromUnitAToB", () => {
 			const errorContext: string[] = [];
 
 			// when
-			const result = calculateConversionFactorFromUnitAToB(
+			const result = calculateConversionFactorFromDefaultUnitToUnit(
 				ingredient,
 				"LITER",
 				"KILOGRAM",
@@ -499,6 +500,53 @@ describe("calculateConversionFactorFromDefaultUnitToCustomUnit", () => {
 
 		// then
 		expect(result).toBeCloseTo(6);
+		expect(errorContext).toHaveLength(0);
+	});
+});
+
+describe("calculateConversionFactorFromUnitToUnit", () => {
+	it("converts between generic units", () => {
+		// given
+		const ingredient = ingredientFactory.build();
+		const errorContext: string[] = [];
+
+		// when
+		const result = calculateConversionFactorFromUnitToUnit(
+			ingredient,
+			"GRAM",
+			"GRAM",
+			"KILOGRAM",
+			errorContext,
+		);
+
+		// then
+		expect(result).toBeCloseTo(0.001);
+		expect(errorContext).toHaveLength(0);
+	});
+
+	it("converts from a custom unit to a generic unit", () => {
+		// given
+		const customUnit = customUnitFactory.build({
+			name: "slice",
+			conversionUnit: "GRAM",
+			customUnitToConversionUnitFactor: 30,
+		});
+		const ingredient = ingredientFactory.build({
+			customUnits: [customUnit],
+		});
+		const errorContext: string[] = [];
+
+		// when
+		const result = calculateConversionFactorFromUnitToUnit(
+			ingredient,
+			"GRAM",
+			"slice",
+			"KILOGRAM",
+			errorContext,
+		);
+
+		// then
+		expect(result).toBeCloseTo(0.03);
 		expect(errorContext).toHaveLength(0);
 	});
 });
