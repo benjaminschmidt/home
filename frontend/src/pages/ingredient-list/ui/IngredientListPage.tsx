@@ -1,6 +1,6 @@
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
-import type { IngredientDto } from "home-api/dist/src";
+import type { IngredientDto } from "home-api";
 import type { RefObject } from "react";
 import { IngredientList } from "@/pages/ingredient-list/ui/IngredientList.tsx";
 import { SearchField } from "@/shared/ui/SearchField.tsx";

@@ -5,7 +5,7 @@ import type {
 	GenericUnitDto,
 	IngredientDto,
 	IngredientVariantDto,
-} from "home-api/dist/src";
+} from "home-api";
 
 const GENERIC_UNITS: GenericUnitDto[] = [
 	"GRAM",

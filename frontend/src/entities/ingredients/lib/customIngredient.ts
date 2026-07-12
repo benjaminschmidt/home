@@ -1,4 +1,4 @@
-import type { IngredientDto, IngredientVariantDto } from "home-api/dist/src";
+import type { IngredientDto, IngredientVariantDto } from "home-api";
 import { findIngredientVariant } from "@/entities/ingredients";
 import { calculateConversionFactorFromDefaultUnitToUnit } from "@/entities/ingredients/lib/conversion.ts";
 import type { Ingredient } from "@/entities/ingredients/model/ingredient.ts";

@@ -1,5 +1,5 @@
 import { infiniteQueryOptions } from "@tanstack/react-query";
-import { listIngredients } from "home-api/dist/src";
+import { listIngredients } from "home-api";
 
 const INGREDIENTS_PAGE_SIZE = 10;
 

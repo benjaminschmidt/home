@@ -1,4 +1,4 @@
-import type { IngredientVariantDto } from "home-api/dist/src";
+import type { IngredientVariantDto } from "home-api";
 
 const getDefaultIngredientVariant = (
 	ingredientVariants: IngredientVariantDto[],

@@ -3,7 +3,7 @@ import type {
 	GenericUnitDto,
 	VolumeUnitDto,
 	WeightUnitDto,
-} from "home-api/dist/src";
+} from "home-api";
 
 type Ingredient = {
 	name: string;

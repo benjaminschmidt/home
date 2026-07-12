@@ -1,4 +1,4 @@
-import type { IngredientDto } from "home-api/dist/src";
+import type { IngredientDto } from "home-api";
 import {
 	calculateConversionFactorFromDefaultUnitToUnit,
 	findIngredientVariant,

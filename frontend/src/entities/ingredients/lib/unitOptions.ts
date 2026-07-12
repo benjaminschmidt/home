@@ -1,4 +1,4 @@
-import type { CustomUnitDto, GenericUnitDto } from "home-api/dist/src";
+import type { CustomUnitDto, GenericUnitDto } from "home-api";
 import { formatUnit } from "@/entities/ingredients/lib/formatUnit.ts";
 import {
 	isVolumeUnit,

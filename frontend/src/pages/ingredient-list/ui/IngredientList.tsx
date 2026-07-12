@@ -1,5 +1,5 @@
 import List from "@mui/material/List";
-import type { IngredientDto } from "home-api/dist/src";
+import type { IngredientDto } from "home-api";
 import type { RefObject } from "react";
 import { IngredientListItem } from "@/pages/ingredient-list/ui/IngredientListItem.tsx";
 

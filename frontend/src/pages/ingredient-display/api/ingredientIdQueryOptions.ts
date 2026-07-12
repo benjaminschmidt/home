@@ -1,5 +1,5 @@
 import { queryOptions } from "@tanstack/react-query";
-import { getIngredient } from "home-api/dist/src";
+import { getIngredient } from "home-api";
 
 const createIngredientIdQueryOptions = (ingredientId: string) =>
 	queryOptions({

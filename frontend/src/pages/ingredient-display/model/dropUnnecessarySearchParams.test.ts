@@ -1,5 +1,5 @@
 import { faker } from "@faker-js/faker";
-import type { IngredientDto } from "home-api/dist/src";
+import type { IngredientDto } from "home-api";
 import { describe, expect, it } from "vitest";
 import { dropUnnecessarySearchParams } from "@/pages/ingredient-display";
 import { ingredientFactory, ingredientVariantFactory } from "@/shared/testing";

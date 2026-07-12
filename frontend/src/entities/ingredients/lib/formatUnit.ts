@@ -1,4 +1,4 @@
-import type { GenericUnitDto } from "home-api/dist/src";
+import type { GenericUnitDto } from "home-api";
 import { isGenericUnit } from "@/entities/ingredients/lib/unitType.ts";
 
 const unitSymbols: Record<GenericUnitDto, string> = {

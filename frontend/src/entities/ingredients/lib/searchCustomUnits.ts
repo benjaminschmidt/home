@@ -1,4 +1,4 @@
-import type { CustomUnitDto } from "home-api/dist/src";
+import type { CustomUnitDto } from "home-api";
 
 const findCustomUnit = (
 	customUnits: CustomUnitDto[],

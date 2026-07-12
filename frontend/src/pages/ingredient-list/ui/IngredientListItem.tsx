@@ -2,7 +2,7 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Divider from "@mui/material/Divider";
 import ListItem from "@mui/material/ListItem";
-import type { IngredientDto, IngredientVariantDto } from "home-api/dist/src";
+import type { IngredientDto, IngredientVariantDto } from "home-api";
 import { useState } from "react";
 import {
 	getIngredientNutritionDetailArray,

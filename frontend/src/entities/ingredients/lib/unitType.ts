@@ -1,8 +1,4 @@
-import type {
-	GenericUnitDto,
-	VolumeUnitDto,
-	WeightUnitDto,
-} from "home-api/dist/src";
+import type { GenericUnitDto, VolumeUnitDto, WeightUnitDto } from "home-api";
 
 const genericUnitDtoObject: Record<GenericUnitDto, undefined> = {
 	GRAM: undefined,

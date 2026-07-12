@@ -4,7 +4,7 @@ import type {
 	IngredientDto,
 	VolumeUnitDto,
 	WeightUnitDto,
-} from "home-api/dist/src";
+} from "home-api";
 import { findCustomUnit } from "@/entities/ingredients/lib/searchCustomUnits.ts";
 import {
 	isGenericUnit,

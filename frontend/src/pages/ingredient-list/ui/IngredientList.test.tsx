@@ -1,5 +1,5 @@
 import { render, screen } from "@testing-library/react";
-import type { IngredientDto } from "home-api/dist/src";
+import type { IngredientDto } from "home-api";
 import type { ReactNode } from "react";
 import { describe, expect, test, vi } from "vitest";
 import { IngredientList } from "@/pages/ingredient-list/ui/IngredientList.tsx";
