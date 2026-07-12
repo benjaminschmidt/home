@@ -24,8 +24,11 @@ const recalculateValue = (
 	servingSize: number,
 	value?: number,
 ) => {
-	if (defaultServingSize === 0)
-		throw new Error("Default serving size must not be zero.");
+	if (defaultServingSize <= 0)
+		throw new Error("Default serving size must be positive.");
+
+	if (conversionFactor <= 0)
+		throw new Error("Conversion factor must be positive.");
 
 	return value !== undefined
 		? (value * servingSize) / defaultServingSize / conversionFactor
@@ -33,7 +36,7 @@ const recalculateValue = (
 };
 
 const recalculateIngredient = (
-	name: string,
+	ingredient: IngredientDto,
 	variant: IngredientVariantDto,
 	conversionFactor: number,
 	defaultServingSize: number,
@@ -41,10 +44,11 @@ const recalculateIngredient = (
 	unit: string,
 ): Ingredient => {
 	return {
-		name,
+		name: ingredient.name,
 		description: variant.description,
 		servingSize,
 		unit,
+		...getIngredientConversionContext(ingredient, variant),
 		...Object.fromEntries(
 			nutrientFields.map((field) => [
 				field,
@@ -60,19 +64,39 @@ const recalculateIngredient = (
 };
 
 const copyIngredient = (
-	name: string,
+	ingredient: IngredientDto,
 	variant?: IngredientVariantDto,
 ): Ingredient => {
 	return {
-		name,
+		name: ingredient.name,
 		description: variant?.description,
 		servingSize: variant?.servingSize,
 		unit: variant?.unit,
+		...getIngredientConversionContext(ingredient, variant),
 		...Object.fromEntries(
 			nutrientFields.map((field) => [field, variant?.[field]]),
 		),
 	};
 };
+
+const getIngredientConversionContext = (
+	ingredient: IngredientDto,
+	variant?: IngredientVariantDto,
+): Pick<
+	Ingredient,
+	| "defaultUnit"
+	| "weightToVolumeConversionFactor"
+	| "conversionWeightUnit"
+	| "conversionVolumeUnit"
+	| "customUnits"
+> => ({
+	defaultUnit: variant?.unit ?? undefined,
+	weightToVolumeConversionFactor:
+		ingredient.weightToVolumeConversionFactor ?? undefined,
+	conversionWeightUnit: ingredient.conversionWeightUnit ?? undefined,
+	conversionVolumeUnit: ingredient.conversionVolumeUnit ?? undefined,
+	customUnits: ingredient.customUnits ?? [],
+});
 
 const getCustomIngredient = (
 	ingredient: IngredientDto,
@@ -88,21 +112,28 @@ const getCustomIngredient = (
 	);
 
 	if (variant === undefined) {
-		return copyIngredient(ingredient.name, undefined);
+		return copyIngredient(ingredient, undefined);
 	}
 
-	if (variant.servingSize == null || variant.servingSize === 0) {
-		errorContext.push("Serving size is missing or 0 on ingredient variant.");
-		return copyIngredient(ingredient.name, variant);
+	if (variant.servingSize === undefined || variant.servingSize <= 0) {
+		errorContext.push(
+			"Serving size is missing or not positive on ingredient variant.",
+		);
+		return copyIngredient(ingredient, variant);
 	}
 
-	if (variant.unit == null) {
+	if (variant.unit === undefined) {
 		errorContext.push("Unit is missing on ingredient variant.");
-		return copyIngredient(ingredient.name, variant);
+		return copyIngredient(ingredient, variant);
 	}
 
 	const servingSize = rawServingSize ?? variant.servingSize;
 	const unit = rawUnit ?? variant.unit;
+
+	if (servingSize <= 0) {
+		errorContext.push("Serving size must be positive.");
+		return copyIngredient(ingredient, variant);
+	}
 
 	const conversionFactor = isGenericUnit(unit)
 		? calculateConversionFactorFromUnitAToB(
@@ -118,12 +149,12 @@ const getCustomIngredient = (
 				errorContext,
 			);
 
-	if (conversionFactor == null) {
-		return copyIngredient(ingredient.name, variant);
+	if (conversionFactor === undefined) {
+		return copyIngredient(ingredient, variant);
 	}
 
 	return recalculateIngredient(
-		ingredient.name,
+		ingredient,
 		variant,
 		conversionFactor,
 		variant.servingSize,

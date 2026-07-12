@@ -84,9 +84,7 @@ const IngredientDetail = ({
 					<CardContent sx={{ pt: { xs: 1, sm: 1.5 }, px: { xs: 2, sm: 2.5 } }}>
 						<DetailGrid>
 							<ServingGridElement
-								servingSize={ingredient.servingSize}
-								unit={ingredient.unit}
-								customUnits={ingredientDto.customUnits}
+								ingredient={ingredient}
 								onServingChange={onServingChange}
 							/>
 							{nutritionDetailArray.map(({ label, value }) => (

@@ -10,23 +10,16 @@ import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
-import type { CustomUnitDto } from "home-api/dist/src";
 import { useState } from "react";
-import {
-	formatUnit,
-	volumeUnitDtoArray,
-	weightUnitDtoArray,
-} from "@/entities/ingredients";
+import { getUnitOptions, type Ingredient } from "@/entities/ingredients";
 
 type ServingDialogProps = {
-	servingSize?: number;
-	unit?: string;
-	customUnits?: CustomUnitDto[];
+	ingredient: Ingredient;
+	servingSize: number;
+	unit: string;
 	onClose: () => void;
 	onApply: (next: { servingSize?: number; unit?: string }) => void;
 };
-
-const emptyCustomUnits: CustomUnitDto[] = [];
 
 const unitGroupHeaderSx = {
 	typography: "caption",
@@ -47,20 +40,25 @@ const parseServingSize = (draftServingSize: string) => {
 	if (trimmedServingSize === "") return undefined;
 
 	const servingSize = Number(trimmedServingSize);
-	return Number.isNaN(servingSize) ? undefined : servingSize;
+	return Number.isFinite(servingSize) ? servingSize : undefined;
 };
 
 const ServingDialog = ({
+	ingredient,
 	servingSize,
 	unit,
-	customUnits = emptyCustomUnits,
 	onClose,
 	onApply,
 }: ServingDialogProps) => {
 	const [draftServingSize, setDraftServingSize] = useState(
-		servingSize?.toString() ?? "",
+		servingSize.toString(),
 	);
-	const [selectedUnit, setSelectedUnit] = useState(unit ?? "GRAM");
+	const [selectedUnit, setSelectedUnit] = useState(unit);
+	const unitOptions = getUnitOptions(ingredient);
+	const parsedServingSize = parseServingSize(draftServingSize);
+	const amountEmpty = draftServingSize.trim() === "";
+	const amountInvalid =
+		!amountEmpty && (parsedServingSize === undefined || parsedServingSize <= 0);
 
 	return (
 		<Dialog open={true} onClose={onClose} fullWidth maxWidth="xs">
@@ -69,9 +67,14 @@ const ServingDialog = ({
 				<Stack spacing={2} sx={{ pt: 0.5 }}>
 					<TextField
 						label="Amount"
-						type="number"
+						type="text"
+						slotProps={{ htmlInput: { inputMode: "decimal" } }}
 						value={draftServingSize}
 						onChange={(event) => setDraftServingSize(event.target.value)}
+						error={amountInvalid}
+						helperText={
+							amountInvalid ? "Amount must be a number greater than 0" : " "
+						}
 						fullWidth
 					/>
 
@@ -83,36 +86,40 @@ const ServingDialog = ({
 							value={selectedUnit}
 							onChange={(event) => setSelectedUnit(event.target.value)}
 						>
-							<ListSubheader sx={unitGroupHeaderSx}>Weight</ListSubheader>
-							{weightUnitDtoArray.map((weightUnit) => (
+							{unitOptions.weight.length > 0 && (
+								<ListSubheader sx={unitGroupHeaderSx}>Weight</ListSubheader>
+							)}
+							{unitOptions.weight.map((weightUnit) => (
 								<MenuItem
-									key={weightUnit}
-									value={weightUnit}
+									key={weightUnit.key}
+									value={weightUnit.value}
 									sx={unitMenuItemSx}
 								>
-									{formatUnit(weightUnit)}
+									{weightUnit.displayText}
 								</MenuItem>
 							))}
-							<ListSubheader sx={unitGroupHeaderSx}>Volume</ListSubheader>
-							{volumeUnitDtoArray.map((volumeUnit) => (
+							{unitOptions.volume.length > 0 && (
+								<ListSubheader sx={unitGroupHeaderSx}>Volume</ListSubheader>
+							)}
+							{unitOptions.volume.map((volumeUnit) => (
 								<MenuItem
-									key={volumeUnit}
-									value={volumeUnit}
+									key={volumeUnit.key}
+									value={volumeUnit.value}
 									sx={unitMenuItemSx}
 								>
-									{formatUnit(volumeUnit)}
+									{volumeUnit.displayText}
 								</MenuItem>
 							))}
-							{customUnits.length > 0 && (
+							{unitOptions.custom.length > 0 && (
 								<ListSubheader sx={unitGroupHeaderSx}>Custom</ListSubheader>
 							)}
-							{customUnits.map((customUnit) => (
+							{unitOptions.custom.map((customUnit) => (
 								<MenuItem
-									key={customUnit.name}
-									value={customUnit.name}
+									key={customUnit.key}
+									value={customUnit.value}
 									sx={unitMenuItemSx}
 								>
-									{customUnit.name}
+									{customUnit.displayText}
 								</MenuItem>
 							))}
 						</Select>
@@ -120,12 +127,22 @@ const ServingDialog = ({
 				</Stack>
 			</DialogContent>
 			<DialogActions>
+				<Button
+					onClick={() => {
+						onApply({ servingSize: undefined, unit: undefined });
+						onClose();
+					}}
+					sx={{ mr: "auto" }}
+				>
+					Reset
+				</Button>
 				<Button onClick={onClose}>Cancel</Button>
 				<Button
 					variant="contained"
+					disabled={amountInvalid}
 					onClick={() => {
 						onApply({
-							servingSize: parseServingSize(draftServingSize),
+							servingSize: parsedServingSize,
 							unit: selectedUnit,
 						});
 						onClose();

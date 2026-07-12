@@ -183,6 +183,30 @@ describe("calculateConversionFactorFromUnitAToB", () => {
 			expect(errorContext).toContain("Conversion weight unit is undefined.");
 		});
 
+		it("returns undefined and pushes error when weightToVolumeConversionFactor is 0", () => {
+			// given
+			const ingredient = ingredientFactory.build({
+				weightToVolumeConversionFactor: 0,
+				conversionWeightUnit: "GRAM",
+				conversionVolumeUnit: "MILLILITER",
+			});
+			const errorContext: string[] = [];
+
+			// when
+			const result = calculateConversionFactorFromUnitAToB(
+				ingredient,
+				"GRAM",
+				"MILLILITER",
+				errorContext,
+			);
+
+			// then
+			expect(result).toBeUndefined();
+			expect(errorContext).toContain(
+				"Weight to volume conversion factor must be positive.",
+			);
+		});
+
 		it("returns undefined and pushes error when conversionVolumeUnit is missing", () => {
 			// given
 			const ingredient = ingredientFactory.build({
@@ -338,11 +362,11 @@ describe("calculateConversionFactorFromDefaultUnitToCustomUnit", () => {
 		expect(errorContext).toContain("Custom unit is undefined.");
 	});
 
-	it("returns undefined and pushes error when customUnit.conversionUnit is null", () => {
+	it("returns undefined and pushes error when customUnit.conversionUnit is undefined", () => {
 		// given
 		const ingredient = ingredientFactory.build();
 		const customUnit = customUnitFactory.build({
-			conversionUnit: null as never,
+			conversionUnit: undefined,
 			customUnitToConversionUnitFactor: 1 / 2,
 		});
 		const errorContext: string[] = [];
@@ -360,12 +384,12 @@ describe("calculateConversionFactorFromDefaultUnitToCustomUnit", () => {
 		expect(errorContext).toContain("Conversion unit is undefined.");
 	});
 
-	it("returns undefined and pushes error when customUnit.customUnitToConversionUnitFactor is null", () => {
+	it("returns undefined and pushes error when customUnit.customUnitToConversionUnitFactor is undefined", () => {
 		// given
 		const ingredient = ingredientFactory.build();
 		const customUnit = customUnitFactory.build({
 			conversionUnit: "GRAM",
-			customUnitToConversionUnitFactor: null as never,
+			customUnitToConversionUnitFactor: undefined,
 		});
 		const errorContext: string[] = [];
 
@@ -381,6 +405,30 @@ describe("calculateConversionFactorFromDefaultUnitToCustomUnit", () => {
 		expect(result).toBeUndefined();
 		expect(errorContext).toContain(
 			"Conversion unit to custom unit factor is undefined.",
+		);
+	});
+
+	it("returns undefined and pushes error when customUnit.customUnitToConversionUnitFactor is negative", () => {
+		// given
+		const ingredient = ingredientFactory.build();
+		const customUnit = customUnitFactory.build({
+			conversionUnit: "GRAM",
+			customUnitToConversionUnitFactor: -1,
+		});
+		const errorContext: string[] = [];
+
+		// when
+		const result = calculateConversionFactorFromDefaultUnitToCustomUnit(
+			ingredient,
+			"GRAM",
+			customUnit,
+			errorContext,
+		);
+
+		// then
+		expect(result).toBeUndefined();
+		expect(errorContext).toContain(
+			"Conversion unit to custom unit factor must be positive.",
 		);
 	});
 

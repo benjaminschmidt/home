@@ -1,32 +1,45 @@
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import ButtonBase from "@mui/material/ButtonBase";
 import Typography from "@mui/material/Typography";
-import type { CustomUnitDto } from "home-api/dist/src";
 import { useState } from "react";
-import { getIngredientServingDetail } from "@/entities/ingredients";
+import {
+	getIngredientServingDetail,
+	type Ingredient,
+} from "@/entities/ingredients";
 import { ServingDialog } from "@/pages/ingredient-display/ui/ServingDialog.tsx";
 
 type ServingGridElementProps = {
-	servingSize?: number;
-	unit?: string;
-	customUnits?: CustomUnitDto[];
+	ingredient: Ingredient;
 	onServingChange?: (next: { servingSize?: number; unit?: string }) => void;
 };
 
 const ServingGridElement = ({
-	servingSize,
-	unit,
-	customUnits,
+	ingredient,
 	onServingChange,
 }: ServingGridElementProps) => {
 	const [dialogOpen, setDialogOpen] = useState(false);
-	const servingDetail = getIngredientServingDetail({ servingSize, unit });
+	const servingSize = ingredient.servingSize;
+	const unit = ingredient.unit;
+	const servingDetail = getIngredientServingDetail({
+		servingSize,
+		unit,
+	});
+	const canChangeServing =
+		servingSize !== undefined &&
+		unit !== undefined &&
+		ingredient.defaultUnit !== undefined;
 
 	return (
 		<>
 			<ButtonBase
 				component="div"
-				onClick={() => setDialogOpen(true)}
-				aria-label="Change serving"
+				disabled={!canChangeServing}
+				onClick={() => {
+					if (canChangeServing) setDialogOpen(true);
+				}}
+				aria-label={
+					canChangeServing ? "Change serving" : "Serving cannot be changed"
+				}
 				sx={{
 					display: "flex",
 					flexDirection: "column",
@@ -43,17 +56,31 @@ const ServingGridElement = ({
 						bgcolor: "action.hover",
 						borderColor: "text.secondary",
 					},
+					"&.Mui-disabled": {
+						color: "inherit",
+					},
 				}}
 			>
 				<Typography
 					component="dt"
 					sx={{
+						display: "flex",
+						alignItems: "center",
+						justifyContent: "space-between",
+						gap: 1,
 						typography: "body2",
 						color: "text.secondary",
 						whiteSpace: "nowrap",
 					}}
 				>
-					{servingDetail.label}
+					<span>{servingDetail.label}</span>
+					{canChangeServing && (
+						<EditOutlinedIcon
+							aria-hidden="true"
+							fontSize="small"
+							sx={{ color: "action.active" }}
+						/>
+					)}
 				</Typography>
 				<Typography
 					component="dd"
@@ -67,11 +94,11 @@ const ServingGridElement = ({
 					{servingDetail.value}
 				</Typography>
 			</ButtonBase>
-			{dialogOpen && (
+			{dialogOpen && canChangeServing && (
 				<ServingDialog
+					ingredient={ingredient}
 					servingSize={servingSize}
 					unit={unit}
-					customUnits={customUnits}
 					onClose={() => setDialogOpen(false)}
 					onApply={(next) => onServingChange?.(next)}
 				/>

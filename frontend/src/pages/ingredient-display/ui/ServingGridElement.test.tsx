@@ -6,15 +6,24 @@ import {
 	waitFor,
 } from "@testing-library/react";
 import { afterEach, describe, expect, test, vi } from "vitest";
+import type { Ingredient } from "@/entities/ingredients";
 import { ServingGridElement } from "@/pages/ingredient-display/ui/ServingGridElement.tsx";
 
 afterEach(cleanup);
+
+const ingredient: Ingredient = {
+	name: "ingredient",
+	servingSize: 100,
+	unit: "GRAM",
+	defaultUnit: "GRAM",
+	customUnits: [],
+};
 
 describe("ServingGridElement", () => {
 	test("renders serving size with formatted unit", () => {
 		// when
 		const { container } = render(
-			<ServingGridElement servingSize={100} unit="GRAM" />,
+			<ServingGridElement ingredient={ingredient} />,
 		);
 
 		// then
@@ -24,16 +33,41 @@ describe("ServingGridElement", () => {
 
 	test("renders an em-dash when serving size is missing", () => {
 		// when
-		const { container } = render(<ServingGridElement />);
+		const { container } = render(
+			<ServingGridElement
+				ingredient={{
+					...ingredient,
+					servingSize: undefined,
+				}}
+			/>,
+		);
 
 		// then
 		expect(container.querySelector("dt")?.textContent).toBe("Serving");
 		expect(container.querySelector("dd")?.textContent).toBe("\u2014");
 	});
 
+	test("does not open the serving dialog when serving data is incomplete", () => {
+		// given
+		render(
+			<ServingGridElement
+				ingredient={{
+					...ingredient,
+					unit: undefined,
+				}}
+			/>,
+		);
+
+		// when
+		fireEvent.click(screen.getByLabelText("Serving cannot be changed"));
+
+		// then
+		expect(screen.queryByRole("dialog")).toBeNull();
+	});
+
 	test("opens and closes the serving dialog", async () => {
 		// given
-		render(<ServingGridElement servingSize={100} unit="GRAM" />);
+		render(<ServingGridElement ingredient={ingredient} />);
 
 		// when
 		fireEvent.click(screen.getByLabelText("Change serving"));
@@ -54,8 +88,7 @@ describe("ServingGridElement", () => {
 		const onServingChange = vi.fn();
 		render(
 			<ServingGridElement
-				servingSize={100}
-				unit="GRAM"
+				ingredient={ingredient}
 				onServingChange={onServingChange}
 			/>,
 		);

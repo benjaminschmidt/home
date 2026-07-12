@@ -55,7 +55,7 @@ describe("getCustomIngredient", () => {
 			expect(result.name).toBe(ingredient.name);
 			expect(result.servingSize).toBeUndefined();
 			expect(errorContext).toContain(
-				"Serving size is missing or 0 on ingredient variant.",
+				"Serving size is missing or not positive on ingredient variant.",
 			);
 		});
 
@@ -80,7 +80,32 @@ describe("getCustomIngredient", () => {
 			expect(result.name).toBe(ingredient.name);
 			expect(result.servingSize).toBe(0);
 			expect(errorContext).toContain(
-				"Serving size is missing or 0 on ingredient variant.",
+				"Serving size is missing or not positive on ingredient variant.",
+			);
+		});
+
+		it("copies ingredient when variant servingSize is negative", () => {
+			// given
+			const variant = ingredientVariantFactory.build({ servingSize: -1 });
+			const ingredient = ingredientFactory.build({
+				ingredientVariants: [variant],
+			});
+			const errorContext: string[] = [];
+
+			// when
+			const result = getCustomIngredient(
+				ingredient,
+				variant.id,
+				undefined,
+				undefined,
+				errorContext,
+			);
+
+			// then
+			expect(result.name).toBe(ingredient.name);
+			expect(result.servingSize).toBe(-1);
+			expect(errorContext).toContain(
+				"Serving size is missing or not positive on ingredient variant.",
 			);
 		});
 
@@ -134,6 +159,45 @@ describe("getCustomIngredient", () => {
 			expect(result.servingSize).toBe(100);
 			expect(result.unit).toBe("GRAM");
 			expect(result.calories).toBeCloseTo(200);
+			expect(errorContext).toHaveLength(0);
+		});
+
+		it("adds conversion context to the returned ingredient", () => {
+			// given
+			const customUnit = customUnitFactory.build({
+				name: "slice",
+				conversionUnit: "GRAM",
+				customUnitToConversionUnitFactor: 30,
+			});
+			const variant = ingredientVariantFactory.build({
+				unit: "GRAM",
+				servingSize: 100,
+			});
+			const ingredient = ingredientFactory.build({
+				ingredientVariants: [variant],
+				weightToVolumeConversionFactor: 1,
+				conversionWeightUnit: "GRAM",
+				conversionVolumeUnit: "MILLILITER",
+				customUnits: [customUnit],
+			});
+			const errorContext: string[] = [];
+
+			// when
+			const result = getCustomIngredient(
+				ingredient,
+				variant.id,
+				1,
+				"KILOGRAM",
+				errorContext,
+			);
+
+			// then
+			expect(result.unit).toBe("KILOGRAM");
+			expect(result.defaultUnit).toBe("GRAM");
+			expect(result.weightToVolumeConversionFactor).toBe(1);
+			expect(result.conversionWeightUnit).toBe("GRAM");
+			expect(result.conversionVolumeUnit).toBe("MILLILITER");
+			expect(result.customUnits).toEqual([customUnit]);
 			expect(errorContext).toHaveLength(0);
 		});
 
@@ -193,6 +257,33 @@ describe("getCustomIngredient", () => {
 		expect(result.calories).toBeCloseTo(100);
 		expect(result.protein).toBeCloseTo(5);
 		expect(errorContext).toHaveLength(0);
+	});
+
+	it("returns copied ingredient when custom serving size is 0", () => {
+		// given
+		const variant = ingredientVariantFactory.build({
+			unit: "GRAM",
+			servingSize: 100,
+			calories: 200,
+		});
+		const ingredient = ingredientFactory.build({
+			ingredientVariants: [variant],
+		});
+		const errorContext: string[] = [];
+
+		// when
+		const result = getCustomIngredient(
+			ingredient,
+			variant.id,
+			0,
+			undefined,
+			errorContext,
+		);
+
+		// then
+		expect(result.servingSize).toBe(100);
+		expect(result.calories).toBe(200);
+		expect(errorContext).toContain("Serving size must be positive.");
 	});
 
 	describe("when using a generic unit conversion", () => {

@@ -9,7 +9,5 @@ export {
 	findIngredientVariant,
 	getDefaultIngredientVariant,
 } from "@/entities/ingredients/lib/searchVariants.ts";
-export {
-	volumeUnitDtoArray,
-	weightUnitDtoArray,
-} from "@/entities/ingredients/lib/unitType.ts";
+export { getUnitOptions } from "@/entities/ingredients/lib/unitOptions.ts";
+export type { Ingredient } from "@/entities/ingredients/model/ingredient.ts";

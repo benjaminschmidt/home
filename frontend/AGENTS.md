@@ -10,7 +10,8 @@ Before substantial work:
 
 ## Running tests
 - This repository uses pnpm and not npm.
-- Node is installed with mise and therefore, one needs to use `mise exec`.
+- To check that everything works after changes one can run `mise check` in either the root directory, the backend directory, or the frontend directory.
+- Node is installed with mise and therefore, one needs to use `mise exec` to run it.
 
 ## Architecture
 - The structure of the frontend source code is organized strictly by feature sliced design. The steiger tool is used to actually enforce it.

@@ -17,7 +17,9 @@ const genericUnitDtoObject: Record<GenericUnitDto, undefined> = {
 	TABLESPOON: undefined,
 	CUP: undefined,
 };
-const genericUnitDtoArray = Object.keys(genericUnitDtoObject);
+const genericUnitDtoArray = Object.keys(
+	genericUnitDtoObject,
+) as GenericUnitDto[];
 
 const volumeUnitDtoObject: Record<VolumeUnitDto, undefined> = {
 	MILLILITER: undefined,
@@ -27,7 +29,7 @@ const volumeUnitDtoObject: Record<VolumeUnitDto, undefined> = {
 	TABLESPOON: undefined,
 	CUP: undefined,
 };
-const volumeUnitDtoArray = Object.keys(volumeUnitDtoObject);
+const volumeUnitDtoArray = Object.keys(volumeUnitDtoObject) as VolumeUnitDto[];
 
 const weightUnitDtoObject: Record<WeightUnitDto, undefined> = {
 	GRAM: undefined,
@@ -36,16 +38,16 @@ const weightUnitDtoObject: Record<WeightUnitDto, undefined> = {
 	OUNCE: undefined,
 	POUND: undefined,
 };
-const weightUnitDtoArray = Object.keys(weightUnitDtoObject);
+const weightUnitDtoArray = Object.keys(weightUnitDtoObject) as WeightUnitDto[];
 
 const isGenericUnit = (value: string): value is GenericUnitDto =>
-	genericUnitDtoArray.includes(value);
+	(genericUnitDtoArray as readonly string[]).includes(value);
 
 const isVolumeUnit = (value: string): value is VolumeUnitDto =>
-	volumeUnitDtoArray.includes(value);
+	(volumeUnitDtoArray as readonly string[]).includes(value);
 
 const isWeightUnit = (value: string): value is WeightUnitDto =>
-	weightUnitDtoArray.includes(value);
+	(weightUnitDtoArray as readonly string[]).includes(value);
 
 export {
 	isGenericUnit,

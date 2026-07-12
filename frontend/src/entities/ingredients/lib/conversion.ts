@@ -87,17 +87,22 @@ const calculateConversionFactorFromUnitAToB = (
 		return calculateConversionFactorFromVolumeUnitAToB(unitA, unitB);
 	}
 
-	if (ingredient.weightToVolumeConversionFactor == null) {
+	if (ingredient.weightToVolumeConversionFactor === undefined) {
 		errorContext.push("Weight to volume conversion factor is undefined.");
 		return undefined;
 	}
 
-	if (ingredient.conversionWeightUnit == null) {
+	if (ingredient.weightToVolumeConversionFactor <= 0) {
+		errorContext.push("Weight to volume conversion factor must be positive.");
+		return undefined;
+	}
+
+	if (ingredient.conversionWeightUnit === undefined) {
 		errorContext.push("Conversion weight unit is undefined.");
 		return undefined;
 	}
 
-	if (ingredient.conversionVolumeUnit == null) {
+	if (ingredient.conversionVolumeUnit === undefined) {
 		errorContext.push("Conversion volume unit is undefined.");
 		return undefined;
 	}
@@ -139,13 +144,20 @@ const calculateConversionFactorFromDefaultUnitToCustomUnit = (
 		return undefined;
 	}
 
-	if (customUnit.conversionUnit == null) {
+	if (customUnit.conversionUnit === undefined) {
 		errorContext.push("Conversion unit is undefined.");
 		return undefined;
 	}
 
-	if (customUnit.customUnitToConversionUnitFactor == null) {
+	if (customUnit.customUnitToConversionUnitFactor === undefined) {
 		errorContext.push("Conversion unit to custom unit factor is undefined.");
+		return undefined;
+	}
+
+	if (customUnit.customUnitToConversionUnitFactor <= 0) {
+		errorContext.push(
+			"Conversion unit to custom unit factor must be positive.",
+		);
 		return undefined;
 	}
 

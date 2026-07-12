@@ -1,8 +1,20 @@
+import type {
+	CustomUnitDto,
+	GenericUnitDto,
+	VolumeUnitDto,
+	WeightUnitDto,
+} from "home-api/dist/src";
+
 type Ingredient = {
 	name: string;
 	description?: string;
 	servingSize?: number;
 	unit?: string;
+	defaultUnit?: GenericUnitDto;
+	weightToVolumeConversionFactor?: number;
+	conversionWeightUnit?: WeightUnitDto;
+	conversionVolumeUnit?: VolumeUnitDto;
+	customUnits: CustomUnitDto[];
 	calories?: number;
 	carbohydrate?: number;
 	fat?: number;

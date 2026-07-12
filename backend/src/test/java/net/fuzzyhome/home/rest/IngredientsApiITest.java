@@ -181,6 +181,42 @@ class IngredientsApiITest {
 
     @SneakyThrows
     @Test
+    void getIngredient_omitsNullValues() {
+        // given
+        final var ingredientVariant = IngredientVariant.builder()
+            .description("variant")
+            .defaultVariant(false)
+            .build();
+        final var customUnit = CustomUnit.builder()
+            .name("custom")
+            .build();
+        final var ingredient = Ingredient.builder()
+            .name("ingredient")
+            .ingredientVariants(List.of(ingredientVariant))
+            .customUnits(List.of(customUnit))
+            .build();
+        ingredientVariant.setIngredient(ingredient);
+        customUnit.setIngredient(ingredient);
+        ingredientRepository.saveAndFlush(ingredient);
+
+        // when
+        final var result = mockMvc.perform(get("/ingredients/{ingredientId}", ingredient.getId()))
+            .andExpect(status().isOk())
+            .andReturn();
+
+        // then
+        final var response = objectMapper.readTree(result.getResponse().getContentAsString());
+        assertThat(response.has("weightToVolumeConversionFactor")).isFalse();
+        assertThat(response.has("conversionWeightUnit")).isFalse();
+        assertThat(response.has("conversionVolumeUnit")).isFalse();
+        assertThat(response.get("ingredientVariants").get(0).has("unit")).isFalse();
+        assertThat(response.get("ingredientVariants").get(0).has("servingSize")).isFalse();
+        assertThat(response.get("customUnits").get(0).has("customUnitToConversionUnitFactor")).isFalse();
+        assertThat(response.get("customUnits").get(0).has("conversionUnit")).isFalse();
+    }
+
+    @SneakyThrows
+    @Test
     void updateIngredient() {
         // given
         final var ingredient = Instancio.of(Ingredient.class)
