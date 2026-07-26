@@ -12,6 +12,8 @@ const createIngredientIdQueryOptions = (ingredientId: string) =>
 				response?.data ?? {
 					id: ingredientId,
 					name: "Unknown",
+					ingredientVariants: [],
+					customUnits: [],
 				}
 			);
 		},

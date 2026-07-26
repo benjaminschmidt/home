@@ -1,0 +1,26 @@
+title: IngredientWriteRequest
+type: object
+required: [
+  "name", "ingredientVariants", "customUnits"
+]
+properties:
+  name:
+    type: string
+    nullable: false
+  weightToVolumeConversionFactor:
+    type: number
+    format: double
+  conversionWeightUnit:
+    $ref: './WeightUnitDto.yaml'
+  conversionVolumeUnit:
+    $ref: './VolumeUnitDto.yaml'
+  ingredientVariants:
+    type: array
+    description: "Authoritative list of variants. On update, variants are matched by description, so changing a description replaces the variant. At most one variant may have 'defaultVariant' set to true."
+    items:
+      $ref: './IngredientVariantWriteRequest.yaml'
+  customUnits:
+    type: array
+    description: "Authoritative list of custom units. On update, custom units are matched by name, so changing a name replaces the custom unit."
+    items:
+      $ref: './CustomUnitWriteRequest.yaml'

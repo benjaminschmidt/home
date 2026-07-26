@@ -14,8 +14,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.openapitools.model.CustomUnitDto;
+import org.openapitools.model.CustomUnitWriteRequest;
 import org.openapitools.model.IngredientDto;
 import org.openapitools.model.IngredientVariantDto;
+import org.openapitools.model.IngredientVariantWriteRequest;
+import org.openapitools.model.IngredientWriteRequest;
 import org.openapitools.model.VolumeUnitDto;
 import org.openapitools.model.WeightUnitDto;
 
@@ -158,10 +161,10 @@ class IngredientMapperTest {
     @Test
     void maps_to_entity_field_id() {
         // given
-        final var ingredientDto = Instancio.of(IngredientDto.class).create();
+        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class).create();
 
         // when
-        final var result = ingredientMapper.mapDtoToIngredient(ingredientDto);
+        final var result = ingredientMapper.mapWriteRequestToIngredient(ingredientWriteRequest);
 
         // then
         assertThat(result).extracting(Ingredient::getId)
@@ -171,38 +174,38 @@ class IngredientMapperTest {
     @Test
     void maps_to_entity_field_name() {
         // given
-        final var ingredientDto = Instancio.of(IngredientDto.class).create();
+        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class).create();
 
         // when
-        final var result = ingredientMapper.mapDtoToIngredient(ingredientDto);
+        final var result = ingredientMapper.mapWriteRequestToIngredient(ingredientWriteRequest);
 
         // then
         assertThat(result).extracting(Ingredient::getName)
-            .isEqualTo(ingredientDto.getName());
+            .isEqualTo(ingredientWriteRequest.getName());
     }
 
     @Test
     void maps_to_entity_field_weightToVolumeConversionFactor() {
         // given
-        final var ingredientDto = Instancio.of(IngredientDto.class).create();
+        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class).create();
 
         // when
-        final var result = ingredientMapper.mapDtoToIngredient(ingredientDto);
+        final var result = ingredientMapper.mapWriteRequestToIngredient(ingredientWriteRequest);
 
         // then
         assertThat(result).extracting(Ingredient::getWeightToVolumeConversionFactor)
-            .isEqualTo(ingredientDto.getWeightToVolumeConversionFactor());
+            .isEqualTo(ingredientWriteRequest.getWeightToVolumeConversionFactor());
     }
 
     @Test
     void maps_to_entity_field_conversionWeightUnit() {
         // given
-        final var ingredientDto = Instancio.of(IngredientDto.class)
-            .set(field(IngredientDto::getConversionWeightUnit), WeightUnitDto.MILLIGRAM)
+        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class)
+            .set(field(IngredientWriteRequest::getConversionWeightUnit), WeightUnitDto.MILLIGRAM)
             .create();
 
         // when
-        final var result = ingredientMapper.mapDtoToIngredient(ingredientDto);
+        final var result = ingredientMapper.mapWriteRequestToIngredient(ingredientWriteRequest);
 
         // then
         assertThat(result).extracting(Ingredient::getConversionWeightUnit)
@@ -212,12 +215,12 @@ class IngredientMapperTest {
     @Test
     void maps_to_entity_field_conversionVolumeUnit() {
         // given
-        final var ingredientDto = Instancio.of(IngredientDto.class)
-            .set(field(IngredientDto::getConversionVolumeUnit), VolumeUnitDto.LITER)
+        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class)
+            .set(field(IngredientWriteRequest::getConversionVolumeUnit), VolumeUnitDto.LITER)
             .create();
 
         // when
-        final var result = ingredientMapper.mapDtoToIngredient(ingredientDto);
+        final var result = ingredientMapper.mapWriteRequestToIngredient(ingredientWriteRequest);
 
         // then
         assertThat(result).extracting(Ingredient::getConversionVolumeUnit)
@@ -227,19 +230,19 @@ class IngredientMapperTest {
     @Test
     void maps_to_entity_field_ingredientVariants() {
         // given
-        final var ingredientDto = Instancio.of(IngredientDto.class)
+        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class)
             .set(
-                field(IngredientDto::getIngredientVariants),
-                Instancio.ofList(IngredientVariantDto.class)
+                field(IngredientWriteRequest::getIngredientVariants),
+                Instancio.ofList(IngredientVariantWriteRequest.class)
                     .size(2)
                     .create()
             )
             .create();
         final var ingredientVariant = Instancio.of(IngredientVariant.class).create();
-        when(ingredientVariantMapper.mapDtoToIngredientVariant(any(), any())).thenReturn(ingredientVariant);
+        when(ingredientVariantMapper.mapWriteRequestToIngredientVariant(any(), any())).thenReturn(ingredientVariant);
 
         // when
-        final var result = ingredientMapper.mapDtoToIngredient(ingredientDto);
+        final var result = ingredientMapper.mapWriteRequestToIngredient(ingredientWriteRequest);
 
         // then
         assertThat(result).extracting(
@@ -252,19 +255,19 @@ class IngredientMapperTest {
     @Test
     void maps_to_entity_field_customUnits() {
         // given
-        final var ingredientDto = Instancio.of(IngredientDto.class)
+        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class)
             .set(
-                field(IngredientDto::getCustomUnits),
-                Instancio.ofList(CustomUnitDto.class)
+                field(IngredientWriteRequest::getCustomUnits),
+                Instancio.ofList(CustomUnitWriteRequest.class)
                     .size(2)
                     .create()
             )
             .create();
         final var customUnit = Instancio.of(CustomUnit.class).create();
-        when(customUnitMapper.mapDtoToCustomUnit(any(), any())).thenReturn(customUnit);
+        when(customUnitMapper.mapWriteRequestToCustomUnit(any(), any())).thenReturn(customUnit);
 
         // when
-        final var result = ingredientMapper.mapDtoToIngredient(ingredientDto);
+        final var result = ingredientMapper.mapWriteRequestToIngredient(ingredientWriteRequest);
 
         // then
         assertThat(result).extracting(
@@ -278,28 +281,28 @@ class IngredientMapperTest {
     void updates_entity_field_name() {
         // given
         final var ingredient = Instancio.of(Ingredient.class).create();
-        final var ingredientDto = Instancio.of(IngredientDto.class).create();
+        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class).create();
 
         // when
-        final var result = ingredientMapper.updateIngredientFromDto(ingredient, ingredientDto);
+        final var result = ingredientMapper.updateIngredientFromWriteRequest(ingredient, ingredientWriteRequest);
 
         // then
         assertThat(result).extracting(Ingredient::getName)
-            .isEqualTo(ingredientDto.getName());
+            .isEqualTo(ingredientWriteRequest.getName());
     }
 
     @Test
     void updates_entity_field_weightToVolumeConversionFactor() {
         // given
         final var ingredient = Instancio.of(Ingredient.class).create();
-        final var ingredientDto = Instancio.of(IngredientDto.class).create();
+        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class).create();
 
         // when
-        final var result = ingredientMapper.updateIngredientFromDto(ingredient, ingredientDto);
+        final var result = ingredientMapper.updateIngredientFromWriteRequest(ingredient, ingredientWriteRequest);
 
         // then
         assertThat(result).extracting(Ingredient::getWeightToVolumeConversionFactor)
-            .isEqualTo(ingredientDto.getWeightToVolumeConversionFactor());
+            .isEqualTo(ingredientWriteRequest.getWeightToVolumeConversionFactor());
     }
 
     @Test
@@ -308,12 +311,12 @@ class IngredientMapperTest {
         final var ingredient = Instancio.of(Ingredient.class)
             .set(field(Ingredient::getConversionWeightUnit), WeightUnit.GRAM)
             .create();
-        final var ingredientDto = Instancio.of(IngredientDto.class)
-            .set(field(IngredientDto::getConversionWeightUnit), WeightUnitDto.MILLIGRAM)
+        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class)
+            .set(field(IngredientWriteRequest::getConversionWeightUnit), WeightUnitDto.MILLIGRAM)
             .create();
 
         // when
-        final var result = ingredientMapper.updateIngredientFromDto(ingredient, ingredientDto);
+        final var result = ingredientMapper.updateIngredientFromWriteRequest(ingredient, ingredientWriteRequest);
 
         // then
         assertThat(result).extracting(Ingredient::getConversionWeightUnit)
@@ -326,12 +329,12 @@ class IngredientMapperTest {
         final var ingredient = Instancio.of(Ingredient.class)
             .set(field(Ingredient::getConversionVolumeUnit), VolumeUnit.FLUID_OUNCE)
             .create();
-        final var ingredientDto = Instancio.of(IngredientDto.class)
-            .set(field(IngredientDto::getConversionVolumeUnit), VolumeUnitDto.TEASPOON)
+        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class)
+            .set(field(IngredientWriteRequest::getConversionVolumeUnit), VolumeUnitDto.TEASPOON)
             .create();
 
         // when
-        final var result = ingredientMapper.updateIngredientFromDto(ingredient, ingredientDto);
+        final var result = ingredientMapper.updateIngredientFromWriteRequest(ingredient, ingredientWriteRequest);
 
         // then
         assertThat(result).extracting(Ingredient::getConversionVolumeUnit)
@@ -346,31 +349,31 @@ class IngredientMapperTest {
             .set(field(Ingredient::getIngredientVariants), ingredientVariants)
             .create();
 
-        final var ingredientDto = Instancio.of(IngredientDto.class)
+        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class)
             .set(
-                field(IngredientDto::getIngredientVariants),
+                field(IngredientWriteRequest::getIngredientVariants),
                 List.of(
-                    Instancio.of(IngredientVariantDto.class)
+                    Instancio.of(IngredientVariantWriteRequest.class)
                         .set(
-                            field(IngredientVariantDto::getDescription),
+                            field(IngredientVariantWriteRequest::getDescription),
                             ingredientVariants.getFirst().getDescription()
                         )
                         .create(),
-                    Instancio.of(IngredientVariantDto.class)
+                    Instancio.of(IngredientVariantWriteRequest.class)
                         .create()
                 )
             )
             .create();
 
         final var ingredientVariantNew = Instancio.of(IngredientVariant.class).create();
-        when(ingredientVariantMapper.updateIngredientVariantFromDto(
+        when(ingredientVariantMapper.updateIngredientVariantFromWriteRequest(
             any(),
             any()
         )).thenReturn(ingredientVariants.getFirst());
-        when(ingredientVariantMapper.mapDtoToIngredientVariant(any(), any())).thenReturn(ingredientVariantNew);
+        when(ingredientVariantMapper.mapWriteRequestToIngredientVariant(any(), any())).thenReturn(ingredientVariantNew);
 
         // when
-        final var result = ingredientMapper.updateIngredientFromDto(ingredient, ingredientDto);
+        final var result = ingredientMapper.updateIngredientFromWriteRequest(ingredient, ingredientWriteRequest);
 
         // then
         assertThat(result).extracting(
@@ -387,31 +390,31 @@ class IngredientMapperTest {
             .set(field(Ingredient::getCustomUnits), customUnits)
             .create();
 
-        final var ingredientDto = Instancio.of(IngredientDto.class)
+        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class)
             .set(
-                field(IngredientDto::getCustomUnits),
+                field(IngredientWriteRequest::getCustomUnits),
                 List.of(
-                    Instancio.of(CustomUnitDto.class)
+                    Instancio.of(CustomUnitWriteRequest.class)
                         .set(
-                            field(CustomUnitDto::getName),
+                            field(CustomUnitWriteRequest::getName),
                             customUnits.getFirst().getName()
                         )
                         .create(),
-                    Instancio.of(CustomUnitDto.class)
+                    Instancio.of(CustomUnitWriteRequest.class)
                         .create()
                 )
             )
             .create();
 
         final var customUnit = Instancio.of(CustomUnit.class).create();
-        when(customUnitMapper.updateCustomUnitFromDto(
+        when(customUnitMapper.updateCustomUnitFromWriteRequest(
             any(),
             any()
         )).thenReturn(customUnits.getFirst());
-        when(customUnitMapper.mapDtoToCustomUnit(any(), any())).thenReturn(customUnit);
+        when(customUnitMapper.mapWriteRequestToCustomUnit(any(), any())).thenReturn(customUnit);
 
         // when
-        final var result = ingredientMapper.updateIngredientFromDto(ingredient, ingredientDto);
+        final var result = ingredientMapper.updateIngredientFromWriteRequest(ingredient, ingredientWriteRequest);
 
         // then
         assertThat(result).extracting(

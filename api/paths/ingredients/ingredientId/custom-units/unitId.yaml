@@ -48,7 +48,7 @@ put:
     content:
       application/json:
         schema:
-          $ref: '../../../../components/ingredients/CustomUnitDto.yaml'
+          $ref: '../../../../components/ingredients/CustomUnitWriteRequest.yaml'
   responses:
     '200':
       description: Successfully updated custom unit

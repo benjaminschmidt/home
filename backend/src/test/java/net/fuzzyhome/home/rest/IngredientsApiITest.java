@@ -17,8 +17,11 @@ import org.instancio.Instancio;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.openapitools.model.CustomUnitDto;
+import org.openapitools.model.CustomUnitWriteRequest;
 import org.openapitools.model.IngredientDto;
 import org.openapitools.model.IngredientVariantDto;
+import org.openapitools.model.IngredientVariantWriteRequest;
+import org.openapitools.model.IngredientWriteRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -131,21 +134,44 @@ class IngredientsApiITest {
     @Test
     void createIngredient() {
         // given
-        final var ingredientDto = Instancio.of(IngredientDto.class)
-            .ignore(field(IngredientDto::getId))
-            .set(field(IngredientVariantDto::getDefaultVariant), false)
+        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class)
+            .set(field(IngredientVariantWriteRequest::getDefaultVariant), false)
             .create();
 
         // when
         mockMvc.perform(post("/ingredients")
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(ingredientDto)))
+                .content(objectMapper.writeValueAsString(ingredientWriteRequest)))
             .andExpect(status().isCreated());
 
         // then
         assertThat(ingredientRepository.findAll()).singleElement()
             .extracting(Ingredient::getName)
-            .isEqualTo(ingredientDto.getName());
+            .isEqualTo(ingredientWriteRequest.getName());
+    }
+
+    @SneakyThrows
+    @Test
+    void createIngredient_requiresNestedCollections() {
+        mockMvc.perform(post("/ingredients")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {
+                      "name": "ingredient",
+                      "customUnits": []
+                    }
+                    """))
+            .andExpect(status().isBadRequest());
+
+        mockMvc.perform(post("/ingredients")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {
+                      "name": "ingredient",
+                      "ingredientVariants": []
+                    }
+                    """))
+            .andExpect(status().isBadRequest());
     }
 
     @SneakyThrows
@@ -231,23 +257,51 @@ class IngredientsApiITest {
             .ifPresent(customUnits -> customUnits.forEach(customUnit -> customUnit.setIngredient(ingredient)));
         ingredientRepository.saveAndFlush(ingredient);
 
-        final var ingredientDto = Instancio.of(IngredientDto.class)
-            .ignore(field(IngredientDto::getId))
-            .ignore(field(IngredientVariantDto::getId))
-            .ignore(field(CustomUnitDto::getId))
-            .set(field(IngredientVariantDto::getDefaultVariant), false)
+        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class)
+            .set(field(IngredientVariantWriteRequest::getDefaultVariant), false)
             .create();
 
         // when
         mockMvc.perform(put("/ingredients/{ingredientId}", ingredient.getId())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(ingredientDto)))
+                .content(objectMapper.writeValueAsString(ingredientWriteRequest)))
             .andExpect(status().isOk());
 
         // then
         assertThat(ingredientRepository.findAll()).singleElement()
             .extracting(Ingredient::getName)
-            .isEqualTo(ingredientDto.getName());
+            .isEqualTo(ingredientWriteRequest.getName());
+    }
+
+    @SneakyThrows
+    @Test
+    void updateIngredient_requiresNestedCollections() {
+        final var ingredient = Ingredient.builder()
+            .name("ingredient")
+            .ingredientVariants(List.of())
+            .customUnits(List.of())
+            .build();
+        ingredientRepository.saveAndFlush(ingredient);
+
+        mockMvc.perform(put("/ingredients/{ingredientId}", ingredient.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {
+                      "name": "updated ingredient",
+                      "customUnits": []
+                    }
+                    """))
+            .andExpect(status().isBadRequest());
+
+        mockMvc.perform(put("/ingredients/{ingredientId}", ingredient.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                    {
+                      "name": "updated ingredient",
+                      "ingredientVariants": []
+                    }
+                    """))
+            .andExpect(status().isBadRequest());
     }
 
     @SneakyThrows
@@ -316,14 +370,12 @@ class IngredientsApiITest {
             .ifPresent(ingredientVariants -> ingredientVariants.forEach(variant -> variant.setIngredient(ingredient)));
         ingredientRepository.saveAndFlush(ingredient);
 
-        final var ingredientVariantDto = Instancio.of(IngredientVariantDto.class)
-            .ignore(field(IngredientVariantDto::getId))
-            .create();
+        final var ingredientVariantWriteRequest = Instancio.of(IngredientVariantWriteRequest.class).create();
 
         // when
         final var result = mockMvc.perform(post("/ingredients/{ingredientId}/variants", ingredient.getId())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(ingredientVariantDto)))
+                .content(objectMapper.writeValueAsString(ingredientVariantWriteRequest)))
             .andExpect(status().isCreated())
             .andReturn();
 
@@ -333,7 +385,7 @@ class IngredientsApiITest {
             IngredientVariantDto.class
         );
         assertThat(response).extracting(IngredientVariantDto::getDescription)
-            .isEqualTo(ingredientVariantDto.getDescription());
+            .isEqualTo(ingredientVariantWriteRequest.getDescription());
     }
 
     @Test
@@ -397,9 +449,8 @@ class IngredientsApiITest {
             .create();
         ingredientRepository.saveAndFlush(otherIngredient);
 
-        final var ingredientVariantDto = Instancio.of(IngredientVariantDto.class)
-            .ignore(field(IngredientVariantDto::getId))
-            .set(field(IngredientVariantDto::getDescription), "changed description")
+        final var ingredientVariantWriteRequest = Instancio.of(IngredientVariantWriteRequest.class)
+            .set(field(IngredientVariantWriteRequest::getDescription), "changed description")
             .create();
 
         // when / then
@@ -415,7 +466,7 @@ class IngredientsApiITest {
                 otherIngredient.getId(),
                 ingredientVariant.getId()
             ).contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(ingredientVariantDto)))
+                .content(objectMapper.writeValueAsString(ingredientVariantWriteRequest)))
             .andExpect(status().isNotFound());
 
         mockMvc.perform(delete(
@@ -449,9 +500,7 @@ class IngredientsApiITest {
         ingredientVariant.setIngredient(ingredient);
         ingredientRepository.saveAndFlush(ingredient);
 
-        final var ingredientVariantDto = Instancio.of(IngredientVariantDto.class)
-            .ignore(field(IngredientVariantDto::getId))
-            .create();
+        final var ingredientVariantWriteRequest = Instancio.of(IngredientVariantWriteRequest.class).create();
 
         // when
         final var result = mockMvc.perform(put(
@@ -459,7 +508,7 @@ class IngredientsApiITest {
                 ingredient.getId(),
                 ingredientVariant.getId()
             ).contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(ingredientVariantDto)))
+                .content(objectMapper.writeValueAsString(ingredientVariantWriteRequest)))
             .andExpect(status().isOk())
             .andReturn();
 
@@ -469,7 +518,7 @@ class IngredientsApiITest {
             IngredientVariantDto.class
         );
         assertThat(response).extracting(IngredientVariantDto::getDescription)
-            .isEqualTo(ingredientVariantDto.getDescription());
+            .isEqualTo(ingredientVariantWriteRequest.getDescription());
     }
 
     @SneakyThrows
@@ -543,14 +592,12 @@ class IngredientsApiITest {
             .ifPresent(customUnits -> customUnits.forEach(customUnit -> customUnit.setIngredient(ingredient)));
         ingredientRepository.saveAndFlush(ingredient);
 
-        final var customUnitDto = Instancio.of(CustomUnitDto.class)
-            .ignore(field(CustomUnitDto::getId))
-            .create();
+        final var customUnitWriteRequest = Instancio.of(CustomUnitWriteRequest.class).create();
 
         // when
         final var result = mockMvc.perform(post("/ingredients/{ingredientId}/custom-units", ingredient.getId())
                 .contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(customUnitDto)))
+                .content(objectMapper.writeValueAsString(customUnitWriteRequest)))
             .andExpect(status().isCreated())
             .andReturn();
 
@@ -560,7 +607,7 @@ class IngredientsApiITest {
             CustomUnitDto.class
         );
         assertThat(response).extracting(CustomUnitDto::getName)
-            .isEqualTo(customUnitDto.getName());
+            .isEqualTo(customUnitWriteRequest.getName());
     }
 
     @Test
@@ -624,9 +671,8 @@ class IngredientsApiITest {
             .create();
         ingredientRepository.saveAndFlush(otherIngredient);
 
-        final var customUnitDto = Instancio.of(CustomUnitDto.class)
-            .ignore(field(CustomUnitDto::getId))
-            .set(field(CustomUnitDto::getName), "changed unit")
+        final var customUnitWriteRequest = Instancio.of(CustomUnitWriteRequest.class)
+            .set(field(CustomUnitWriteRequest::getName), "changed unit")
             .create();
 
         // when / then
@@ -642,7 +688,7 @@ class IngredientsApiITest {
                 otherIngredient.getId(),
                 customUnit.getId()
             ).contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(customUnitDto)))
+                .content(objectMapper.writeValueAsString(customUnitWriteRequest)))
             .andExpect(status().isNotFound());
 
         mockMvc.perform(delete(
@@ -676,9 +722,7 @@ class IngredientsApiITest {
         customUnit.setIngredient(ingredient);
         ingredientRepository.saveAndFlush(ingredient);
 
-        final var customUnitDto = Instancio.of(CustomUnitDto.class)
-            .ignore(field(CustomUnitDto::getId))
-            .create();
+        final var customUnitWriteRequest = Instancio.of(CustomUnitWriteRequest.class).create();
 
         // when
         final var result = mockMvc.perform(put(
@@ -686,7 +730,7 @@ class IngredientsApiITest {
                 ingredient.getId(),
                 customUnit.getId()
             ).contentType(MediaType.APPLICATION_JSON)
-                .content(objectMapper.writeValueAsString(customUnitDto)))
+                .content(objectMapper.writeValueAsString(customUnitWriteRequest)))
             .andExpect(status().isOk())
             .andReturn();
 
@@ -696,7 +740,7 @@ class IngredientsApiITest {
             CustomUnitDto.class
         );
         assertThat(response).extracting(CustomUnitDto::getName)
-            .isEqualTo(customUnitDto.getName());
+            .isEqualTo(customUnitWriteRequest.getName());
     }
 
     @SneakyThrows

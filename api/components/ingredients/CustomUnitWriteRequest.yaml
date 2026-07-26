@@ -1,13 +1,9 @@
-title: CustomUnitDto
+title: CustomUnitWriteRequest
 type: object
 required: [
-  "id", "name"
+  "name"
 ]
 properties:
-  id:
-    type: string
-    format: uuid
-    readOnly: true
   name:
     type: string
     nullable: false

@@ -5,6 +5,7 @@ import net.fuzzyhome.home.database.entities.CustomUnit;
 import net.fuzzyhome.home.database.entities.Ingredient;
 import org.jspecify.annotations.NonNull;
 import org.openapitools.model.CustomUnitDto;
+import org.openapitools.model.CustomUnitWriteRequest;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -22,26 +23,26 @@ public class CustomUnitMapper {
     }
 
     @NonNull
-    public CustomUnit mapDtoToCustomUnit(
-        @NonNull final CustomUnitDto customUnitDto,
+    public CustomUnit mapWriteRequestToCustomUnit(
+        @NonNull final CustomUnitWriteRequest customUnitWriteRequest,
         @NonNull final Ingredient ingredient
     ) {
         return CustomUnit.builder()
-            .name(customUnitDto.getName())
-            .customUnitToConversionUnitFactor(customUnitDto.getCustomUnitToConversionUnitFactor())
-            .conversionUnit(UnitUtils.mapDtoToGenericUnit(customUnitDto.getConversionUnit()))
+            .name(customUnitWriteRequest.getName())
+            .customUnitToConversionUnitFactor(customUnitWriteRequest.getCustomUnitToConversionUnitFactor())
+            .conversionUnit(UnitUtils.mapDtoToGenericUnit(customUnitWriteRequest.getConversionUnit()))
             .ingredient(ingredient)
             .build();
     }
 
     @NonNull
-    public CustomUnit updateCustomUnitFromDto(
+    public CustomUnit updateCustomUnitFromWriteRequest(
         @NonNull final CustomUnit customUnit,
-        @NonNull final CustomUnitDto customUnitDto
+        @NonNull final CustomUnitWriteRequest customUnitWriteRequest
     ) {
-        customUnit.setName(customUnitDto.getName());
-        customUnit.setCustomUnitToConversionUnitFactor(customUnitDto.getCustomUnitToConversionUnitFactor());
-        customUnit.setConversionUnit(UnitUtils.mapDtoToGenericUnit(customUnitDto.getConversionUnit()));
+        customUnit.setName(customUnitWriteRequest.getName());
+        customUnit.setCustomUnitToConversionUnitFactor(customUnitWriteRequest.getCustomUnitToConversionUnitFactor());
+        customUnit.setConversionUnit(UnitUtils.mapDtoToGenericUnit(customUnitWriteRequest.getConversionUnit()));
         return customUnit;
     }
 }

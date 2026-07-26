@@ -21,7 +21,7 @@ type IngredientListItemProps = {
 
 const IngredientListItem = ({ ingredient }: IngredientListItemProps) => {
 	const ingredientVariants: IngredientVariantDto[] =
-		ingredient.ingredientVariants ?? [];
+		ingredient.ingredientVariants;
 
 	const foundIndex = ingredientVariants.findIndex((v) => v.defaultVariant);
 	const defaultIndex = foundIndex !== -1 ? foundIndex : 0;
@@ -42,7 +42,7 @@ const IngredientListItem = ({ ingredient }: IngredientListItemProps) => {
 			>
 				<RouterCardActionArea
 					to="/ingredients/$id"
-					params={{ id: ingredient.id ?? "" }}
+					params={{ id: ingredient.id }}
 					search={
 						ingredientVariant?.id ? { variantId: ingredientVariant.id } : {}
 					}

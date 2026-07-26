@@ -19,8 +19,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.openapitools.model.CustomUnitDto;
+import org.openapitools.model.CustomUnitWriteRequest;
 import org.openapitools.model.IngredientDto;
 import org.openapitools.model.IngredientVariantDto;
+import org.openapitools.model.IngredientVariantWriteRequest;
+import org.openapitools.model.IngredientWriteRequest;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -57,10 +60,10 @@ public class IngredientServiceImpl implements IngredientService {
 
     @NonNull
     @Override
-    public IngredientDto createIngredient(@NonNull final IngredientDto ingredientDto) {
-        validateIngredientDto(ingredientDto);
+    public IngredientDto createIngredient(@NonNull final IngredientWriteRequest ingredientWriteRequest) {
+        validateIngredientWriteRequest(ingredientWriteRequest);
         return ingredientMapper.mapIngredientToDto(
-            ingredientRepository.save(ingredientMapper.mapDtoToIngredient(ingredientDto))
+            ingredientRepository.save(ingredientMapper.mapWriteRequestToIngredient(ingredientWriteRequest))
         );
     }
 
@@ -76,11 +79,11 @@ public class IngredientServiceImpl implements IngredientService {
     @Override
     public IngredientDto updateIngredient(
         @NonNull final UUID ingredientId,
-        @NonNull final IngredientDto ingredientDto
+        @NonNull final IngredientWriteRequest ingredientWriteRequest
     ) {
-        validateIngredientDto(ingredientDto);
+        validateIngredientWriteRequest(ingredientWriteRequest);
         return ingredientRepository.findById(ingredientId)
-            .map(ingredient -> ingredientMapper.updateIngredientFromDto(ingredient, ingredientDto))
+            .map(ingredient -> ingredientMapper.updateIngredientFromWriteRequest(ingredient, ingredientWriteRequest))
             .map(ingredientRepository::save)
             .map(ingredientMapper::mapIngredientToDto)
             .orElseThrow(() -> new NotFoundException(String.format("Ingredient not found for id: %s", ingredientId)));
@@ -104,10 +107,13 @@ public class IngredientServiceImpl implements IngredientService {
     @Override
     public IngredientVariantDto addIngredientVariantToIngredient(
         @NonNull final UUID ingredientId,
-        @NonNull final IngredientVariantDto ingredientVariantDto
+        @NonNull final IngredientVariantWriteRequest ingredientVariantWriteRequest
     ) {
         return ingredientRepository.findById(ingredientId)
-            .map(ingredient -> ingredientVariantMapper.mapDtoToIngredientVariant(ingredientVariantDto, ingredient))
+            .map(ingredient -> ingredientVariantMapper.mapWriteRequestToIngredientVariant(
+                ingredientVariantWriteRequest,
+                ingredient
+            ))
             .map(ingredientVariantRepository::save)
             .map(ingredientVariantMapper::mapIngredientVariantToDto)
             .orElseThrow(() -> new NotFoundException(String.format("Ingredient not found for id: %s", ingredientId)));
@@ -136,16 +142,16 @@ public class IngredientServiceImpl implements IngredientService {
     public IngredientVariantDto updateIngredientVariant(
         @NonNull final UUID ingredientId,
         @NonNull final UUID variantId,
-        @NonNull final IngredientVariantDto ingredientVariantDto
+        @NonNull final IngredientVariantWriteRequest ingredientVariantWriteRequest
     ) {
         if (!ingredientRepository.existsById(ingredientId)) {
             throw new NotFoundException(String.format("Ingredient not found for id: %s", ingredientId));
         }
 
         return ingredientVariantRepository.findByIdAndIngredientId(variantId, ingredientId)
-            .map(ingredientVariant -> ingredientVariantMapper.updateIngredientVariantFromDto(
+            .map(ingredientVariant -> ingredientVariantMapper.updateIngredientVariantFromWriteRequest(
                 ingredientVariant,
-                ingredientVariantDto
+                ingredientVariantWriteRequest
             ))
             .map(ingredientVariantRepository::save)
             .map(ingredientVariantMapper::mapIngredientVariantToDto)
@@ -184,10 +190,10 @@ public class IngredientServiceImpl implements IngredientService {
     @Override
     public CustomUnitDto addCustomUnitToIngredient(
         @NonNull final UUID ingredientId,
-        @NonNull final CustomUnitDto customUnitDto
+        @NonNull final CustomUnitWriteRequest customUnitWriteRequest
     ) {
         return ingredientRepository.findById(ingredientId)
-            .map(ingredient -> customUnitMapper.mapDtoToCustomUnit(customUnitDto, ingredient))
+            .map(ingredient -> customUnitMapper.mapWriteRequestToCustomUnit(customUnitWriteRequest, ingredient))
             .map(customUnitRepository::save)
             .map(customUnitMapper::mapCustomUnitToDto)
             .orElseThrow(() -> new NotFoundException(String.format("Ingredient not found for id: %s", ingredientId)));
@@ -216,14 +222,14 @@ public class IngredientServiceImpl implements IngredientService {
     public CustomUnitDto updateCustomUnit(
         @NonNull final UUID ingredientId,
         @NonNull final UUID unitId,
-        @NonNull final CustomUnitDto customUnitDto
+        @NonNull final CustomUnitWriteRequest customUnitWriteRequest
     ) {
         if (!ingredientRepository.existsById(ingredientId)) {
             throw new NotFoundException(String.format("Ingredient not found for id: %s", ingredientId));
         }
 
         return customUnitRepository.findByIdAndIngredientId(unitId, ingredientId)
-            .map(customUnit -> customUnitMapper.updateCustomUnitFromDto(customUnit, customUnitDto))
+            .map(customUnit -> customUnitMapper.updateCustomUnitFromWriteRequest(customUnit, customUnitWriteRequest))
             .map(customUnitRepository::save)
             .map(customUnitMapper::mapCustomUnitToDto)
             .orElseThrow(() -> new NotFoundException(String.format(
@@ -247,15 +253,14 @@ public class IngredientServiceImpl implements IngredientService {
         ingredientRepository.save(ingredient);
     }
 
-    private void validateIngredientDto(@NonNull final IngredientDto ingredientDto) {
-        final var ingredientVariantDtos = Optional.ofNullable(ingredientDto.getIngredientVariants()).orElse(List.of());
-        final var ingredientVariantDescriptions = ingredientVariantDtos.stream()
-            .map(IngredientVariantDto::getDescription)
+    private void validateIngredientWriteRequest(@NonNull final IngredientWriteRequest ingredientWriteRequest) {
+        final var ingredientVariantWriteRequests = ingredientWriteRequest.getIngredientVariants();
+        final var ingredientVariantDescriptions = ingredientVariantWriteRequests.stream()
+            .map(IngredientVariantWriteRequest::getDescription)
             .toList();
-        final var customUnitDescriptions = Optional.ofNullable(ingredientDto.getCustomUnits())
-            .orElse(List.of())
+        final var customUnitDescriptions = ingredientWriteRequest.getCustomUnits()
             .stream()
-            .map(CustomUnitDto::getName)
+            .map(CustomUnitWriteRequest::getName)
             .toList();
 
         if (ingredientVariantDescriptions.size() != (new HashSet<>(ingredientVariantDescriptions)).size()) {
@@ -266,8 +271,8 @@ public class IngredientServiceImpl implements IngredientService {
             throw new BadRequestException("Duplicate custom units found");
         }
 
-        if (ingredientVariantDtos.stream()
-                .map(IngredientVariantDto::getDefaultVariant)
+        if (ingredientVariantWriteRequests.stream()
+                .map(IngredientVariantWriteRequest::getDefaultVariant)
                 .filter(Boolean.TRUE::equals)
                 .count() > 1) {
             throw new BadRequestException("More than one default ingredient variant found");

@@ -48,7 +48,7 @@ put:
     content:
       application/json:
         schema:
-          $ref: '../../../../components/ingredients/IngredientVariantDto.yaml'
+          $ref: '../../../../components/ingredients/IngredientVariantWriteRequest.yaml'
   responses:
     '200':
       description: Successfully updated ingredient variant

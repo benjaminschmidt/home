@@ -36,7 +36,7 @@ post:
     content:
       application/json:
         schema:
-          $ref: '../components/ingredients/IngredientDto.yaml'
+          $ref: '../components/ingredients/IngredientWriteRequest.yaml'
   responses:
     '201':
       description: Successfully created ingredient

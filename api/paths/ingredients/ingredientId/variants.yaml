@@ -32,7 +32,7 @@ post:
     content:
       application/json:
         schema:
-          $ref: '../../../components/ingredients/IngredientVariantDto.yaml'
+          $ref: '../../../components/ingredients/IngredientVariantWriteRequest.yaml'
   responses:
     '201':
       description: Successfully added ingredient variant

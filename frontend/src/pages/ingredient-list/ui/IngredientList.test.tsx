@@ -15,10 +15,16 @@ describe("IngredientList", () => {
 		// given
 		const ingredients: IngredientDto[] = [
 			{
+				id: "ingredient-1-id",
 				name: "Ingredient 1",
+				ingredientVariants: [],
+				customUnits: [],
 			},
 			{
+				id: "ingredient-2-id",
 				name: "Ingredient 2",
+				ingredientVariants: [],
+				customUnits: [],
 			},
 		];
 

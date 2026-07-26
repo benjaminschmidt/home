@@ -5,8 +5,11 @@ import java.util.UUID;
 import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.openapitools.model.CustomUnitDto;
+import org.openapitools.model.CustomUnitWriteRequest;
 import org.openapitools.model.IngredientDto;
 import org.openapitools.model.IngredientVariantDto;
+import org.openapitools.model.IngredientVariantWriteRequest;
+import org.openapitools.model.IngredientWriteRequest;
 
 public interface IngredientService {
     @NonNull
@@ -17,13 +20,16 @@ public interface IngredientService {
     );
 
     @NonNull
-    IngredientDto createIngredient(@NonNull final IngredientDto ingredientDto);
+    IngredientDto createIngredient(@NonNull final IngredientWriteRequest ingredientWriteRequest);
 
     @NonNull
     IngredientDto getIngredientById(@NonNull final UUID ingredientId);
 
     @NonNull
-    IngredientDto updateIngredient(@NonNull final UUID ingredientId, @NonNull final IngredientDto ingredientDto);
+    IngredientDto updateIngredient(
+        @NonNull final UUID ingredientId,
+        @NonNull final IngredientWriteRequest ingredientWriteRequest
+    );
 
     void deleteIngredient(@NonNull final UUID ingredientId);
 
@@ -33,7 +39,7 @@ public interface IngredientService {
     @NonNull
     IngredientVariantDto addIngredientVariantToIngredient(
         @NonNull final UUID ingredientId,
-        @NonNull final IngredientVariantDto ingredientVariantDto
+        @NonNull final IngredientVariantWriteRequest ingredientVariantWriteRequest
     );
 
     @NonNull
@@ -43,7 +49,7 @@ public interface IngredientService {
     IngredientVariantDto updateIngredientVariant(
         @NonNull final UUID ingredientId,
         @NonNull final UUID variantId,
-        @NonNull final IngredientVariantDto ingredientVariantDto
+        @NonNull final IngredientVariantWriteRequest ingredientVariantWriteRequest
     );
 
     void deleteIngredientVariant(@NonNull final UUID ingredientId, @NonNull final UUID variantId);
@@ -54,7 +60,7 @@ public interface IngredientService {
     @NonNull
     CustomUnitDto addCustomUnitToIngredient(
         @NonNull final UUID ingredientId,
-        @NonNull final CustomUnitDto customUnitDto
+        @NonNull final CustomUnitWriteRequest customUnitWriteRequest
     );
 
     @NonNull CustomUnitDto getCustomUnitById(@NonNull final UUID ingredientId, @NonNull final UUID unitId);
@@ -63,7 +69,7 @@ public interface IngredientService {
     CustomUnitDto updateCustomUnit(
         @NonNull final UUID ingredientId,
         @NonNull final UUID unitId,
-        @NonNull final CustomUnitDto customUnitDto
+        @NonNull final CustomUnitWriteRequest customUnitWriteRequest
     );
 
     void deleteCustomUnit(@NonNull final UUID ingredientId, @NonNull final UUID unitId);

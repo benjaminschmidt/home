@@ -32,7 +32,7 @@ post:
     content:
       application/json:
         schema:
-          $ref: '../../../components/ingredients/CustomUnitDto.yaml'
+          $ref: '../../../components/ingredients/CustomUnitWriteRequest.yaml'
   responses:
     '201':
       description: Successfully added custom unit

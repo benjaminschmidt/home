@@ -5,6 +5,7 @@ import net.fuzzyhome.home.database.entities.Ingredient;
 import net.fuzzyhome.home.database.entities.IngredientVariant;
 import org.jspecify.annotations.NonNull;
 import org.openapitools.model.IngredientVariantDto;
+import org.openapitools.model.IngredientVariantWriteRequest;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -30,42 +31,42 @@ public class IngredientVariantMapper {
     }
 
     @NonNull
-    public IngredientVariant mapDtoToIngredientVariant(
-        @NonNull final IngredientVariantDto ingredientVariantDto,
+    public IngredientVariant mapWriteRequestToIngredientVariant(
+        @NonNull final IngredientVariantWriteRequest ingredientVariantWriteRequest,
         @NonNull final Ingredient ingredient
     ) {
         return IngredientVariant.builder()
-            .description(ingredientVariantDto.getDescription())
-            .defaultVariant(ingredientVariantDto.getDefaultVariant())
-            .unit(UnitUtils.mapDtoToGenericUnit(ingredientVariantDto.getUnit()))
-            .servingSize(ingredientVariantDto.getServingSize())
-            .calories(ingredientVariantDto.getCalories())
-            .carbohydrate(ingredientVariantDto.getCarbohydrate())
-            .fat(ingredientVariantDto.getFat())
-            .protein(ingredientVariantDto.getProtein())
-            .saturatedFat(ingredientVariantDto.getSaturatedFat())
-            .sodium(ingredientVariantDto.getSodium())
-            .sugar(ingredientVariantDto.getSugar())
+            .description(ingredientVariantWriteRequest.getDescription())
+            .defaultVariant(ingredientVariantWriteRequest.getDefaultVariant())
+            .unit(UnitUtils.mapDtoToGenericUnit(ingredientVariantWriteRequest.getUnit()))
+            .servingSize(ingredientVariantWriteRequest.getServingSize())
+            .calories(ingredientVariantWriteRequest.getCalories())
+            .carbohydrate(ingredientVariantWriteRequest.getCarbohydrate())
+            .fat(ingredientVariantWriteRequest.getFat())
+            .protein(ingredientVariantWriteRequest.getProtein())
+            .saturatedFat(ingredientVariantWriteRequest.getSaturatedFat())
+            .sodium(ingredientVariantWriteRequest.getSodium())
+            .sugar(ingredientVariantWriteRequest.getSugar())
             .ingredient(ingredient)
             .build();
     }
 
     @NonNull
-    public IngredientVariant updateIngredientVariantFromDto(
+    public IngredientVariant updateIngredientVariantFromWriteRequest(
         @NonNull final IngredientVariant ingredientVariant,
-        @NonNull final IngredientVariantDto ingredientVariantDto
+        @NonNull final IngredientVariantWriteRequest ingredientVariantWriteRequest
     ) {
-        ingredientVariant.setDescription(ingredientVariantDto.getDescription());
-        ingredientVariant.setDefaultVariant(ingredientVariantDto.getDefaultVariant());
-        ingredientVariant.setUnit(UnitUtils.mapDtoToGenericUnit(ingredientVariantDto.getUnit()));
-        ingredientVariant.setServingSize(ingredientVariantDto.getServingSize());
-        ingredientVariant.setCalories(ingredientVariantDto.getCalories());
-        ingredientVariant.setCarbohydrate(ingredientVariantDto.getCarbohydrate());
-        ingredientVariant.setFat(ingredientVariantDto.getFat());
-        ingredientVariant.setProtein(ingredientVariantDto.getProtein());
-        ingredientVariant.setSaturatedFat(ingredientVariantDto.getSaturatedFat());
-        ingredientVariant.setSodium(ingredientVariantDto.getSodium());
-        ingredientVariant.setSugar(ingredientVariantDto.getSugar());
+        ingredientVariant.setDescription(ingredientVariantWriteRequest.getDescription());
+        ingredientVariant.setDefaultVariant(ingredientVariantWriteRequest.getDefaultVariant());
+        ingredientVariant.setUnit(UnitUtils.mapDtoToGenericUnit(ingredientVariantWriteRequest.getUnit()));
+        ingredientVariant.setServingSize(ingredientVariantWriteRequest.getServingSize());
+        ingredientVariant.setCalories(ingredientVariantWriteRequest.getCalories());
+        ingredientVariant.setCarbohydrate(ingredientVariantWriteRequest.getCarbohydrate());
+        ingredientVariant.setFat(ingredientVariantWriteRequest.getFat());
+        ingredientVariant.setProtein(ingredientVariantWriteRequest.getProtein());
+        ingredientVariant.setSaturatedFat(ingredientVariantWriteRequest.getSaturatedFat());
+        ingredientVariant.setSodium(ingredientVariantWriteRequest.getSodium());
+        ingredientVariant.setSugar(ingredientVariantWriteRequest.getSugar());
 
         return ingredientVariant;
     }

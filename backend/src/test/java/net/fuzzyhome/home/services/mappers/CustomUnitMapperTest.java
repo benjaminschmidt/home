@@ -9,6 +9,7 @@ import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.openapitools.model.CustomUnitDto;
+import org.openapitools.model.CustomUnitWriteRequest;
 import org.openapitools.model.GenericUnitDto;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -77,11 +78,11 @@ class CustomUnitMapperTest {
     @Test
     void maps_to_entity_field_id() {
         // given
-        final var customUnitDto = Instancio.of(CustomUnitDto.class).create();
+        final var customUnitWriteRequest = Instancio.of(CustomUnitWriteRequest.class).create();
         final var ingredient = Instancio.of(Ingredient.class).create();
 
         // when
-        final var result = customUnitMapper.mapDtoToCustomUnit(customUnitDto, ingredient);
+        final var result = customUnitMapper.mapWriteRequestToCustomUnit(customUnitWriteRequest, ingredient);
 
         // then
         assertThat(result).extracting(CustomUnit::getId)
@@ -91,41 +92,41 @@ class CustomUnitMapperTest {
     @Test
     void maps_to_entity_field_name() {
         // given
-        final var customUnitDto = Instancio.of(CustomUnitDto.class).create();
+        final var customUnitWriteRequest = Instancio.of(CustomUnitWriteRequest.class).create();
         final var ingredient = Instancio.of(Ingredient.class).create();
 
         // when
-        final var result = customUnitMapper.mapDtoToCustomUnit(customUnitDto, ingredient);
+        final var result = customUnitMapper.mapWriteRequestToCustomUnit(customUnitWriteRequest, ingredient);
 
         // then
         assertThat(result).extracting(CustomUnit::getName)
-            .isEqualTo(customUnitDto.getName());
+            .isEqualTo(customUnitWriteRequest.getName());
     }
 
     @Test
     void maps_to_entity_field_conversionUnitToCustomUnitFactor() {
         // given
-        final var customUnitDto = Instancio.of(CustomUnitDto.class).create();
+        final var customUnitWriteRequest = Instancio.of(CustomUnitWriteRequest.class).create();
         final var ingredient = Instancio.of(Ingredient.class).create();
 
         // when
-        final var result = customUnitMapper.mapDtoToCustomUnit(customUnitDto, ingredient);
+        final var result = customUnitMapper.mapWriteRequestToCustomUnit(customUnitWriteRequest, ingredient);
 
         // then
         assertThat(result).extracting(CustomUnit::getCustomUnitToConversionUnitFactor)
-            .isEqualTo(customUnitDto.getCustomUnitToConversionUnitFactor());
+            .isEqualTo(customUnitWriteRequest.getCustomUnitToConversionUnitFactor());
     }
 
     @Test
     void maps_to_entity_field_conversionUnit() {
         // given
-        final var customUnitDto = Instancio.of(CustomUnitDto.class)
-            .set(field(CustomUnitDto::getConversionUnit), GenericUnitDto.MILLILITER)
+        final var customUnitWriteRequest = Instancio.of(CustomUnitWriteRequest.class)
+            .set(field(CustomUnitWriteRequest::getConversionUnit), GenericUnitDto.MILLILITER)
             .create();
         final var ingredient = Instancio.of(Ingredient.class).create();
 
         // when
-        final var result = customUnitMapper.mapDtoToCustomUnit(customUnitDto, ingredient);
+        final var result = customUnitMapper.mapWriteRequestToCustomUnit(customUnitWriteRequest, ingredient);
 
         // then
         assertThat(result).extracting(CustomUnit::getConversionUnit)
@@ -135,11 +136,11 @@ class CustomUnitMapperTest {
     @Test
     void maps_to_entity_field_ingredient() {
         // given
-        final var customUnitDto = Instancio.of(CustomUnitDto.class).create();
+        final var customUnitWriteRequest = Instancio.of(CustomUnitWriteRequest.class).create();
         final var ingredient = Instancio.of(Ingredient.class).create();
 
         // when
-        final var result = customUnitMapper.mapDtoToCustomUnit(customUnitDto, ingredient);
+        final var result = customUnitMapper.mapWriteRequestToCustomUnit(customUnitWriteRequest, ingredient);
 
         // then
         assertThat(result).extracting(CustomUnit::getIngredient)
@@ -150,28 +151,28 @@ class CustomUnitMapperTest {
     void updates_entity_field_name() {
         // given
         final var customUnit = Instancio.of(CustomUnit.class).create();
-        final var customUnitDto = Instancio.of(CustomUnitDto.class).create();
+        final var customUnitWriteRequest = Instancio.of(CustomUnitWriteRequest.class).create();
 
         // when
-        final var result = customUnitMapper.updateCustomUnitFromDto(customUnit, customUnitDto);
+        final var result = customUnitMapper.updateCustomUnitFromWriteRequest(customUnit, customUnitWriteRequest);
 
         // then
         assertThat(result).extracting(CustomUnit::getName)
-            .isEqualTo(customUnitDto.getName());
+            .isEqualTo(customUnitWriteRequest.getName());
     }
 
     @Test
     void updates_entity_field_conversionUnitToCustomUnitFactor() {
         // given
         final var customUnit = Instancio.of(CustomUnit.class).create();
-        final var customUnitDto = Instancio.of(CustomUnitDto.class).create();
+        final var customUnitWriteRequest = Instancio.of(CustomUnitWriteRequest.class).create();
 
         // when
-        final var result = customUnitMapper.updateCustomUnitFromDto(customUnit, customUnitDto);
+        final var result = customUnitMapper.updateCustomUnitFromWriteRequest(customUnit, customUnitWriteRequest);
 
         // then
         assertThat(result).extracting(CustomUnit::getCustomUnitToConversionUnitFactor)
-            .isEqualTo(customUnitDto.getCustomUnitToConversionUnitFactor());
+            .isEqualTo(customUnitWriteRequest.getCustomUnitToConversionUnitFactor());
     }
 
     @Test
@@ -180,12 +181,12 @@ class CustomUnitMapperTest {
         final var customUnit = Instancio.of(CustomUnit.class)
             .set(field(CustomUnit::getConversionUnit), GenericUnit.CUP)
             .create();
-        final var customUnitDto = Instancio.of(CustomUnitDto.class)
-            .set(field(CustomUnitDto::getConversionUnit), GenericUnitDto.KILOGRAM)
+        final var customUnitWriteRequest = Instancio.of(CustomUnitWriteRequest.class)
+            .set(field(CustomUnitWriteRequest::getConversionUnit), GenericUnitDto.KILOGRAM)
             .create();
 
         // when
-        final var result = customUnitMapper.updateCustomUnitFromDto(customUnit, customUnitDto);
+        final var result = customUnitMapper.updateCustomUnitFromWriteRequest(customUnit, customUnitWriteRequest);
 
         // then
         assertThat(result).extracting(CustomUnit::getConversionUnit)

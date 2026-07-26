@@ -67,25 +67,30 @@ describe("getUnitOptions", () => {
 			conversionVolumeUnit: "MILLILITER",
 			customUnits: [
 				{
+					id: "slice-id",
 					name: "slice",
 					customUnitToConversionUnitFactor: 30,
 					conversionUnit: "GRAM",
 				},
 				{
+					id: "cup-id",
 					name: "cup",
 					customUnitToConversionUnitFactor: 240,
 					conversionUnit: "MILLILITER",
 				},
 				{
+					id: "missing-factor-id",
 					name: "missing factor",
 					conversionUnit: "GRAM",
 				},
 				{
+					id: "zero-factor-id",
 					name: "zero factor",
 					customUnitToConversionUnitFactor: 0,
 					conversionUnit: "GRAM",
 				},
 				{
+					id: "missing-conversion-unit-id",
 					name: "missing conversion unit",
 					customUnitToConversionUnitFactor: 1,
 				},
@@ -105,6 +110,7 @@ describe("getUnitOptions", () => {
 			...ingredient,
 			customUnits: [
 				{
+					id: "cup-id",
 					name: "cup",
 					customUnitToConversionUnitFactor: 240,
 					conversionUnit: "MILLILITER",

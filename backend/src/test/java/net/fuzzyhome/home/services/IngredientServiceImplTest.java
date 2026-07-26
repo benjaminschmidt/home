@@ -22,8 +22,11 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.openapitools.model.CustomUnitDto;
+import org.openapitools.model.CustomUnitWriteRequest;
 import org.openapitools.model.IngredientDto;
 import org.openapitools.model.IngredientVariantDto;
+import org.openapitools.model.IngredientVariantWriteRequest;
+import org.openapitools.model.IngredientWriteRequest;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
@@ -85,16 +88,17 @@ class IngredientServiceImplTest {
     void creates_ingredients() {
         // given
         final var ingredient = Instancio.of(Ingredient.class).create();
-        final var ingredientDto = Instancio.of(IngredientDto.class)
-            .set(field(IngredientVariantDto::getDefaultVariant), false)
+        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class)
+            .set(field(IngredientVariantWriteRequest::getDefaultVariant), false)
             .create();
+        final var ingredientDto = Instancio.of(IngredientDto.class).create();
 
         when(ingredientRepository.save(any())).thenReturn(ingredient);
-        when(ingredientMapper.mapDtoToIngredient(any())).thenReturn(ingredient);
+        when(ingredientMapper.mapWriteRequestToIngredient(any())).thenReturn(ingredient);
         when(ingredientMapper.mapIngredientToDto(any())).thenReturn(ingredientDto);
 
         // when
-        final var result = ingredientServiceImpl.createIngredient(ingredientDto);
+        final var result = ingredientServiceImpl.createIngredient(ingredientWriteRequest);
 
         // then
         assertThat(result).isEqualTo(ingredientDto);
@@ -104,16 +108,19 @@ class IngredientServiceImplTest {
     @Test
     void fails_to_create_ingredient_due_to_duplicate_variant() {
         // given
-        final var ingredientVariantDtos = Instancio.ofList(IngredientVariantDto.class)
+        final var ingredientVariantWriteRequests = Instancio.ofList(IngredientVariantWriteRequest.class)
             .size(2)
-            .set(field(IngredientVariantDto::getDescription), "description")
+            .set(field(IngredientVariantWriteRequest::getDescription), "description")
             .create();
-        final var ingredientDto = Instancio.of(IngredientDto.class)
-            .set(field(IngredientDto::getIngredientVariants), ingredientVariantDtos)
+        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class)
+            .set(
+                field(IngredientWriteRequest::getIngredientVariants),
+                ingredientVariantWriteRequests
+            )
             .create();
 
         // when
-        final var exception = catchException(() -> ingredientServiceImpl.createIngredient(ingredientDto));
+        final var exception = catchException(() -> ingredientServiceImpl.createIngredient(ingredientWriteRequest));
 
         // then
         assertThat(exception).isInstanceOf(BadRequestException.class)
@@ -123,16 +130,16 @@ class IngredientServiceImplTest {
     @Test
     void fails_to_create_ingredient_due_to_duplicate_custom_unit() {
         // given
-        final var customUnitDtos = Instancio.ofList(CustomUnitDto.class)
+        final var customUnitWriteRequests = Instancio.ofList(CustomUnitWriteRequest.class)
             .size(2)
-            .set(field(CustomUnitDto::getName), "name")
+            .set(field(CustomUnitWriteRequest::getName), "name")
             .create();
-        final var ingredientDto = Instancio.of(IngredientDto.class)
-            .set(field(IngredientDto::getCustomUnits), customUnitDtos)
+        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class)
+            .set(field(IngredientWriteRequest::getCustomUnits), customUnitWriteRequests)
             .create();
 
         // when
-        final var exception = catchException(() -> ingredientServiceImpl.createIngredient(ingredientDto));
+        final var exception = catchException(() -> ingredientServiceImpl.createIngredient(ingredientWriteRequest));
 
         // then
         assertThat(exception).isInstanceOf(BadRequestException.class)
@@ -185,17 +192,22 @@ class IngredientServiceImplTest {
         final var updatedIngredient = Instancio.of(Ingredient.class)
             .set(field(Ingredient::getId), id)
             .create();
+        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class)
+            .set(field(IngredientVariantWriteRequest::getDefaultVariant), false)
+            .create();
         final var ingredientDto = Instancio.of(IngredientDto.class)
             .set(field(IngredientDto::getId), id)
-            .set(field(IngredientVariantDto::getDefaultVariant), false)
             .create();
         when(ingredientRepository.findById(any())).thenReturn(Optional.of(ingredient));
         when(ingredientRepository.save(any())).thenReturn(ingredient);
-        when(ingredientMapper.updateIngredientFromDto(ingredient, ingredientDto)).thenReturn(updatedIngredient);
+        when(ingredientMapper.updateIngredientFromWriteRequest(
+            ingredient,
+            ingredientWriteRequest
+        )).thenReturn(updatedIngredient);
         when(ingredientMapper.mapIngredientToDto(updatedIngredient)).thenReturn(ingredientDto);
 
         // when
-        final var result = ingredientServiceImpl.updateIngredient(id, ingredientDto);
+        final var result = ingredientServiceImpl.updateIngredient(id, ingredientWriteRequest);
 
         // then
         verify(ingredientRepository).findById(id);
@@ -207,16 +219,22 @@ class IngredientServiceImplTest {
     void fails_to_update_ingredient_due_to_multiple_default_variants() {
         // given
         final var ingredientId = UUID.randomUUID();
-        final var ingredientVariantDtos = Instancio.ofList(IngredientVariantDto.class)
+        final var ingredientVariantWriteRequests = Instancio.ofList(IngredientVariantWriteRequest.class)
             .size(2)
-            .set(field(IngredientVariantDto::getDefaultVariant), true)
+            .set(field(IngredientVariantWriteRequest::getDefaultVariant), true)
             .create();
-        final var ingredientDto = Instancio.of(IngredientDto.class)
-            .set(field(IngredientDto::getIngredientVariants), ingredientVariantDtos)
+        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class)
+            .set(
+                field(IngredientWriteRequest::getIngredientVariants),
+                ingredientVariantWriteRequests
+            )
             .create();
 
         // when
-        final var exception = catchException(() -> ingredientServiceImpl.updateIngredient(ingredientId, ingredientDto));
+        final var exception = catchException(() -> ingredientServiceImpl.updateIngredient(
+            ingredientId,
+            ingredientWriteRequest
+        ));
 
         // then
         assertThat(exception).isInstanceOf(BadRequestException.class)
@@ -266,16 +284,20 @@ class IngredientServiceImplTest {
         final var ingredientVariant = Instancio.of(IngredientVariant.class)
             .set(field(IngredientVariant::getIngredient), ingredient)
             .create();
+        final var ingredientVariantWriteRequest = Instancio.of(IngredientVariantWriteRequest.class).create();
         final var ingredientVariantDto = Instancio.of(IngredientVariantDto.class).create();
 
         when(ingredientRepository.findById(any())).thenReturn(Optional.of(ingredient));
         when(ingredientVariantRepository.save(any())).thenReturn(ingredientVariant);
-        when(ingredientVariantMapper.mapDtoToIngredientVariant(ingredientVariantDto, ingredient))
+        when(ingredientVariantMapper.mapWriteRequestToIngredientVariant(
+            ingredientVariantWriteRequest,
+            ingredient
+        ))
             .thenReturn(ingredientVariant);
         when(ingredientVariantMapper.mapIngredientVariantToDto(ingredientVariant)).thenReturn(ingredientVariantDto);
 
         // when
-        final var result = ingredientServiceImpl.addIngredientVariantToIngredient(id, ingredientVariantDto);
+        final var result = ingredientServiceImpl.addIngredientVariantToIngredient(id, ingredientVariantWriteRequest);
 
         // then
         verify(ingredientRepository).findById(id);
@@ -348,15 +370,16 @@ class IngredientServiceImplTest {
         final var ingredientVariantId = UUID.randomUUID();
         final var ingredientVariant = Instancio.of(IngredientVariant.class).create();
         final var updatedIngredientVariant = Instancio.of(IngredientVariant.class).create();
+        final var ingredientVariantWriteRequest = Instancio.of(IngredientVariantWriteRequest.class).create();
         final var ingredientVariantDto = Instancio.of(IngredientVariantDto.class).create();
 
         when(ingredientRepository.existsById(any())).thenReturn(true);
         when(ingredientVariantRepository.findByIdAndIngredientId(any(), any()))
             .thenReturn(Optional.of(ingredientVariant));
         when(ingredientVariantRepository.save(any())).thenReturn(updatedIngredientVariant);
-        when(ingredientVariantMapper.updateIngredientVariantFromDto(
+        when(ingredientVariantMapper.updateIngredientVariantFromWriteRequest(
             ingredientVariant,
-            ingredientVariantDto
+            ingredientVariantWriteRequest
         )).thenReturn(updatedIngredientVariant);
         when(ingredientVariantMapper.mapIngredientVariantToDto(updatedIngredientVariant))
             .thenReturn(ingredientVariantDto);
@@ -365,7 +388,7 @@ class IngredientServiceImplTest {
         final var result = ingredientServiceImpl.updateIngredientVariant(
             ingredientId,
             ingredientVariantId,
-            ingredientVariantDto
+            ingredientVariantWriteRequest
         );
 
         // then
@@ -380,7 +403,7 @@ class IngredientServiceImplTest {
         // given
         final var ingredientId = UUID.randomUUID();
         final var ingredientVariantId = UUID.randomUUID();
-        final var ingredientVariantDto = Instancio.of(IngredientVariantDto.class).create();
+        final var ingredientVariantWriteRequest = Instancio.of(IngredientVariantWriteRequest.class).create();
 
         when(ingredientRepository.existsById(ingredientId)).thenReturn(false);
 
@@ -388,7 +411,7 @@ class IngredientServiceImplTest {
         final var exception = catchException(() -> ingredientServiceImpl.updateIngredientVariant(
             ingredientId,
             ingredientVariantId,
-            ingredientVariantDto
+            ingredientVariantWriteRequest
         ));
 
         // then
@@ -401,7 +424,7 @@ class IngredientServiceImplTest {
         // given
         final var ingredientId = UUID.randomUUID();
         final var ingredientVariantId = UUID.randomUUID();
-        final var ingredientVariantDto = Instancio.of(IngredientVariantDto.class).create();
+        final var ingredientVariantWriteRequest = Instancio.of(IngredientVariantWriteRequest.class).create();
 
         when(ingredientRepository.existsById(ingredientId)).thenReturn(true);
         when(ingredientVariantRepository.findByIdAndIngredientId(ingredientVariantId, ingredientId))
@@ -411,7 +434,7 @@ class IngredientServiceImplTest {
         final var exception = catchException(() -> ingredientServiceImpl.updateIngredientVariant(
             ingredientId,
             ingredientVariantId,
-            ingredientVariantDto
+            ingredientVariantWriteRequest
         ));
 
         // then
@@ -522,16 +545,17 @@ class IngredientServiceImplTest {
         final var customUnit = Instancio.of(CustomUnit.class)
             .set(field(CustomUnit::getIngredient), ingredient)
             .create();
+        final var customUnitWriteRequest = Instancio.of(CustomUnitWriteRequest.class).create();
         final var customUnitDto = Instancio.of(CustomUnitDto.class).create();
 
         when(ingredientRepository.findById(any())).thenReturn(Optional.of(ingredient));
         when(customUnitRepository.save(any())).thenReturn(customUnit);
-        when(customUnitMapper.mapDtoToCustomUnit(customUnitDto, ingredient))
+        when(customUnitMapper.mapWriteRequestToCustomUnit(customUnitWriteRequest, ingredient))
             .thenReturn(customUnit);
         when(customUnitMapper.mapCustomUnitToDto(customUnit)).thenReturn(customUnitDto);
 
         // when
-        final var result = ingredientServiceImpl.addCustomUnitToIngredient(id, customUnitDto);
+        final var result = ingredientServiceImpl.addCustomUnitToIngredient(id, customUnitWriteRequest);
 
         // then
         verify(ingredientRepository).findById(id);
@@ -602,14 +626,15 @@ class IngredientServiceImplTest {
         final var customUnitId = UUID.randomUUID();
         final var customUnit = Instancio.of(CustomUnit.class).create();
         final var updatedCustomUnit = Instancio.of(CustomUnit.class).create();
+        final var customUnitWriteRequest = Instancio.of(CustomUnitWriteRequest.class).create();
         final var customUnitDto = Instancio.of(CustomUnitDto.class).create();
 
         when(ingredientRepository.existsById(any())).thenReturn(true);
         when(customUnitRepository.findByIdAndIngredientId(any(), any())).thenReturn(Optional.of(customUnit));
         when(customUnitRepository.save(any())).thenReturn(updatedCustomUnit);
-        when(customUnitMapper.updateCustomUnitFromDto(
+        when(customUnitMapper.updateCustomUnitFromWriteRequest(
             customUnit,
-            customUnitDto
+            customUnitWriteRequest
         )).thenReturn(updatedCustomUnit);
         when(customUnitMapper.mapCustomUnitToDto(updatedCustomUnit))
             .thenReturn(customUnitDto);
@@ -618,7 +643,7 @@ class IngredientServiceImplTest {
         final var result = ingredientServiceImpl.updateCustomUnit(
             ingredientId,
             customUnitId,
-            customUnitDto
+            customUnitWriteRequest
         );
 
         // then
@@ -633,7 +658,7 @@ class IngredientServiceImplTest {
         // given
         final var ingredientId = UUID.randomUUID();
         final var customUnitId = UUID.randomUUID();
-        final var customUnitDto = Instancio.of(CustomUnitDto.class).create();
+        final var customUnitWriteRequest = Instancio.of(CustomUnitWriteRequest.class).create();
 
         when(ingredientRepository.existsById(ingredientId)).thenReturn(false);
 
@@ -641,7 +666,7 @@ class IngredientServiceImplTest {
         final var exception = catchException(() -> ingredientServiceImpl.updateCustomUnit(
             ingredientId,
             customUnitId,
-            customUnitDto
+            customUnitWriteRequest
         ));
 
         // then
@@ -654,7 +679,7 @@ class IngredientServiceImplTest {
         // given
         final var ingredientId = UUID.randomUUID();
         final var customUnitId = UUID.randomUUID();
-        final var customUnitDto = Instancio.of(CustomUnitDto.class).create();
+        final var customUnitWriteRequest = Instancio.of(CustomUnitWriteRequest.class).create();
 
         when(ingredientRepository.existsById(ingredientId)).thenReturn(true);
         when(customUnitRepository.findByIdAndIngredientId(customUnitId, ingredientId)).thenReturn(Optional.empty());
@@ -663,7 +688,7 @@ class IngredientServiceImplTest {
         final var exception = catchException(() -> ingredientServiceImpl.updateCustomUnit(
             ingredientId,
             customUnitId,
-            customUnitDto
+            customUnitWriteRequest
         ));
 
         // then

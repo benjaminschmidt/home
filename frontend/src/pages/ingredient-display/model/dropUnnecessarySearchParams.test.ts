@@ -1,5 +1,4 @@
 import { faker } from "@faker-js/faker";
-import type { IngredientDto } from "home-api";
 import { describe, expect, it } from "vitest";
 import { dropUnnecessarySearchParams } from "@/pages/ingredient-display";
 import { ingredientFactory, ingredientVariantFactory } from "@/shared/testing";
@@ -440,24 +439,6 @@ describe("dropUnnecessarySearchParams", () => {
 		it("handles ingredient with no variants", () => {
 			// given
 			const ingredient = ingredientFactory.build({ ingredientVariants: [] });
-
-			// when
-			const result = dropUnnecessarySearchParams(
-				ingredient,
-				undefined,
-				100,
-				"GRAM",
-			);
-
-			// then
-			expect(result.updatedServingSize).toBeUndefined();
-			expect(result.updatedUnit).toBeUndefined();
-			expect(result.hasRedundantParams).toBe(true);
-		});
-
-		it("handles ingredient with undefined ingredientVariants", () => {
-			// given
-			const ingredient: IngredientDto = { name: "Test Ingredient" };
 
 			// when
 			const result = dropUnnecessarySearchParams(

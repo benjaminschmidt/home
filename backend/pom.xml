@@ -186,6 +186,7 @@
                                 <interfaceOnly>true</interfaceOnly>
                                 <generateBuilders>true</generateBuilders>
                                 <skipDefaultInterface>true</skipDefaultInterface>
+                                <containerDefaultToNull>true</containerDefaultToNull>
                             </configOptions>
                             <generateApiTests>false</generateApiTests>
                             <generateModelTests>false</generateModelTests>

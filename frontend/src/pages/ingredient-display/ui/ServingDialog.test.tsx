@@ -20,6 +20,7 @@ describe("ServingDialog", () => {
 					...ingredient,
 					customUnits: [
 						{
+							id: "slice-id",
 							name: "slice",
 							customUnitToConversionUnitFactor: 30,
 							conversionUnit: "GRAM",
@@ -55,6 +56,7 @@ describe("ServingDialog", () => {
 					...ingredient,
 					customUnits: [
 						{
+							id: "slice-id",
 							name: "slice",
 							customUnitToConversionUnitFactor: 30,
 							conversionUnit: "GRAM",

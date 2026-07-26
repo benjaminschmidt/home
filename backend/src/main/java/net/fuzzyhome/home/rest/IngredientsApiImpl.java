@@ -8,8 +8,11 @@ import org.jspecify.annotations.NonNull;
 import org.jspecify.annotations.Nullable;
 import org.openapitools.api.IngredientsApi;
 import org.openapitools.model.CustomUnitDto;
+import org.openapitools.model.CustomUnitWriteRequest;
 import org.openapitools.model.IngredientDto;
 import org.openapitools.model.IngredientVariantDto;
+import org.openapitools.model.IngredientVariantWriteRequest;
+import org.openapitools.model.IngredientWriteRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.RestController;
@@ -33,9 +36,11 @@ public class IngredientsApiImpl implements IngredientsApi {
 
     @NonNull
     @Override
-    public ResponseEntity<@NonNull IngredientDto> createIngredient(@NonNull final IngredientDto ingredientDto) {
+    public ResponseEntity<@NonNull IngredientDto> createIngredient(
+        @NonNull final IngredientWriteRequest ingredientWriteRequest
+    ) {
         return ResponseEntity.status(HttpStatus.CREATED)
-            .body(ingredientService.createIngredient(ingredientDto));
+            .body(ingredientService.createIngredient(ingredientWriteRequest));
     }
 
     @NonNull
@@ -49,10 +54,10 @@ public class IngredientsApiImpl implements IngredientsApi {
     @Override
     public ResponseEntity<@NonNull IngredientDto> updateIngredient(
         @NonNull final UUID ingredientId,
-        @NonNull final IngredientDto ingredientDto
+        @NonNull final IngredientWriteRequest ingredientWriteRequest
     ) {
         return ResponseEntity.status(HttpStatus.OK)
-            .body(ingredientService.updateIngredient(ingredientId, ingredientDto));
+            .body(ingredientService.updateIngredient(ingredientId, ingredientWriteRequest));
     }
 
     @NonNull
@@ -76,10 +81,10 @@ public class IngredientsApiImpl implements IngredientsApi {
     @Override
     public ResponseEntity<@NonNull IngredientVariantDto> addIngredientVariant(
         @NonNull final UUID ingredientId,
-        @NonNull final IngredientVariantDto ingredientVariantDto
+        @NonNull final IngredientVariantWriteRequest ingredientVariantWriteRequest
     ) {
         return ResponseEntity.status(HttpStatus.CREATED)
-            .body(ingredientService.addIngredientVariantToIngredient(ingredientId, ingredientVariantDto));
+            .body(ingredientService.addIngredientVariantToIngredient(ingredientId, ingredientVariantWriteRequest));
     }
 
     @NonNull
@@ -97,10 +102,10 @@ public class IngredientsApiImpl implements IngredientsApi {
     public ResponseEntity<@NonNull IngredientVariantDto> updateIngredientVariant(
         @NonNull final UUID ingredientId,
         @NonNull final UUID variantId,
-        @NonNull final IngredientVariantDto ingredientVariantDto
+        @NonNull final IngredientVariantWriteRequest ingredientVariantWriteRequest
     ) {
         return ResponseEntity.status(HttpStatus.OK)
-            .body(ingredientService.updateIngredientVariant(ingredientId, variantId, ingredientVariantDto));
+            .body(ingredientService.updateIngredientVariant(ingredientId, variantId, ingredientVariantWriteRequest));
     }
 
     @NonNull
@@ -125,10 +130,10 @@ public class IngredientsApiImpl implements IngredientsApi {
     @Override
     public ResponseEntity<@NonNull CustomUnitDto> addCustomUnit(
         @NonNull final UUID ingredientId,
-        @NonNull final CustomUnitDto customUnitDto
+        @NonNull final CustomUnitWriteRequest customUnitWriteRequest
     ) {
         return ResponseEntity.status(HttpStatus.CREATED)
-            .body(ingredientService.addCustomUnitToIngredient(ingredientId, customUnitDto));
+            .body(ingredientService.addCustomUnitToIngredient(ingredientId, customUnitWriteRequest));
     }
 
     @NonNull
@@ -146,10 +151,10 @@ public class IngredientsApiImpl implements IngredientsApi {
     public ResponseEntity<@NonNull CustomUnitDto> updateCustomUnit(
         @NonNull final UUID ingredientId,
         @NonNull final UUID unitId,
-        @NonNull final CustomUnitDto customUnitDto
+        @NonNull final CustomUnitWriteRequest customUnitWriteRequest
     ) {
         return ResponseEntity.status(HttpStatus.OK)
-            .body(ingredientService.updateCustomUnit(ingredientId, unitId, customUnitDto));
+            .body(ingredientService.updateCustomUnit(ingredientId, unitId, customUnitWriteRequest));
     }
 
     @NonNull

@@ -44,4 +44,5 @@ export const ingredientFactory = Factory.define<IngredientDto>(() => ({
 	ingredientVariants: ingredientVariantFactory.buildList(1, {
 		defaultVariant: true,
 	}),
+	customUnits: [],
 }));

@@ -1,13 +1,9 @@
-title: IngredientVariantDto
+title: IngredientVariantWriteRequest
 type: object
 required: [
-  "id", "description", "defaultVariant"
+  "description", "defaultVariant"
 ]
 properties:
-  id:
-    type: string
-    format: uuid
-    readOnly: true
   description:
     type: string
     nullable: false

@@ -8,9 +8,10 @@ import net.fuzzyhome.home.database.entities.Ingredient;
 import net.fuzzyhome.home.database.entities.IngredientVariant;
 import net.fuzzyhome.home.services.EntityToDtoMatcher;
 import org.jspecify.annotations.NonNull;
-import org.openapitools.model.CustomUnitDto;
+import org.openapitools.model.CustomUnitWriteRequest;
 import org.openapitools.model.IngredientDto;
-import org.openapitools.model.IngredientVariantDto;
+import org.openapitools.model.IngredientVariantWriteRequest;
+import org.openapitools.model.IngredientWriteRequest;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -42,52 +43,60 @@ public class IngredientMapper {
     }
 
     @NonNull
-    public Ingredient mapDtoToIngredient(@NonNull final IngredientDto ingredientDto) {
+    public Ingredient mapWriteRequestToIngredient(@NonNull final IngredientWriteRequest ingredientWriteRequest) {
         final var ingredient = Ingredient.builder()
-            .name(ingredientDto.getName())
-            .weightToVolumeConversionFactor(ingredientDto.getWeightToVolumeConversionFactor())
-            .conversionWeightUnit(UnitUtils.mapDtoToWeightUnit(ingredientDto.getConversionWeightUnit()))
-            .conversionVolumeUnit(UnitUtils.mapDtoToVolumeUnit(ingredientDto.getConversionVolumeUnit()))
+            .name(ingredientWriteRequest.getName())
+            .weightToVolumeConversionFactor(ingredientWriteRequest.getWeightToVolumeConversionFactor())
+            .conversionWeightUnit(UnitUtils.mapDtoToWeightUnit(ingredientWriteRequest.getConversionWeightUnit()))
+            .conversionVolumeUnit(UnitUtils.mapDtoToVolumeUnit(ingredientWriteRequest.getConversionVolumeUnit()))
             .build();
-        ingredient.setIngredientVariants(Optional.ofNullable(ingredientDto.getIngredientVariants())
-            .orElse(List.of())
+        ingredient.setIngredientVariants(ingredientWriteRequest.getIngredientVariants()
             .stream()
-            .map(ingredientVariantDto -> ingredientVariantMapper.mapDtoToIngredientVariant(
-                ingredientVariantDto,
+            .map(ingredientVariantWriteRequest -> ingredientVariantMapper.mapWriteRequestToIngredientVariant(
+                ingredientVariantWriteRequest,
                 ingredient
             ))
             .toList());
-        ingredient.setCustomUnits(Optional.ofNullable(ingredientDto.getCustomUnits())
-            .orElse(List.of())
+        ingredient.setCustomUnits(ingredientWriteRequest.getCustomUnits()
             .stream()
-            .map(customUnitDto -> customUnitMapper.mapDtoToCustomUnit(customUnitDto, ingredient))
+            .map(customUnitWriteRequest -> customUnitMapper.mapWriteRequestToCustomUnit(
+                customUnitWriteRequest,
+                ingredient
+            ))
             .toList());
         return ingredient;
     }
 
     @NonNull
-    public Ingredient updateIngredientFromDto(
+    public Ingredient updateIngredientFromWriteRequest(
         @NonNull final Ingredient ingredient,
-        @NonNull final IngredientDto ingredientDto
+        @NonNull final IngredientWriteRequest ingredientWriteRequest
     ) {
-        ingredient.setName(ingredientDto.getName());
-        ingredient.setWeightToVolumeConversionFactor(ingredientDto.getWeightToVolumeConversionFactor());
-        ingredient.setConversionWeightUnit(UnitUtils.mapDtoToWeightUnit(ingredientDto.getConversionWeightUnit()));
-        ingredient.setConversionVolumeUnit(UnitUtils.mapDtoToVolumeUnit(ingredientDto.getConversionVolumeUnit()));
+        ingredient.setName(ingredientWriteRequest.getName());
+        ingredient.setWeightToVolumeConversionFactor(ingredientWriteRequest.getWeightToVolumeConversionFactor());
+        ingredient.setConversionWeightUnit(
+            UnitUtils.mapDtoToWeightUnit(ingredientWriteRequest.getConversionWeightUnit())
+        );
+        ingredient.setConversionVolumeUnit(
+            UnitUtils.mapDtoToVolumeUnit(ingredientWriteRequest.getConversionVolumeUnit())
+        );
 
         final var matchedIngredients = new EntityToDtoMatcher<>(
             Optional.ofNullable(ingredient.getIngredientVariants()).orElse(List.of()),
             IngredientVariant::getDescription,
-            Optional.ofNullable(ingredientDto.getIngredientVariants()).orElse(List.of()),
-            IngredientVariantDto::getDescription
+            ingredientWriteRequest.getIngredientVariants(),
+            IngredientVariantWriteRequest::getDescription
         );
         ingredient.getIngredientVariants().removeAll(matchedIngredients.getEntitiesToDelete());
         matchedIngredients.getEntitiesToUpdate()
-            .forEach(pair -> ingredientVariantMapper.updateIngredientVariantFromDto(pair.getFirst(), pair.getSecond()));
+            .forEach(pair -> ingredientVariantMapper.updateIngredientVariantFromWriteRequest(
+                pair.getFirst(),
+                pair.getSecond()
+            ));
         matchedIngredients.getDtosToCreate()
             .stream()
-            .map(ingredientVariantDto -> ingredientVariantMapper.mapDtoToIngredientVariant(
-                ingredientVariantDto,
+            .map(variantWriteRequest -> ingredientVariantMapper.mapWriteRequestToIngredientVariant(
+                variantWriteRequest,
                 ingredient
             ))
             .forEach(ingredient.getIngredientVariants()::add);
@@ -95,15 +104,15 @@ public class IngredientMapper {
         final var matchedUnits = new EntityToDtoMatcher<>(
             Optional.ofNullable(ingredient.getCustomUnits()).orElse(List.of()),
             CustomUnit::getName,
-            Optional.ofNullable(ingredientDto.getCustomUnits()).orElse(List.of()),
-            CustomUnitDto::getName
+            ingredientWriteRequest.getCustomUnits(),
+            CustomUnitWriteRequest::getName
         );
         ingredient.getCustomUnits().removeAll(matchedUnits.getEntitiesToDelete());
         matchedUnits.getEntitiesToUpdate()
-            .forEach(pair -> customUnitMapper.updateCustomUnitFromDto(pair.getFirst(), pair.getSecond()));
+            .forEach(pair -> customUnitMapper.updateCustomUnitFromWriteRequest(pair.getFirst(), pair.getSecond()));
         matchedUnits.getDtosToCreate()
             .stream()
-            .map(customUnitDto -> customUnitMapper.mapDtoToCustomUnit(customUnitDto, ingredient))
+            .map(unitWriteRequest -> customUnitMapper.mapWriteRequestToCustomUnit(unitWriteRequest, ingredient))
             .forEach(ingredient.getCustomUnits()::add);
 
         return ingredient;
