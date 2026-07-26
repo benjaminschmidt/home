@@ -2,6 +2,7 @@ package net.fuzzyhome.home.database.repositories;
 
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import net.fuzzyhome.home.database.entities.CustomUnit;
 import net.fuzzyhome.home.database.entities.Ingredient;
@@ -204,6 +205,43 @@ class IngredientsDbTest {
     }
 
     @Test
+    void retrieve_ingredient_variant_by_id_and_ingredient_id() {
+        // given
+        final var ingredientVariant = Instancio.of(IngredientVariant.class)
+            .ignore(field(IngredientVariant::getId))
+            .ignore(field(IngredientVariant::getIngredient))
+            .create();
+        final var ingredient = Instancio.of(Ingredient.class)
+            .ignore(field(Ingredient::getId))
+            .ignore(field(Ingredient::getCustomUnits))
+            .set(field(Ingredient::getIngredientVariants), List.of(ingredientVariant))
+            .create();
+        ingredientVariant.setIngredient(ingredient);
+        ingredientRepository.saveAndFlush(ingredient);
+
+        final var otherIngredient = Instancio.of(Ingredient.class)
+            .ignore(field(Ingredient::getId))
+            .ignore(field(Ingredient::getCustomUnits))
+            .ignore(field(Ingredient::getIngredientVariants))
+            .create();
+        ingredientRepository.saveAndFlush(otherIngredient);
+
+        // when
+        final var result = ingredientVariantRepository.findByIdAndIngredientId(
+            Objects.requireNonNull(ingredientVariant.getId()),
+            Objects.requireNonNull(ingredient.getId())
+        );
+        final var mismatchedResult = ingredientVariantRepository.findByIdAndIngredientId(
+            Objects.requireNonNull(ingredientVariant.getId()),
+            Objects.requireNonNull(otherIngredient.getId())
+        );
+
+        // then
+        assertThat(result).contains(ingredientVariant);
+        assertThat(mismatchedResult).isEmpty();
+    }
+
+    @Test
     void retrieve_custom_units_by_ingredient_id() {
         // given
         final var customUnit = Instancio.of(CustomUnit.class)
@@ -226,6 +264,43 @@ class IngredientsDbTest {
         // then
         assertThat(result).singleElement()
             .isEqualTo(customUnit);
+    }
+
+    @Test
+    void retrieve_custom_unit_by_id_and_ingredient_id() {
+        // given
+        final var customUnit = Instancio.of(CustomUnit.class)
+            .ignore(field(CustomUnit::getId))
+            .ignore(field(CustomUnit::getIngredient))
+            .create();
+        final var ingredient = Instancio.of(Ingredient.class)
+            .ignore(field(Ingredient::getId))
+            .ignore(field(Ingredient::getIngredientVariants))
+            .set(field(Ingredient::getCustomUnits), List.of(customUnit))
+            .create();
+        customUnit.setIngredient(ingredient);
+        ingredientRepository.saveAndFlush(ingredient);
+
+        final var otherIngredient = Instancio.of(Ingredient.class)
+            .ignore(field(Ingredient::getId))
+            .ignore(field(Ingredient::getCustomUnits))
+            .ignore(field(Ingredient::getIngredientVariants))
+            .create();
+        ingredientRepository.saveAndFlush(otherIngredient);
+
+        // when
+        final var result = customUnitRepository.findByIdAndIngredientId(
+            Objects.requireNonNull(customUnit.getId()),
+            Objects.requireNonNull(ingredient.getId())
+        );
+        final var mismatchedResult = customUnitRepository.findByIdAndIngredientId(
+            Objects.requireNonNull(customUnit.getId()),
+            Objects.requireNonNull(otherIngredient.getId())
+        );
+
+        // then
+        assertThat(result).contains(customUnit);
+        assertThat(mismatchedResult).isEmpty();
     }
 
     @Test

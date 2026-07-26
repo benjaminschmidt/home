@@ -123,7 +123,7 @@ public class IngredientServiceImpl implements IngredientService {
             throw new NotFoundException(String.format("Ingredient not found for id: %s", ingredientId));
         }
 
-        return ingredientVariantRepository.findById(variantId)
+        return ingredientVariantRepository.findByIdAndIngredientId(variantId, ingredientId)
             .map(ingredientVariantMapper::mapIngredientVariantToDto)
             .orElseThrow(() -> new NotFoundException(String.format(
                 "Ingredient variant not found for id: %s",
@@ -142,7 +142,7 @@ public class IngredientServiceImpl implements IngredientService {
             throw new NotFoundException(String.format("Ingredient not found for id: %s", ingredientId));
         }
 
-        return ingredientVariantRepository.findById(variantId)
+        return ingredientVariantRepository.findByIdAndIngredientId(variantId, ingredientId)
             .map(ingredientVariant -> ingredientVariantMapper.updateIngredientVariantFromDto(
                 ingredientVariant,
                 ingredientVariantDto
@@ -198,7 +198,7 @@ public class IngredientServiceImpl implements IngredientService {
             throw new NotFoundException(String.format("Ingredient not found for id: %s", ingredientId));
         }
 
-        return customUnitRepository.findById(unitId)
+        return customUnitRepository.findByIdAndIngredientId(unitId, ingredientId)
             .map(customUnitMapper::mapCustomUnitToDto)
             .orElseThrow(() -> new NotFoundException(String.format(
                 "Custom unit not found for id: %s",
@@ -217,7 +217,7 @@ public class IngredientServiceImpl implements IngredientService {
             throw new NotFoundException(String.format("Ingredient not found for id: %s", ingredientId));
         }
 
-        return customUnitRepository.findById(unitId)
+        return customUnitRepository.findByIdAndIngredientId(unitId, ingredientId)
             .map(customUnit -> customUnitMapper.updateCustomUnitFromDto(customUnit, customUnitDto))
             .map(customUnitRepository::save)
             .map(customUnitMapper::mapCustomUnitToDto)

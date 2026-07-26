@@ -373,6 +373,60 @@ class IngredientsApiITest {
 
     @SneakyThrows
     @Test
+    void ingredientVariantCannotBeAccessedThroughDifferentIngredient() {
+        // given
+        final var ingredientVariant = Instancio.of(IngredientVariant.class)
+            .ignore(field(IngredientVariant::getId))
+            .ignore(field(IngredientVariant::getIngredient))
+            .set(field(IngredientVariant::getDescription), "original description")
+            .create();
+        final var ingredient = Instancio.of(Ingredient.class)
+            .ignore(field(Ingredient::getId))
+            .ignore(field(Ingredient::getCustomUnits))
+            .set(field(Ingredient::getName), "variant owner")
+            .set(field(Ingredient::getIngredientVariants), List.of(ingredientVariant))
+            .create();
+        ingredientVariant.setIngredient(ingredient);
+        ingredientRepository.saveAndFlush(ingredient);
+
+        final var otherIngredient = Instancio.of(Ingredient.class)
+            .ignore(field(Ingredient::getId))
+            .ignore(field(Ingredient::getCustomUnits))
+            .ignore(field(Ingredient::getIngredientVariants))
+            .set(field(Ingredient::getName), "other variant ingredient")
+            .create();
+        ingredientRepository.saveAndFlush(otherIngredient);
+
+        final var ingredientVariantDto = Instancio.of(IngredientVariantDto.class)
+            .ignore(field(IngredientVariantDto::getId))
+            .set(field(IngredientVariantDto::getDescription), "changed description")
+            .create();
+
+        // when / then
+        mockMvc.perform(get(
+                "/ingredients/{ingredientId}/variants/{variantId}",
+                otherIngredient.getId(),
+                ingredientVariant.getId()
+            ))
+            .andExpect(status().isNotFound());
+
+        mockMvc.perform(put(
+                "/ingredients/{ingredientId}/variants/{variantId}",
+                otherIngredient.getId(),
+                ingredientVariant.getId()
+            ).contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(ingredientVariantDto)))
+            .andExpect(status().isNotFound());
+
+        assertThat(ingredientVariantRepository.findById(
+            Objects.requireNonNull(ingredientVariant.getId())
+        )).get()
+            .extracting(IngredientVariant::getDescription)
+            .isEqualTo("original description");
+    }
+
+    @SneakyThrows
+    @Test
     void updateIngredientVariant() {
         // given
         final var ingredientVariant = Instancio.of(IngredientVariant.class)
@@ -535,6 +589,60 @@ class IngredientsApiITest {
         );
         assertThat(response).extracting(CustomUnitDto::getName)
             .isEqualTo(customUnit.getName());
+    }
+
+    @SneakyThrows
+    @Test
+    void customUnitCannotBeAccessedThroughDifferentIngredient() {
+        // given
+        final var customUnit = Instancio.of(CustomUnit.class)
+            .ignore(field(CustomUnit::getId))
+            .ignore(field(CustomUnit::getIngredient))
+            .set(field(CustomUnit::getName), "original unit")
+            .create();
+        final var ingredient = Instancio.of(Ingredient.class)
+            .ignore(field(Ingredient::getId))
+            .ignore(field(Ingredient::getIngredientVariants))
+            .set(field(Ingredient::getName), "custom unit owner")
+            .set(field(Ingredient::getCustomUnits), List.of(customUnit))
+            .create();
+        customUnit.setIngredient(ingredient);
+        ingredientRepository.saveAndFlush(ingredient);
+
+        final var otherIngredient = Instancio.of(Ingredient.class)
+            .ignore(field(Ingredient::getId))
+            .ignore(field(Ingredient::getCustomUnits))
+            .ignore(field(Ingredient::getIngredientVariants))
+            .set(field(Ingredient::getName), "other custom unit ingredient")
+            .create();
+        ingredientRepository.saveAndFlush(otherIngredient);
+
+        final var customUnitDto = Instancio.of(CustomUnitDto.class)
+            .ignore(field(CustomUnitDto::getId))
+            .set(field(CustomUnitDto::getName), "changed unit")
+            .create();
+
+        // when / then
+        mockMvc.perform(get(
+                "/ingredients/{ingredientId}/custom-units/{unitId}",
+                otherIngredient.getId(),
+                customUnit.getId()
+            ))
+            .andExpect(status().isNotFound());
+
+        mockMvc.perform(put(
+                "/ingredients/{ingredientId}/custom-units/{unitId}",
+                otherIngredient.getId(),
+                customUnit.getId()
+            ).contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(customUnitDto)))
+            .andExpect(status().isNotFound());
+
+        assertThat(customUnitRepository.findById(
+            Objects.requireNonNull(customUnit.getId())
+        )).get()
+            .extracting(CustomUnit::getName)
+            .isEqualTo("original unit");
     }
 
     @SneakyThrows

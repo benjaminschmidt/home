@@ -291,7 +291,8 @@ class IngredientServiceImplTest {
         final var ingredientVariantDto = Instancio.of(IngredientVariantDto.class).create();
 
         when(ingredientRepository.existsById(any())).thenReturn(true);
-        when(ingredientVariantRepository.findById(any())).thenReturn(Optional.of(ingredientVariant));
+        when(ingredientVariantRepository.findByIdAndIngredientId(any(), any()))
+            .thenReturn(Optional.of(ingredientVariant));
         when(ingredientVariantMapper.mapIngredientVariantToDto(ingredientVariant)).thenReturn(ingredientVariantDto);
 
         // when
@@ -299,7 +300,7 @@ class IngredientServiceImplTest {
 
         // then
         verify(ingredientRepository).existsById(ingredientId);
-        verify(ingredientVariantRepository).findById(ingredientVariantId);
+        verify(ingredientVariantRepository).findByIdAndIngredientId(ingredientVariantId, ingredientId);
         assertThat(result).isEqualTo(ingredientVariantDto);
     }
 
@@ -326,7 +327,8 @@ class IngredientServiceImplTest {
         final var ingredientId = UUID.randomUUID();
         final var ingredientVariantId = UUID.randomUUID();
         when(ingredientRepository.existsById(ingredientId)).thenReturn(true);
-        when(ingredientVariantRepository.findById(ingredientVariantId)).thenReturn(Optional.empty());
+        when(ingredientVariantRepository.findByIdAndIngredientId(ingredientVariantId, ingredientId))
+            .thenReturn(Optional.empty());
 
         // when
         final var exception = catchException(
@@ -348,7 +350,8 @@ class IngredientServiceImplTest {
         final var ingredientVariantDto = Instancio.of(IngredientVariantDto.class).create();
 
         when(ingredientRepository.existsById(any())).thenReturn(true);
-        when(ingredientVariantRepository.findById(any())).thenReturn(Optional.of(ingredientVariant));
+        when(ingredientVariantRepository.findByIdAndIngredientId(any(), any()))
+            .thenReturn(Optional.of(ingredientVariant));
         when(ingredientVariantRepository.save(any())).thenReturn(updatedIngredientVariant);
         when(ingredientVariantMapper.updateIngredientVariantFromDto(
             ingredientVariant,
@@ -366,7 +369,7 @@ class IngredientServiceImplTest {
 
         // then
         verify(ingredientRepository).existsById(ingredientId);
-        verify(ingredientVariantRepository).findById(ingredientVariantId);
+        verify(ingredientVariantRepository).findByIdAndIngredientId(ingredientVariantId, ingredientId);
         verify(ingredientVariantRepository).save(updatedIngredientVariant);
         assertThat(result).isEqualTo(ingredientVariantDto);
     }
@@ -400,7 +403,8 @@ class IngredientServiceImplTest {
         final var ingredientVariantDto = Instancio.of(IngredientVariantDto.class).create();
 
         when(ingredientRepository.existsById(ingredientId)).thenReturn(true);
-        when(ingredientVariantRepository.findById(ingredientVariantId)).thenReturn(Optional.empty());
+        when(ingredientVariantRepository.findByIdAndIngredientId(ingredientVariantId, ingredientId))
+            .thenReturn(Optional.empty());
 
         // when
         final var exception = catchException(() -> ingredientServiceImpl.updateIngredientVariant(
@@ -516,7 +520,7 @@ class IngredientServiceImplTest {
         final var customUnitDto = Instancio.of(CustomUnitDto.class).create();
 
         when(ingredientRepository.existsById(any())).thenReturn(true);
-        when(customUnitRepository.findById(any())).thenReturn(Optional.of(customUnit));
+        when(customUnitRepository.findByIdAndIngredientId(any(), any())).thenReturn(Optional.of(customUnit));
         when(customUnitMapper.mapCustomUnitToDto(customUnit)).thenReturn(customUnitDto);
 
         // when
@@ -524,7 +528,7 @@ class IngredientServiceImplTest {
 
         // then
         verify(ingredientRepository).existsById(ingredientId);
-        verify(customUnitRepository).findById(customUnitId);
+        verify(customUnitRepository).findByIdAndIngredientId(customUnitId, ingredientId);
         assertThat(result).isEqualTo(customUnitDto);
     }
 
@@ -551,7 +555,7 @@ class IngredientServiceImplTest {
         final var ingredientId = UUID.randomUUID();
         final var customUnitId = UUID.randomUUID();
         when(ingredientRepository.existsById(ingredientId)).thenReturn(true);
-        when(customUnitRepository.findById(customUnitId)).thenReturn(Optional.empty());
+        when(customUnitRepository.findByIdAndIngredientId(customUnitId, ingredientId)).thenReturn(Optional.empty());
 
         // when
         final var exception = catchException(
@@ -573,7 +577,7 @@ class IngredientServiceImplTest {
         final var customUnitDto = Instancio.of(CustomUnitDto.class).create();
 
         when(ingredientRepository.existsById(any())).thenReturn(true);
-        when(customUnitRepository.findById(any())).thenReturn(Optional.of(customUnit));
+        when(customUnitRepository.findByIdAndIngredientId(any(), any())).thenReturn(Optional.of(customUnit));
         when(customUnitRepository.save(any())).thenReturn(updatedCustomUnit);
         when(customUnitMapper.updateCustomUnitFromDto(
             customUnit,
@@ -591,7 +595,7 @@ class IngredientServiceImplTest {
 
         // then
         verify(ingredientRepository).existsById(ingredientId);
-        verify(customUnitRepository).findById(customUnitId);
+        verify(customUnitRepository).findByIdAndIngredientId(customUnitId, ingredientId);
         verify(customUnitRepository).save(updatedCustomUnit);
         assertThat(result).isEqualTo(customUnitDto);
     }
@@ -625,7 +629,7 @@ class IngredientServiceImplTest {
         final var customUnitDto = Instancio.of(CustomUnitDto.class).create();
 
         when(ingredientRepository.existsById(ingredientId)).thenReturn(true);
-        when(customUnitRepository.findById(customUnitId)).thenReturn(Optional.empty());
+        when(customUnitRepository.findByIdAndIngredientId(customUnitId, ingredientId)).thenReturn(Optional.empty());
 
         // when
         final var exception = catchException(() -> ingredientServiceImpl.updateCustomUnit(
