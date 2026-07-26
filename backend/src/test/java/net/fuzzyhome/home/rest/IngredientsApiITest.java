@@ -418,6 +418,13 @@ class IngredientsApiITest {
                 .content(objectMapper.writeValueAsString(ingredientVariantDto)))
             .andExpect(status().isNotFound());
 
+        mockMvc.perform(delete(
+                "/ingredients/{ingredientId}/variants/{variantId}",
+                otherIngredient.getId(),
+                ingredientVariant.getId()
+            ))
+            .andExpect(status().isNotFound());
+
         assertThat(ingredientVariantRepository.findById(
             Objects.requireNonNull(ingredientVariant.getId())
         )).get()
@@ -636,6 +643,13 @@ class IngredientsApiITest {
                 customUnit.getId()
             ).contentType(MediaType.APPLICATION_JSON)
                 .content(objectMapper.writeValueAsString(customUnitDto)))
+            .andExpect(status().isNotFound());
+
+        mockMvc.perform(delete(
+                "/ingredients/{ingredientId}/custom-units/{unitId}",
+                otherIngredient.getId(),
+                customUnit.getId()
+            ))
             .andExpect(status().isNotFound());
 
         assertThat(customUnitRepository.findById(

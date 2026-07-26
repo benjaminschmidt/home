@@ -82,7 +82,7 @@ delete:
     '204':
       description: Custom unit successfully removed
     '404':
-      description: Ingredient not found
+      description: Ingredient or unit not found
       content:
         application/json:
           schema:

@@ -31,6 +31,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.catchException;
 import static org.instancio.Select.field;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -464,6 +465,33 @@ class IngredientServiceImplTest {
     }
 
     @Test
+    void fails_to_delete_ingredient_variant_since_variant_missing() {
+        // given
+        final var ingredientId = UUID.randomUUID();
+        final var ingredientVariantId = UUID.randomUUID();
+        final var ingredient = Instancio.of(Ingredient.class)
+            .set(field(Ingredient::getId), ingredientId)
+            .set(field(Ingredient::getIngredientVariants), new ArrayList<>())
+            .create();
+
+        when(ingredientRepository.findById(ingredientId)).thenReturn(Optional.of(ingredient));
+
+        // when
+        final var exception = catchException(() -> ingredientServiceImpl.deleteIngredientVariant(
+            ingredientId,
+            ingredientVariantId
+        ));
+
+        // then
+        assertThat(exception).isInstanceOf(NotFoundException.class)
+            .hasMessageContaining(String.format(
+                "Ingredient variant not found for id: %s",
+                ingredientVariantId
+            ));
+        verify(ingredientRepository, never()).save(any());
+    }
+
+    @Test
     void retrieves_custom_units() {
         // given
         final var id = UUID.randomUUID();
@@ -686,5 +714,29 @@ class IngredientServiceImplTest {
         // then
         assertThat(exception).isInstanceOf(NotFoundException.class)
             .hasMessageContaining(String.format("Ingredient not found for id: %s", ingredientId));
+    }
+
+    @Test
+    void fails_to_delete_custom_unit_since_unit_missing() {
+        // given
+        final var ingredientId = UUID.randomUUID();
+        final var customUnitId = UUID.randomUUID();
+        final var ingredient = Instancio.of(Ingredient.class)
+            .set(field(Ingredient::getId), ingredientId)
+            .set(field(Ingredient::getCustomUnits), new ArrayList<>())
+            .create();
+
+        when(ingredientRepository.findById(ingredientId)).thenReturn(Optional.of(ingredient));
+
+        // when
+        final var exception = catchException(() -> ingredientServiceImpl.deleteCustomUnit(
+            ingredientId,
+            customUnitId
+        ));
+
+        // then
+        assertThat(exception).isInstanceOf(NotFoundException.class)
+            .hasMessageContaining(String.format("Custom unit not found for id: %s", customUnitId));
+        verify(ingredientRepository, never()).save(any());
     }
 }

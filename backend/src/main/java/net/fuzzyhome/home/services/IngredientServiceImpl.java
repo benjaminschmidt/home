@@ -160,8 +160,13 @@ public class IngredientServiceImpl implements IngredientService {
         final var ingredient = ingredientRepository.findById(ingredientId)
             .orElseThrow(() -> new NotFoundException(String.format("Ingredient not found for id: %s", ingredientId)));
 
-        Optional.ofNullable(ingredient.getIngredientVariants())
-            .ifPresent(variants -> variants.removeIf(variant -> Objects.equals(variant.getId(), variantId)));
+        final var removed = Optional.ofNullable(ingredient.getIngredientVariants())
+            .map(variants -> variants.removeIf(variant -> Objects.equals(variant.getId(), variantId)))
+            .orElse(false);
+
+        if (!removed) {
+            throw new NotFoundException(String.format("Ingredient variant not found for id: %s", variantId));
+        }
 
         ingredientRepository.save(ingredient);
     }
@@ -231,8 +236,13 @@ public class IngredientServiceImpl implements IngredientService {
         final var ingredient = ingredientRepository.findById(ingredientId)
             .orElseThrow(() -> new NotFoundException(String.format("Ingredient not found for id: %s", ingredientId)));
 
-        Optional.ofNullable(ingredient.getCustomUnits())
-            .ifPresent(customUnits -> customUnits.removeIf(customUnit -> Objects.equals(customUnit.getId(), unitId)));
+        final var removed = Optional.ofNullable(ingredient.getCustomUnits())
+            .map(customUnits -> customUnits.removeIf(customUnit -> Objects.equals(customUnit.getId(), unitId)))
+            .orElse(false);
+
+        if (!removed) {
+            throw new NotFoundException(String.format("Custom unit not found for id: %s", unitId));
+        }
 
         ingredientRepository.save(ingredient);
     }
