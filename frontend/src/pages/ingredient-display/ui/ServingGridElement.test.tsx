@@ -101,10 +101,12 @@ describe("ServingGridElement", () => {
 		fireEvent.click(screen.getByRole("button", { name: "Apply" }));
 
 		// then
-		expect(onServingChange).toHaveBeenCalledWith({
-			servingSize: 250,
-			unit: "GRAM",
+		await waitFor(() => {
+			expect(onServingChange).toHaveBeenCalledWith({
+				servingSize: 250,
+				unit: "GRAM",
+			});
+			expect(screen.queryByRole("dialog")).toBeNull();
 		});
-		await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
 	});
 });

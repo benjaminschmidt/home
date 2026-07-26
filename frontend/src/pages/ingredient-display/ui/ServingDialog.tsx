@@ -10,7 +10,8 @@ import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
-import { useState } from "react";
+import { useForm } from "@tanstack/react-form";
+import { z } from "zod";
 import {
 	calculateConversionFactorFromUnitToUnit,
 	getUnitOptions,
@@ -39,13 +40,26 @@ const unitMenuItemSx = {
 	pl: 3,
 };
 
-const parseServingSize = (draftServingSize: string) => {
+const servingSizeSchema = z.string().transform((draftServingSize, context) => {
 	const trimmedServingSize = draftServingSize.trim();
 	if (trimmedServingSize === "") return undefined;
 
 	const servingSize = Number(trimmedServingSize);
-	return Number.isFinite(servingSize) ? servingSize : undefined;
-};
+	if (!Number.isFinite(servingSize) || servingSize <= 0) {
+		context.addIssue({
+			code: "custom",
+			message: "Amount must be a number greater than 0",
+		});
+		return z.NEVER;
+	}
+
+	return servingSize;
+});
+
+const servingFormSchema = z.object({
+	servingSize: servingSizeSchema,
+	unit: z.string(),
+});
 
 const formatDraftServingSize = (servingSize: number) =>
 	`${Number(servingSize.toPrecision(12))}`;
@@ -57,126 +71,159 @@ const ServingDialog = ({
 	onClose,
 	onApply,
 }: ServingDialogProps) => {
-	const [draftServingSize, setDraftServingSize] = useState(
-		servingSize.toString(),
-	);
-	const [selectedUnit, setSelectedUnit] = useState(unit);
+	const form = useForm({
+		defaultValues: {
+			servingSize: servingSize.toString(),
+			unit,
+		},
+		validators: {
+			onChange: servingFormSchema,
+		},
+		onSubmit: ({ value }) => {
+			const parsedValue = servingFormSchema.parse(value);
+			onApply(parsedValue);
+			onClose();
+		},
+	});
 	const unitOptions = getUnitOptions(ingredient);
-	const parsedServingSize = parseServingSize(draftServingSize);
-	const amountEmpty = draftServingSize.trim() === "";
-	const amountInvalid =
-		!amountEmpty && (parsedServingSize === undefined || parsedServingSize <= 0);
 	const handleUnitChange = (nextUnit: string) => {
-		if (parsedServingSize !== undefined && parsedServingSize > 0) {
+		const previousUnit = form.getFieldValue("unit");
+		const parsedServingSize = servingSizeSchema.safeParse(
+			form.getFieldValue("servingSize"),
+		);
+
+		if (parsedServingSize.success && parsedServingSize.data !== undefined) {
 			const conversionFactor = calculateConversionFactorFromUnitToUnit(
 				ingredient,
 				ingredient.defaultUnit,
-				selectedUnit,
+				previousUnit,
 				nextUnit,
 				[],
 			);
 
 			if (conversionFactor !== undefined) {
-				setDraftServingSize(
-					formatDraftServingSize(parsedServingSize * conversionFactor),
+				form.setFieldValue(
+					"servingSize",
+					formatDraftServingSize(parsedServingSize.data * conversionFactor),
 				);
 			}
 		}
 
-		setSelectedUnit(nextUnit);
+		form.setFieldValue("unit", nextUnit);
 	};
 
 	return (
 		<Dialog open={true} onClose={onClose} fullWidth maxWidth="xs">
 			<DialogTitle>Serving</DialogTitle>
-			<DialogContent>
-				<Stack spacing={2} sx={{ pt: 0.5 }}>
-					<FormControl fullWidth>
-						<InputLabel id="serving-unit-label">Unit</InputLabel>
-						<Select
-							labelId="serving-unit-label"
-							label="Unit"
-							value={selectedUnit}
-							onChange={(event) => handleUnitChange(event.target.value)}
-						>
-							{unitOptions.weight.length > 0 && (
-								<ListSubheader sx={unitGroupHeaderSx}>Weight</ListSubheader>
+			<form
+				onSubmit={(event) => {
+					event.preventDefault();
+					event.stopPropagation();
+					void form.handleSubmit();
+				}}
+			>
+				<DialogContent>
+					<Stack spacing={2} sx={{ pt: 0.5 }}>
+						<form.Field name="unit">
+							{(field) => (
+								<FormControl fullWidth>
+									<InputLabel id="serving-unit-label">Unit</InputLabel>
+									<Select
+										labelId="serving-unit-label"
+										label="Unit"
+										value={field.state.value}
+										onChange={(event) => handleUnitChange(event.target.value)}
+									>
+										{unitOptions.weight.length > 0 && (
+											<ListSubheader sx={unitGroupHeaderSx}>
+												Weight
+											</ListSubheader>
+										)}
+										{unitOptions.weight.map((weightUnit) => (
+											<MenuItem
+												key={weightUnit.key}
+												value={weightUnit.value}
+												sx={unitMenuItemSx}
+											>
+												{weightUnit.displayText}
+											</MenuItem>
+										))}
+										{unitOptions.volume.length > 0 && (
+											<ListSubheader sx={unitGroupHeaderSx}>
+												Volume
+											</ListSubheader>
+										)}
+										{unitOptions.volume.map((volumeUnit) => (
+											<MenuItem
+												key={volumeUnit.key}
+												value={volumeUnit.value}
+												sx={unitMenuItemSx}
+											>
+												{volumeUnit.displayText}
+											</MenuItem>
+										))}
+										{unitOptions.custom.length > 0 && (
+											<ListSubheader sx={unitGroupHeaderSx}>
+												Custom
+											</ListSubheader>
+										)}
+										{unitOptions.custom.map((customUnit) => (
+											<MenuItem
+												key={customUnit.key}
+												value={customUnit.value}
+												sx={unitMenuItemSx}
+											>
+												{customUnit.displayText}
+											</MenuItem>
+										))}
+									</Select>
+								</FormControl>
 							)}
-							{unitOptions.weight.map((weightUnit) => (
-								<MenuItem
-									key={weightUnit.key}
-									value={weightUnit.value}
-									sx={unitMenuItemSx}
-								>
-									{weightUnit.displayText}
-								</MenuItem>
-							))}
-							{unitOptions.volume.length > 0 && (
-								<ListSubheader sx={unitGroupHeaderSx}>Volume</ListSubheader>
-							)}
-							{unitOptions.volume.map((volumeUnit) => (
-								<MenuItem
-									key={volumeUnit.key}
-									value={volumeUnit.value}
-									sx={unitMenuItemSx}
-								>
-									{volumeUnit.displayText}
-								</MenuItem>
-							))}
-							{unitOptions.custom.length > 0 && (
-								<ListSubheader sx={unitGroupHeaderSx}>Custom</ListSubheader>
-							)}
-							{unitOptions.custom.map((customUnit) => (
-								<MenuItem
-									key={customUnit.key}
-									value={customUnit.value}
-									sx={unitMenuItemSx}
-								>
-									{customUnit.displayText}
-								</MenuItem>
-							))}
-						</Select>
-					</FormControl>
+						</form.Field>
 
-					<TextField
-						label="Amount"
-						type="text"
-						slotProps={{ htmlInput: { inputMode: "decimal" } }}
-						value={draftServingSize}
-						onChange={(event) => setDraftServingSize(event.target.value)}
-						error={amountInvalid}
-						helperText={
-							amountInvalid ? "Amount must be a number greater than 0" : " "
-						}
-						fullWidth
-					/>
-				</Stack>
-			</DialogContent>
-			<DialogActions>
-				<Button
-					onClick={() => {
-						onApply({ servingSize: undefined, unit: undefined });
-						onClose();
-					}}
-					sx={{ mr: "auto" }}
-				>
-					Reset
-				</Button>
-				<Button onClick={onClose}>Cancel</Button>
-				<Button
-					variant="contained"
-					disabled={amountInvalid}
-					onClick={() => {
-						onApply({
-							servingSize: parsedServingSize,
-							unit: selectedUnit,
-						});
-						onClose();
-					}}
-				>
-					Apply
-				</Button>
-			</DialogActions>
+						<form.Field name="servingSize">
+							{(field) => {
+								const errorMessage = field.state.meta.errors[0]?.message;
+
+								return (
+									<TextField
+										label="Amount"
+										type="text"
+										slotProps={{ htmlInput: { inputMode: "decimal" } }}
+										value={field.state.value}
+										onChange={(event) => field.handleChange(event.target.value)}
+										error={errorMessage !== undefined}
+										helperText={errorMessage ?? " "}
+										fullWidth
+									/>
+								);
+							}}
+						</form.Field>
+					</Stack>
+				</DialogContent>
+				<DialogActions>
+					<Button
+						type="button"
+						onClick={() => {
+							onApply({ servingSize: undefined, unit: undefined });
+							onClose();
+						}}
+						sx={{ mr: "auto" }}
+					>
+						Reset
+					</Button>
+					<Button type="button" onClick={onClose}>
+						Cancel
+					</Button>
+					<form.Subscribe selector={(state) => state.canSubmit}>
+						{(canSubmit) => (
+							<Button type="submit" variant="contained" disabled={!canSubmit}>
+								Apply
+							</Button>
+						)}
+					</form.Subscribe>
+				</DialogActions>
+			</form>
 		</Dialog>
 	);
 };

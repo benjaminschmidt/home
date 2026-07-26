@@ -1,4 +1,10 @@
-import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import {
+	cleanup,
+	fireEvent,
+	render,
+	screen,
+	waitFor,
+} from "@testing-library/react";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import type { Ingredient } from "@/entities/ingredients";
 import { ServingDialog } from "@/pages/ingredient-display/ui/ServingDialog.tsx";
@@ -9,6 +15,12 @@ const ingredient: Ingredient = {
 	name: "ingredient",
 	defaultUnit: "GRAM",
 	customUnits: [],
+};
+
+const getServingForm = () => {
+	const form = screen.getByRole("dialog").querySelector("form");
+	if (form === null) throw new Error("Serving form not found");
+	return form;
 };
 
 describe("ServingDialog", () => {
@@ -146,7 +158,7 @@ describe("ServingDialog", () => {
 		).toBeTruthy();
 	});
 
-	test("applies the selected serving draft and closes", () => {
+	test("applies the selected serving draft and closes", async () => {
 		// given
 		const onClose = vi.fn();
 		const onApply = vi.fn();
@@ -167,11 +179,16 @@ describe("ServingDialog", () => {
 		fireEvent.click(screen.getByRole("button", { name: "Apply" }));
 
 		// then
-		expect(onApply).toHaveBeenCalledWith({ servingSize: 250, unit: "GRAM" });
-		expect(onClose).toHaveBeenCalledOnce();
+		await waitFor(() => {
+			expect(onApply).toHaveBeenCalledWith({
+				servingSize: 250,
+				unit: "GRAM",
+			});
+			expect(onClose).toHaveBeenCalledOnce();
+		});
 	});
 
-	test("applies an empty serving draft as undefined", () => {
+	test("applies an empty serving draft as undefined", async () => {
 		// given
 		const onClose = vi.fn();
 		const onApply = vi.fn();
@@ -192,11 +209,13 @@ describe("ServingDialog", () => {
 		fireEvent.click(screen.getByRole("button", { name: "Apply" }));
 
 		// then
-		expect(onApply).toHaveBeenCalledWith({
-			servingSize: undefined,
-			unit: "GRAM",
+		await waitFor(() => {
+			expect(onApply).toHaveBeenCalledWith({
+				servingSize: undefined,
+				unit: "GRAM",
+			});
+			expect(onClose).toHaveBeenCalledOnce();
 		});
-		expect(onClose).toHaveBeenCalledOnce();
 	});
 
 	test("does not apply a non-positive serving draft", () => {
@@ -259,6 +278,117 @@ describe("ServingDialog", () => {
 		);
 		expect(onApply).not.toHaveBeenCalled();
 		expect(onClose).not.toHaveBeenCalled();
+	});
+
+	test("clears the validation error after correcting the amount", () => {
+		// given
+		render(
+			<ServingDialog
+				ingredient={ingredient}
+				servingSize={100}
+				unit="GRAM"
+				onClose={vi.fn()}
+				onApply={vi.fn()}
+			/>,
+		);
+		const amount = screen.getByLabelText("Amount");
+		const apply = screen.getByRole("button", { name: "Apply" });
+		fireEvent.change(amount, { target: { value: "abc" } });
+
+		// when
+		fireEvent.change(amount, { target: { value: "125" } });
+
+		// then
+		expect(
+			screen.queryByText("Amount must be a number greater than 0"),
+		).toBeNull();
+		expect(apply).toHaveProperty("disabled", false);
+	});
+
+	test("applies transformed values through native form submission", async () => {
+		// given
+		const onClose = vi.fn();
+		const onApply = vi.fn();
+		render(
+			<ServingDialog
+				ingredient={ingredient}
+				servingSize={100}
+				unit="GRAM"
+				onClose={onClose}
+				onApply={onApply}
+			/>,
+		);
+		fireEvent.change(screen.getByLabelText("Amount"), {
+			target: { value: "275.5" },
+		});
+
+		// when
+		fireEvent.submit(getServingForm());
+
+		// then
+		await waitFor(() => {
+			expect(onApply).toHaveBeenCalledWith({
+				servingSize: 275.5,
+				unit: "GRAM",
+			});
+			expect(onClose).toHaveBeenCalledOnce();
+		});
+	});
+
+	test("rejects programmatic submission of invalid values", async () => {
+		// given
+		const onClose = vi.fn();
+		const onApply = vi.fn();
+		render(
+			<ServingDialog
+				ingredient={ingredient}
+				servingSize={100}
+				unit="GRAM"
+				onClose={onClose}
+				onApply={onApply}
+			/>,
+		);
+		fireEvent.change(screen.getByLabelText("Amount"), {
+			target: { value: "invalid" },
+		});
+
+		// when
+		fireEvent.submit(getServingForm());
+		await new Promise((resolve) => setTimeout(resolve, 0));
+
+		// then
+		expect(onApply).not.toHaveBeenCalled();
+		expect(onClose).not.toHaveBeenCalled();
+	});
+
+	test("transforms a blank amount to undefined on native submission", async () => {
+		// given
+		const onClose = vi.fn();
+		const onApply = vi.fn();
+		render(
+			<ServingDialog
+				ingredient={ingredient}
+				servingSize={100}
+				unit="GRAM"
+				onClose={onClose}
+				onApply={onApply}
+			/>,
+		);
+		fireEvent.change(screen.getByLabelText("Amount"), {
+			target: { value: "" },
+		});
+
+		// when
+		fireEvent.submit(getServingForm());
+
+		// then
+		await waitFor(() => {
+			expect(onApply).toHaveBeenCalledWith({
+				servingSize: undefined,
+				unit: "GRAM",
+			});
+			expect(onClose).toHaveBeenCalledOnce();
+		});
 	});
 
 	test("resets serving to variant defaults and closes", () => {
