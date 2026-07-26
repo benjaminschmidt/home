@@ -1,6 +1,5 @@
 package net.fuzzyhome.home.services.mappers;
 
-import java.util.List;
 import net.fuzzyhome.home.database.entities.CustomUnit;
 import net.fuzzyhome.home.database.entities.Ingredient;
 import net.fuzzyhome.home.database.entities.IngredientVariant;
@@ -14,10 +13,8 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.openapitools.model.CustomUnitDto;
-import org.openapitools.model.CustomUnitWriteRequest;
 import org.openapitools.model.IngredientDto;
 import org.openapitools.model.IngredientVariantDto;
-import org.openapitools.model.IngredientVariantWriteRequest;
 import org.openapitools.model.IngredientWriteRequest;
 import org.openapitools.model.VolumeUnitDto;
 import org.openapitools.model.WeightUnitDto;
@@ -228,53 +225,27 @@ class IngredientMapperTest {
     }
 
     @Test
-    void maps_to_entity_field_ingredientVariants() {
+    void maps_to_entity_without_ingredientVariants() {
         // given
-        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class)
-            .set(
-                field(IngredientWriteRequest::getIngredientVariants),
-                Instancio.ofList(IngredientVariantWriteRequest.class)
-                    .size(2)
-                    .create()
-            )
-            .create();
-        final var ingredientVariant = Instancio.of(IngredientVariant.class).create();
-        when(ingredientVariantMapper.mapWriteRequestToIngredientVariant(any(), any())).thenReturn(ingredientVariant);
+        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class).create();
 
         // when
         final var result = ingredientMapper.mapWriteRequestToIngredient(ingredientWriteRequest);
 
         // then
-        assertThat(result).extracting(
-                Ingredient::getIngredientVariants,
-                InstanceOfAssertFactories.list(IngredientVariant.class)
-            )
-            .containsExactly(ingredientVariant, ingredientVariant);
+        assertThat(result.getIngredientVariants()).isNullOrEmpty();
     }
 
     @Test
-    void maps_to_entity_field_customUnits() {
+    void maps_to_entity_without_customUnits() {
         // given
-        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class)
-            .set(
-                field(IngredientWriteRequest::getCustomUnits),
-                Instancio.ofList(CustomUnitWriteRequest.class)
-                    .size(2)
-                    .create()
-            )
-            .create();
-        final var customUnit = Instancio.of(CustomUnit.class).create();
-        when(customUnitMapper.mapWriteRequestToCustomUnit(any(), any())).thenReturn(customUnit);
+        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class).create();
 
         // when
         final var result = ingredientMapper.mapWriteRequestToIngredient(ingredientWriteRequest);
 
         // then
-        assertThat(result).extracting(
-                Ingredient::getCustomUnits,
-                InstanceOfAssertFactories.list(CustomUnit.class)
-            )
-            .containsExactly(customUnit, customUnit);
+        assertThat(result.getCustomUnits()).isNullOrEmpty();
     }
 
     @Test
@@ -342,84 +313,34 @@ class IngredientMapperTest {
     }
 
     @Test
-    void updates_entity_field_ingredientVariants() {
+    void preserves_ingredientVariants_when_updating_entity() {
         // given
         final var ingredientVariants = Instancio.ofList(IngredientVariant.class).size(3).create();
         final var ingredient = Instancio.of(Ingredient.class)
             .set(field(Ingredient::getIngredientVariants), ingredientVariants)
             .create();
-
-        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class)
-            .set(
-                field(IngredientWriteRequest::getIngredientVariants),
-                List.of(
-                    Instancio.of(IngredientVariantWriteRequest.class)
-                        .set(
-                            field(IngredientVariantWriteRequest::getDescription),
-                            ingredientVariants.getFirst().getDescription()
-                        )
-                        .create(),
-                    Instancio.of(IngredientVariantWriteRequest.class)
-                        .create()
-                )
-            )
-            .create();
-
-        final var ingredientVariantNew = Instancio.of(IngredientVariant.class).create();
-        when(ingredientVariantMapper.updateIngredientVariantFromWriteRequest(
-            any(),
-            any()
-        )).thenReturn(ingredientVariants.getFirst());
-        when(ingredientVariantMapper.mapWriteRequestToIngredientVariant(any(), any())).thenReturn(ingredientVariantNew);
+        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class).create();
 
         // when
         final var result = ingredientMapper.updateIngredientFromWriteRequest(ingredient, ingredientWriteRequest);
 
         // then
-        assertThat(result).extracting(
-            Ingredient::getIngredientVariants,
-            InstanceOfAssertFactories.list(IngredientVariant.class)
-        ).containsExactlyInAnyOrder(ingredientVariantNew, ingredientVariants.getFirst());
+        assertThat(result.getIngredientVariants()).isSameAs(ingredientVariants);
     }
 
     @Test
-    void updates_entity_field_customUnits() {
+    void preserves_customUnits_when_updating_entity() {
         // given
         final var customUnits = Instancio.ofList(CustomUnit.class).size(3).create();
         final var ingredient = Instancio.of(Ingredient.class)
             .set(field(Ingredient::getCustomUnits), customUnits)
             .create();
-
-        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class)
-            .set(
-                field(IngredientWriteRequest::getCustomUnits),
-                List.of(
-                    Instancio.of(CustomUnitWriteRequest.class)
-                        .set(
-                            field(CustomUnitWriteRequest::getName),
-                            customUnits.getFirst().getName()
-                        )
-                        .create(),
-                    Instancio.of(CustomUnitWriteRequest.class)
-                        .create()
-                )
-            )
-            .create();
-
-        final var customUnit = Instancio.of(CustomUnit.class).create();
-        when(customUnitMapper.updateCustomUnitFromWriteRequest(
-            any(),
-            any()
-        )).thenReturn(customUnits.getFirst());
-        when(customUnitMapper.mapWriteRequestToCustomUnit(any(), any())).thenReturn(customUnit);
+        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class).create();
 
         // when
         final var result = ingredientMapper.updateIngredientFromWriteRequest(ingredient, ingredientWriteRequest);
 
         // then
-        assertThat(result).extracting(
-            Ingredient::getCustomUnits,
-            InstanceOfAssertFactories.list(CustomUnit.class)
-        ).containsExactlyInAnyOrder(customUnit, customUnits.getFirst());
+        assertThat(result.getCustomUnits()).isSameAs(customUnits);
     }
 }

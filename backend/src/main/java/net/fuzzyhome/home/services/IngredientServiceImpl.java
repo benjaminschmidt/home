@@ -1,7 +1,6 @@
 package net.fuzzyhome.home.services;
 
 import jakarta.transaction.Transactional;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -10,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import net.fuzzyhome.home.database.repositories.CustomUnitRepository;
 import net.fuzzyhome.home.database.repositories.IngredientRepository;
 import net.fuzzyhome.home.database.repositories.IngredientVariantRepository;
-import net.fuzzyhome.home.services.errors.BadRequestException;
 import net.fuzzyhome.home.services.errors.NotFoundException;
 import net.fuzzyhome.home.services.mappers.CustomUnitMapper;
 import net.fuzzyhome.home.services.mappers.IngredientMapper;
@@ -61,7 +59,6 @@ public class IngredientServiceImpl implements IngredientService {
     @NonNull
     @Override
     public IngredientDto createIngredient(@NonNull final IngredientWriteRequest ingredientWriteRequest) {
-        validateIngredientWriteRequest(ingredientWriteRequest);
         return ingredientMapper.mapIngredientToDto(
             ingredientRepository.save(ingredientMapper.mapWriteRequestToIngredient(ingredientWriteRequest))
         );
@@ -81,7 +78,6 @@ public class IngredientServiceImpl implements IngredientService {
         @NonNull final UUID ingredientId,
         @NonNull final IngredientWriteRequest ingredientWriteRequest
     ) {
-        validateIngredientWriteRequest(ingredientWriteRequest);
         return ingredientRepository.findById(ingredientId)
             .map(ingredient -> ingredientMapper.updateIngredientFromWriteRequest(ingredient, ingredientWriteRequest))
             .map(ingredientRepository::save)
@@ -251,31 +247,5 @@ public class IngredientServiceImpl implements IngredientService {
         }
 
         ingredientRepository.save(ingredient);
-    }
-
-    private void validateIngredientWriteRequest(@NonNull final IngredientWriteRequest ingredientWriteRequest) {
-        final var ingredientVariantWriteRequests = ingredientWriteRequest.getIngredientVariants();
-        final var ingredientVariantDescriptions = ingredientVariantWriteRequests.stream()
-            .map(IngredientVariantWriteRequest::getDescription)
-            .toList();
-        final var customUnitDescriptions = ingredientWriteRequest.getCustomUnits()
-            .stream()
-            .map(CustomUnitWriteRequest::getName)
-            .toList();
-
-        if (ingredientVariantDescriptions.size() != (new HashSet<>(ingredientVariantDescriptions)).size()) {
-            throw new BadRequestException("Duplicate ingredient variants found");
-        }
-
-        if (customUnitDescriptions.size() != (new HashSet<>(customUnitDescriptions)).size()) {
-            throw new BadRequestException("Duplicate custom units found");
-        }
-
-        if (ingredientVariantWriteRequests.stream()
-                .map(IngredientVariantWriteRequest::getDefaultVariant)
-                .filter(Boolean.TRUE::equals)
-                .count() > 1) {
-            throw new BadRequestException("More than one default ingredient variant found");
-        }
     }
 }

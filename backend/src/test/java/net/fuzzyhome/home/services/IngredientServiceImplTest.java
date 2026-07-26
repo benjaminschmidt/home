@@ -10,7 +10,6 @@ import net.fuzzyhome.home.database.entities.IngredientVariant;
 import net.fuzzyhome.home.database.repositories.CustomUnitRepository;
 import net.fuzzyhome.home.database.repositories.IngredientRepository;
 import net.fuzzyhome.home.database.repositories.IngredientVariantRepository;
-import net.fuzzyhome.home.services.errors.BadRequestException;
 import net.fuzzyhome.home.services.errors.NotFoundException;
 import net.fuzzyhome.home.services.mappers.CustomUnitMapper;
 import net.fuzzyhome.home.services.mappers.IngredientMapper;
@@ -88,9 +87,7 @@ class IngredientServiceImplTest {
     void creates_ingredients() {
         // given
         final var ingredient = Instancio.of(Ingredient.class).create();
-        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class)
-            .set(field(IngredientVariantWriteRequest::getDefaultVariant), false)
-            .create();
+        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class).create();
         final var ingredientDto = Instancio.of(IngredientDto.class).create();
 
         when(ingredientRepository.save(any())).thenReturn(ingredient);
@@ -103,47 +100,6 @@ class IngredientServiceImplTest {
         // then
         assertThat(result).isEqualTo(ingredientDto);
         verify(ingredientRepository).save(ingredient);
-    }
-
-    @Test
-    void fails_to_create_ingredient_due_to_duplicate_variant() {
-        // given
-        final var ingredientVariantWriteRequests = Instancio.ofList(IngredientVariantWriteRequest.class)
-            .size(2)
-            .set(field(IngredientVariantWriteRequest::getDescription), "description")
-            .create();
-        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class)
-            .set(
-                field(IngredientWriteRequest::getIngredientVariants),
-                ingredientVariantWriteRequests
-            )
-            .create();
-
-        // when
-        final var exception = catchException(() -> ingredientServiceImpl.createIngredient(ingredientWriteRequest));
-
-        // then
-        assertThat(exception).isInstanceOf(BadRequestException.class)
-            .hasMessage("Duplicate ingredient variants found");
-    }
-
-    @Test
-    void fails_to_create_ingredient_due_to_duplicate_custom_unit() {
-        // given
-        final var customUnitWriteRequests = Instancio.ofList(CustomUnitWriteRequest.class)
-            .size(2)
-            .set(field(CustomUnitWriteRequest::getName), "name")
-            .create();
-        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class)
-            .set(field(IngredientWriteRequest::getCustomUnits), customUnitWriteRequests)
-            .create();
-
-        // when
-        final var exception = catchException(() -> ingredientServiceImpl.createIngredient(ingredientWriteRequest));
-
-        // then
-        assertThat(exception).isInstanceOf(BadRequestException.class)
-            .hasMessage("Duplicate custom units found");
     }
 
     @Test
@@ -192,9 +148,7 @@ class IngredientServiceImplTest {
         final var updatedIngredient = Instancio.of(Ingredient.class)
             .set(field(Ingredient::getId), id)
             .create();
-        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class)
-            .set(field(IngredientVariantWriteRequest::getDefaultVariant), false)
-            .create();
+        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class).create();
         final var ingredientDto = Instancio.of(IngredientDto.class)
             .set(field(IngredientDto::getId), id)
             .create();
@@ -213,32 +167,6 @@ class IngredientServiceImplTest {
         verify(ingredientRepository).findById(id);
         verify(ingredientRepository).save(updatedIngredient);
         assertThat(result).isEqualTo(ingredientDto);
-    }
-
-    @Test
-    void fails_to_update_ingredient_due_to_multiple_default_variants() {
-        // given
-        final var ingredientId = UUID.randomUUID();
-        final var ingredientVariantWriteRequests = Instancio.ofList(IngredientVariantWriteRequest.class)
-            .size(2)
-            .set(field(IngredientVariantWriteRequest::getDefaultVariant), true)
-            .create();
-        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class)
-            .set(
-                field(IngredientWriteRequest::getIngredientVariants),
-                ingredientVariantWriteRequests
-            )
-            .create();
-
-        // when
-        final var exception = catchException(() -> ingredientServiceImpl.updateIngredient(
-            ingredientId,
-            ingredientWriteRequest
-        ));
-
-        // then
-        assertThat(exception).isInstanceOf(BadRequestException.class)
-            .hasMessage("More than one default ingredient variant found");
     }
 
     @Test
