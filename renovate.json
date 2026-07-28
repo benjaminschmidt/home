@@ -15,6 +15,9 @@
         "pin",
         "digest"
       ],
+      "matchDatasources": [
+        "!java-version"
+      ],
       "automerge": true,
       "groupName": "non-major"
     },

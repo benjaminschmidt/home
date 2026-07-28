@@ -9,7 +9,7 @@ config_roots = [
 lockfile = true
 
 [settings]
-install_before = "13d"
+minimum_release_age = "13d"
 
 [tasks.check]
 depends = [
