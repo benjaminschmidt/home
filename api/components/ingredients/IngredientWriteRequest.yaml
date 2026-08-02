@@ -15,3 +15,6 @@ properties:
     $ref: './WeightUnitDto.yaml'
   conversionVolumeUnit:
     $ref: './VolumeUnitDto.yaml'
+  defaultVariantId:
+    type: string
+    format: uuid

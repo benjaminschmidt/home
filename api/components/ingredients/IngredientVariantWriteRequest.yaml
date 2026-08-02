@@ -1,14 +1,11 @@
 title: IngredientVariantWriteRequest
 type: object
 required: [
-  "description", "defaultVariant"
+  "description"
 ]
 properties:
   description:
     type: string
-    nullable: false
-  defaultVariant:
-    type: boolean
     nullable: false
   unit:
     $ref: './GenericUnitDto.yaml'

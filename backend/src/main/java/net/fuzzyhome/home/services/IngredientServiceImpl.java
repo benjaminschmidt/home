@@ -6,9 +6,12 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import net.fuzzyhome.home.database.entities.Ingredient;
+import net.fuzzyhome.home.database.entities.IngredientVariant;
 import net.fuzzyhome.home.database.repositories.CustomUnitRepository;
 import net.fuzzyhome.home.database.repositories.IngredientRepository;
 import net.fuzzyhome.home.database.repositories.IngredientVariantRepository;
+import net.fuzzyhome.home.services.errors.BadRequestException;
 import net.fuzzyhome.home.services.errors.NotFoundException;
 import net.fuzzyhome.home.services.mappers.CustomUnitMapper;
 import net.fuzzyhome.home.services.mappers.IngredientMapper;
@@ -59,9 +62,11 @@ public class IngredientServiceImpl implements IngredientService {
     @NonNull
     @Override
     public IngredientDto createIngredient(@NonNull final IngredientWriteRequest ingredientWriteRequest) {
-        return ingredientMapper.mapIngredientToDto(
-            ingredientRepository.save(ingredientMapper.mapWriteRequestToIngredient(ingredientWriteRequest))
+        final var savedIngredient = ingredientRepository.save(
+            ingredientMapper.mapWriteRequestToIngredient(ingredientWriteRequest)
         );
+        reconcileDefaultVariant(savedIngredient, ingredientWriteRequest.getDefaultVariantId());
+        return ingredientMapper.mapIngredientToDto(savedIngredient);
     }
 
     @NonNull
@@ -81,8 +86,43 @@ public class IngredientServiceImpl implements IngredientService {
         return ingredientRepository.findById(ingredientId)
             .map(ingredient -> ingredientMapper.updateIngredientFromWriteRequest(ingredient, ingredientWriteRequest))
             .map(ingredientRepository::save)
+            .map(ingredient -> {
+                reconcileDefaultVariant(ingredient, ingredientWriteRequest.getDefaultVariantId());
+                return ingredient;
+            })
             .map(ingredientMapper::mapIngredientToDto)
             .orElseThrow(() -> new NotFoundException(String.format("Ingredient not found for id: %s", ingredientId)));
+    }
+
+    private void reconcileDefaultVariant(
+        @NonNull final Ingredient ingredient,
+        @Nullable final UUID defaultVariantId
+    ) {
+        final var variants = Optional.ofNullable(ingredient.getIngredientVariants()).orElse(List.of());
+
+        final IngredientVariant newDefaultVariant;
+        if (defaultVariantId == null) {
+            newDefaultVariant = null;
+        } else {
+            newDefaultVariant = variants.stream()
+                .filter(variant -> Objects.equals(variant.getId(), defaultVariantId))
+                .findFirst()
+                .orElseThrow(() -> new BadRequestException(
+                    String.format("Ingredient variant not found for id: %s", defaultVariantId)
+                ));
+        }
+
+        final var previousDefaults = variants.stream()
+            .filter(variant -> !Objects.equals(variant, newDefaultVariant))
+            .filter(IngredientVariant::getDefaultVariant)
+            .toList();
+        previousDefaults.forEach(variant -> variant.setDefaultVariant(false));
+        ingredientVariantRepository.saveAllAndFlush(previousDefaults);
+
+        if (newDefaultVariant != null) {
+            newDefaultVariant.setDefaultVariant(true);
+            ingredientVariantRepository.save(newDefaultVariant);
+        }
     }
 
     @Override

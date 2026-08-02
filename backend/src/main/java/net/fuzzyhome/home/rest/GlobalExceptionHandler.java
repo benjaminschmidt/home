@@ -4,10 +4,10 @@ import net.fuzzyhome.home.services.errors.BadRequestException;
 import net.fuzzyhome.home.services.errors.NotFoundException;
 import org.jspecify.annotations.NonNull;
 import org.openapitools.model.ErrorDto;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 @RestControllerAdvice
@@ -21,6 +21,17 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST)
             .body(ErrorDto.builder()
                 .message(badRequestException.getMessage())
+                .build());
+    }
+
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    @NonNull
+    public ResponseEntity<@NonNull ErrorDto> handleDataIntegrityViolationException(
+        @NonNull final DataIntegrityViolationException dataIntegrityViolationException
+    ) {
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            .body(ErrorDto.builder()
+                .message(dataIntegrityViolationException.getMessage())
                 .build());
     }
 

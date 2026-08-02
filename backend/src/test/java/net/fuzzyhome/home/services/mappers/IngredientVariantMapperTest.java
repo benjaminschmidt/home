@@ -208,7 +208,7 @@ class IngredientVariantMapperTest {
     }
 
     @Test
-    void maps_to_entity_field_defaultVariant() {
+    void maps_to_entity_field_defaultVariant_as_false() {
         // given
         final var ingredientVariantWriteRequest = Instancio.of(IngredientVariantWriteRequest.class).create();
         final var ingredient = Instancio.of(Ingredient.class).create();
@@ -218,7 +218,7 @@ class IngredientVariantMapperTest {
 
         // then
         assertThat(result).extracting(IngredientVariant::getDefaultVariant)
-            .isEqualTo(ingredientVariantWriteRequest.getDefaultVariant());
+            .isEqualTo(false);
     }
 
     @Test
@@ -381,9 +381,11 @@ class IngredientVariantMapperTest {
     }
 
     @Test
-    void updates_entity_field_defaultVariant() {
+    void update_leaves_entity_field_defaultVariant_untouched() {
         // given
-        final var ingredientVariant = Instancio.of(IngredientVariant.class).create();
+        final var ingredientVariant = Instancio.of(IngredientVariant.class)
+            .set(field(IngredientVariant::getDefaultVariant), true)
+            .create();
         final var ingredientVariantWriteRequest = Instancio.of(IngredientVariantWriteRequest.class).create();
 
         // when
@@ -394,7 +396,7 @@ class IngredientVariantMapperTest {
 
         // then
         assertThat(result).extracting(IngredientVariant::getDefaultVariant)
-            .isEqualTo(ingredientVariantWriteRequest.getDefaultVariant());
+            .isEqualTo(true);
     }
 
     @Test

@@ -10,6 +10,7 @@ import net.fuzzyhome.home.database.entities.IngredientVariant;
 import net.fuzzyhome.home.database.repositories.CustomUnitRepository;
 import net.fuzzyhome.home.database.repositories.IngredientRepository;
 import net.fuzzyhome.home.database.repositories.IngredientVariantRepository;
+import net.fuzzyhome.home.services.errors.BadRequestException;
 import net.fuzzyhome.home.services.errors.NotFoundException;
 import net.fuzzyhome.home.services.mappers.CustomUnitMapper;
 import net.fuzzyhome.home.services.mappers.IngredientMapper;
@@ -86,8 +87,12 @@ class IngredientServiceImplTest {
     @Test
     void creates_ingredients() {
         // given
-        final var ingredient = Instancio.of(Ingredient.class).create();
-        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class).create();
+        final var ingredient = Instancio.of(Ingredient.class)
+            .set(field(Ingredient::getIngredientVariants), new ArrayList<>())
+            .create();
+        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class)
+            .set(field(IngredientWriteRequest::getDefaultVariantId), null)
+            .create();
         final var ingredientDto = Instancio.of(IngredientDto.class).create();
 
         when(ingredientRepository.save(any())).thenReturn(ingredient);
@@ -100,6 +105,30 @@ class IngredientServiceImplTest {
         // then
         assertThat(result).isEqualTo(ingredientDto);
         verify(ingredientRepository).save(ingredient);
+        verify(ingredientVariantRepository, never()).save(any());
+        verify(ingredientVariantRepository).saveAllAndFlush(List.of());
+    }
+
+    @Test
+    void fails_to_create_ingredient_since_defaultVariantId_not_found() {
+        // given
+        final var ingredient = Instancio.of(Ingredient.class)
+            .set(field(Ingredient::getIngredientVariants), new ArrayList<>())
+            .create();
+        final var defaultVariantId = UUID.randomUUID();
+        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class)
+            .set(field(IngredientWriteRequest::getDefaultVariantId), defaultVariantId)
+            .create();
+
+        when(ingredientRepository.save(any())).thenReturn(ingredient);
+        when(ingredientMapper.mapWriteRequestToIngredient(any())).thenReturn(ingredient);
+
+        // when
+        final var exception = catchException(() -> ingredientServiceImpl.createIngredient(ingredientWriteRequest));
+
+        // then
+        assertThat(exception).isInstanceOf(BadRequestException.class)
+            .hasMessageContaining(String.format("Ingredient variant not found for id: %s", defaultVariantId));
     }
 
     @Test
@@ -147,13 +176,16 @@ class IngredientServiceImplTest {
             .create();
         final var updatedIngredient = Instancio.of(Ingredient.class)
             .set(field(Ingredient::getId), id)
+            .set(field(Ingredient::getIngredientVariants), new ArrayList<>())
             .create();
-        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class).create();
+        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class)
+            .set(field(IngredientWriteRequest::getDefaultVariantId), null)
+            .create();
         final var ingredientDto = Instancio.of(IngredientDto.class)
             .set(field(IngredientDto::getId), id)
             .create();
         when(ingredientRepository.findById(any())).thenReturn(Optional.of(ingredient));
-        when(ingredientRepository.save(any())).thenReturn(ingredient);
+        when(ingredientRepository.save(any())).thenReturn(updatedIngredient);
         when(ingredientMapper.updateIngredientFromWriteRequest(
             ingredient,
             ingredientWriteRequest
@@ -166,7 +198,110 @@ class IngredientServiceImplTest {
         // then
         verify(ingredientRepository).findById(id);
         verify(ingredientRepository).save(updatedIngredient);
+        verify(ingredientVariantRepository, never()).save(any());
+        verify(ingredientVariantRepository).saveAllAndFlush(List.of());
         assertThat(result).isEqualTo(ingredientDto);
+    }
+
+    @Test
+    void updates_ingredient_and_sets_default_variant() {
+        // given
+        final var id = UUID.randomUUID();
+        final var previousDefault = Instancio.of(IngredientVariant.class)
+            .set(field(IngredientVariant::getDefaultVariant), true)
+            .create();
+        final var newDefault = Instancio.of(IngredientVariant.class)
+            .set(field(IngredientVariant::getDefaultVariant), false)
+            .create();
+        final var updatedIngredient = Instancio.of(Ingredient.class)
+            .set(field(Ingredient::getId), id)
+            .set(field(Ingredient::getIngredientVariants), new ArrayList<>(List.of(previousDefault, newDefault)))
+            .create();
+        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class)
+            .set(field(IngredientWriteRequest::getDefaultVariantId), newDefault.getId())
+            .create();
+        final var ingredientDto = Instancio.of(IngredientDto.class)
+            .set(field(IngredientDto::getId), id)
+            .create();
+        when(ingredientRepository.findById(any())).thenReturn(Optional.of(updatedIngredient));
+        when(ingredientRepository.save(any())).thenReturn(updatedIngredient);
+        when(ingredientMapper.updateIngredientFromWriteRequest(
+            updatedIngredient,
+            ingredientWriteRequest
+        )).thenReturn(updatedIngredient);
+        when(ingredientMapper.mapIngredientToDto(updatedIngredient)).thenReturn(ingredientDto);
+
+        // when
+        final var result = ingredientServiceImpl.updateIngredient(id, ingredientWriteRequest);
+
+        // then
+        assertThat(previousDefault.getDefaultVariant()).isFalse();
+        assertThat(newDefault.getDefaultVariant()).isTrue();
+        verify(ingredientVariantRepository).saveAllAndFlush(List.of(previousDefault));
+        verify(ingredientVariantRepository).save(newDefault);
+        assertThat(result).isEqualTo(ingredientDto);
+    }
+
+    @Test
+    void updates_ingredient_and_clears_default_variant_when_defaultVariantId_omitted() {
+        // given
+        final var id = UUID.randomUUID();
+        final var currentDefault = Instancio.of(IngredientVariant.class)
+            .set(field(IngredientVariant::getDefaultVariant), true)
+            .create();
+        final var updatedIngredient = Instancio.of(Ingredient.class)
+            .set(field(Ingredient::getId), id)
+            .set(field(Ingredient::getIngredientVariants), new ArrayList<>(List.of(currentDefault)))
+            .create();
+        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class)
+            .set(field(IngredientWriteRequest::getDefaultVariantId), null)
+            .create();
+        final var ingredientDto = Instancio.of(IngredientDto.class)
+            .set(field(IngredientDto::getId), id)
+            .create();
+        when(ingredientRepository.findById(any())).thenReturn(Optional.of(updatedIngredient));
+        when(ingredientRepository.save(any())).thenReturn(updatedIngredient);
+        when(ingredientMapper.updateIngredientFromWriteRequest(
+            updatedIngredient,
+            ingredientWriteRequest
+        )).thenReturn(updatedIngredient);
+        when(ingredientMapper.mapIngredientToDto(updatedIngredient)).thenReturn(ingredientDto);
+
+        // when
+        ingredientServiceImpl.updateIngredient(id, ingredientWriteRequest);
+
+        // then
+        assertThat(currentDefault.getDefaultVariant()).isFalse();
+        verify(ingredientVariantRepository).saveAllAndFlush(List.of(currentDefault));
+        verify(ingredientVariantRepository, never()).save(any());
+    }
+
+    @Test
+    void fails_to_update_ingredient_since_defaultVariantId_not_found() {
+        // given
+        final var id = UUID.randomUUID();
+        final var otherIngredientVariant = Instancio.of(IngredientVariant.class).create();
+        final var updatedIngredient = Instancio.of(Ingredient.class)
+            .set(field(Ingredient::getId), id)
+            .set(field(Ingredient::getIngredientVariants), new ArrayList<>(List.of(otherIngredientVariant)))
+            .create();
+        final var defaultVariantId = UUID.randomUUID();
+        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class)
+            .set(field(IngredientWriteRequest::getDefaultVariantId), defaultVariantId)
+            .create();
+        when(ingredientRepository.findById(any())).thenReturn(Optional.of(updatedIngredient));
+        when(ingredientRepository.save(any())).thenReturn(updatedIngredient);
+        when(ingredientMapper.updateIngredientFromWriteRequest(
+            updatedIngredient,
+            ingredientWriteRequest
+        )).thenReturn(updatedIngredient);
+
+        // when
+        final var exception = catchException(() -> ingredientServiceImpl.updateIngredient(id, ingredientWriteRequest));
+
+        // then
+        assertThat(exception).isInstanceOf(BadRequestException.class)
+            .hasMessageContaining(String.format("Ingredient variant not found for id: %s", defaultVariantId));
     }
 
     @Test

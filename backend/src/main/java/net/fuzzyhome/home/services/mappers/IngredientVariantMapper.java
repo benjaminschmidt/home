@@ -37,7 +37,7 @@ public class IngredientVariantMapper {
     ) {
         return IngredientVariant.builder()
             .description(ingredientVariantWriteRequest.getDescription())
-            .defaultVariant(ingredientVariantWriteRequest.getDefaultVariant())
+            .defaultVariant(false)
             .unit(UnitUtils.mapDtoToGenericUnit(ingredientVariantWriteRequest.getUnit()))
             .servingSize(ingredientVariantWriteRequest.getServingSize())
             .calories(ingredientVariantWriteRequest.getCalories())
@@ -57,7 +57,6 @@ public class IngredientVariantMapper {
         @NonNull final IngredientVariantWriteRequest ingredientVariantWriteRequest
     ) {
         ingredientVariant.setDescription(ingredientVariantWriteRequest.getDescription());
-        ingredientVariant.setDefaultVariant(ingredientVariantWriteRequest.getDefaultVariant());
         ingredientVariant.setUnit(UnitUtils.mapDtoToGenericUnit(ingredientVariantWriteRequest.getUnit()));
         ingredientVariant.setServingSize(ingredientVariantWriteRequest.getServingSize());
         ingredientVariant.setCalories(ingredientVariantWriteRequest.getCalories());

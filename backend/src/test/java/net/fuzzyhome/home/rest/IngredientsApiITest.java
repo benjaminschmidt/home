@@ -6,6 +6,7 @@ import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 import lombok.SneakyThrows;
 import net.fuzzyhome.home.database.entities.CustomUnit;
 import net.fuzzyhome.home.database.entities.Ingredient;
@@ -134,7 +135,9 @@ class IngredientsApiITest {
     @Test
     void createIngredientWithoutChildren() {
         // given
-        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class).create();
+        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class)
+            .set(field(IngredientWriteRequest::getDefaultVariantId), null)
+            .create();
 
         // when
         final var result = mockMvc.perform(post("/ingredients")
@@ -241,7 +244,9 @@ class IngredientsApiITest {
         customUnit.setIngredient(ingredient);
         ingredientRepository.saveAndFlush(ingredient);
 
-        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class).create();
+        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class)
+            .set(field(IngredientWriteRequest::getDefaultVariantId), null)
+            .create();
 
         // when
         final var result = mockMvc.perform(put("/ingredients/{ingredientId}", ingredient.getId())
@@ -261,6 +266,117 @@ class IngredientsApiITest {
         assertThat(ingredientRepository.findAll()).singleElement()
             .extracting(Ingredient::getName)
             .isEqualTo(ingredientWriteRequest.getName());
+    }
+
+    @SneakyThrows
+    @Test
+    void updateIngredientSetsDefaultVariant() {
+        // given
+        final var variantA = IngredientVariant.builder()
+            .description("variant A")
+            .defaultVariant(true)
+            .build();
+        final var variantB = IngredientVariant.builder()
+            .description("variant B")
+            .defaultVariant(false)
+            .build();
+        final var ingredient = Ingredient.builder()
+            .name("ingredient")
+            .ingredientVariants(List.of(variantA, variantB))
+            .build();
+        variantA.setIngredient(ingredient);
+        variantB.setIngredient(ingredient);
+        ingredientRepository.saveAndFlush(ingredient);
+
+        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class)
+            .set(field(IngredientWriteRequest::getDefaultVariantId), variantB.getId())
+            .create();
+
+        // when
+        final var result = mockMvc.perform(put("/ingredients/{ingredientId}", ingredient.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(ingredientWriteRequest)))
+            .andExpect(status().isOk())
+            .andReturn();
+
+        // then
+        final var response = objectMapper.readValue(result.getResponse().getContentAsString(), IngredientDto.class);
+        assertThat(response.getIngredientVariants())
+            .filteredOn(IngredientVariantDto::getDefaultVariant)
+            .extracting(IngredientVariantDto::getId)
+            .containsExactly(variantB.getId());
+        assertThat(ingredientVariantRepository.findById(Objects.requireNonNull(variantA.getId())))
+            .get()
+            .extracting(IngredientVariant::getDefaultVariant)
+            .isEqualTo(false);
+        assertThat(ingredientVariantRepository.findById(Objects.requireNonNull(variantB.getId())))
+            .get()
+            .extracting(IngredientVariant::getDefaultVariant)
+            .isEqualTo(true);
+    }
+
+    @SneakyThrows
+    @Test
+    void updateIngredientClearsDefaultVariantWhenOmitted() {
+        // given
+        final var ingredientVariant = IngredientVariant.builder()
+            .description("variant")
+            .defaultVariant(true)
+            .build();
+        final var ingredient = Ingredient.builder()
+            .name("ingredient")
+            .ingredientVariants(List.of(ingredientVariant))
+            .build();
+        ingredientVariant.setIngredient(ingredient);
+        ingredientRepository.saveAndFlush(ingredient);
+
+        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class)
+            .set(field(IngredientWriteRequest::getDefaultVariantId), null)
+            .create();
+
+        // when
+        mockMvc.perform(put("/ingredients/{ingredientId}", ingredient.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(ingredientWriteRequest)))
+            .andExpect(status().isOk());
+
+        // then
+        assertThat(ingredientVariantRepository.findById(Objects.requireNonNull(ingredientVariant.getId())))
+            .get()
+            .extracting(IngredientVariant::getDefaultVariant)
+            .isEqualTo(false);
+    }
+
+    @SneakyThrows
+    @Test
+    void updateIngredientFailsForUnknownDefaultVariantId() {
+        // given
+        final var ingredientVariant = IngredientVariant.builder()
+            .description("variant")
+            .defaultVariant(true)
+            .build();
+        final var ingredient = Ingredient.builder()
+            .name("ingredient")
+            .ingredientVariants(List.of(ingredientVariant))
+            .build();
+        ingredientVariant.setIngredient(ingredient);
+        ingredientRepository.saveAndFlush(ingredient);
+
+        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class)
+            .set(field(IngredientWriteRequest::getDefaultVariantId), UUID.randomUUID())
+            .create();
+
+        // when
+        mockMvc.perform(put("/ingredients/{ingredientId}", ingredient.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(ingredientWriteRequest)))
+            .andExpect(status().isBadRequest());
+
+        // then
+        assertThat(ingredientVariantRepository.findById(Objects.requireNonNull(ingredientVariant.getId())))
+            .get()
+            .extracting(IngredientVariant::getDefaultVariant)
+            .isEqualTo(true);
     }
 
     @SneakyThrows
