@@ -44,7 +44,7 @@ jobs:
           restore-keys: |
             maven-${{ runner.os }}-
       - name: Set up mise
-        uses: https://github.com/jdx/mise-action@v4.2.2
+        uses: https://github.com/jdx/mise-action@v4.2.3
         with:
           working_directory: backend
           github_token: ${{ secrets.TOKEN_GITHUB }}
@@ -65,7 +65,7 @@ jobs:
           restore-keys: |
             pnpm-${{ runner.os }}-
       - name: Set up mise
-        uses: https://github.com/jdx/mise-action@v4.2.2
+        uses: https://github.com/jdx/mise-action@v4.2.3
         with:
           working_directory: frontend
           github_token: ${{ secrets.TOKEN_GITHUB }}
