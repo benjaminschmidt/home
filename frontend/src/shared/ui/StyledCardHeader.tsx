@@ -1,17 +1,21 @@
 import CardHeader from "@mui/material/CardHeader";
 import Typography from "@mui/material/Typography";
+import type { ReactNode } from "react";
 
 type StyledCardHeaderProps = {
 	title: string;
 	forceCompact?: boolean;
+	action?: ReactNode;
 };
 
 const StyledCardHeader = ({
 	title,
 	forceCompact = false,
+	action,
 }: StyledCardHeaderProps) => {
 	return (
 		<CardHeader
+			action={action}
 			title={
 				<Typography
 					variant={forceCompact ? "body1" : "h5"}

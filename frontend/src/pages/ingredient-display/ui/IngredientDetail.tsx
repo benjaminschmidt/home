@@ -1,3 +1,4 @@
+import EditOutlinedIcon from "@mui/icons-material/EditOutlined";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
@@ -13,6 +14,7 @@ import {
 import { ServingGridElement } from "@/pages/ingredient-display/ui/ServingGridElement.tsx";
 import { DetailGrid } from "@/shared/ui/DetailGrid.tsx";
 import { DetailGridElement } from "@/shared/ui/DetailGridElement.tsx";
+import { RouterIconButton } from "@/shared/ui/RouterIconButton.tsx";
 import { StyledCardActionSelector } from "@/shared/ui/StyledCardActionSelector.tsx";
 import { StyledCardHeader } from "@/shared/ui/StyledCardHeader.tsx";
 
@@ -79,7 +81,18 @@ const IngredientDetail = ({
 						width: "100%",
 					}}
 				>
-					<StyledCardHeader title={ingredient.name} />
+					<StyledCardHeader
+						title={ingredient.name}
+						action={
+							<RouterIconButton
+								to="/ingredients/$id/edit"
+								params={{ id: ingredientDto.id }}
+								aria-label="Edit ingredient"
+							>
+								<EditOutlinedIcon fontSize="small" />
+							</RouterIconButton>
+						}
+					/>
 
 					<CardContent sx={{ pt: { xs: 1, sm: 1.5 }, px: { xs: 2, sm: 2.5 } }}>
 						<DetailGrid>

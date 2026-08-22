@@ -4,9 +4,9 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import java.util.Arrays;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jspecify.annotations.NonNull;
 import org.springframework.boot.jackson.autoconfigure.JsonMapperBuilderCustomizer;
 import org.springframework.context.annotation.Bean;
-import org.jspecify.annotations.NonNull;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
@@ -34,7 +34,9 @@ public class WebConfig implements WebMvcConfigurer {
                 Arrays.asList(webConfigProperties.getAllowedOrigins())
             );
             final var CorsRegistration = registry.addMapping("/**");
-            CorsRegistration.allowedOrigins(webConfigProperties.getAllowedOrigins());
+            CorsRegistration
+                .allowedMethods("GET", "POST", "PUT", "DELETE", "HEAD")
+                .allowedOrigins(webConfigProperties.getAllowedOrigins());
         }
     }
 }
