@@ -1,18 +1,41 @@
 import {
+	createMemoryHistory,
+	createRootRoute,
+	createRouter,
+	RouterProvider,
+} from "@tanstack/react-router";
+import {
+	act,
 	cleanup,
 	fireEvent,
 	render,
 	screen,
 	waitFor,
 } from "@testing-library/react";
+import type { ReactNode } from "react";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { IngredientDetail } from "@/pages/ingredient-display/ui/IngredientDetail.tsx";
 import { ingredientFactory, ingredientVariantFactory } from "@/shared/testing";
 
 afterEach(cleanup);
 
+const createTestRouter = (ui: ReactNode) => {
+	const rootRoute = createRootRoute({ component: () => ui });
+	return createRouter({
+		routeTree: rootRoute,
+		history: createMemoryHistory(),
+	});
+};
+
+const renderWithRouter = async (ui: ReactNode) => {
+	const router = createTestRouter(ui);
+	const result = render(<RouterProvider router={router} />);
+	await act(() => router.load());
+	return result;
+};
+
 describe("IngredientDetail", () => {
-	test("renders the selected ingredient detail card", () => {
+	test("renders the selected ingredient detail card", async () => {
 		// given
 		const variant = ingredientVariantFactory.build({
 			description: "Cooked breast",
@@ -30,7 +53,7 @@ describe("IngredientDetail", () => {
 		});
 
 		// when
-		const { container } = render(
+		const { container } = await renderWithRouter(
 			<IngredientDetail ingredientDto={ingredient} rawVariantId={variant.id} />,
 		);
 
@@ -43,14 +66,14 @@ describe("IngredientDetail", () => {
 		expect(container.textContent).toContain("31 g");
 	});
 
-	test("renders conversion warnings", () => {
+	test("renders conversion warnings", async () => {
 		// given
 		const ingredient = ingredientFactory.build({
 			ingredientVariants: [],
 		});
 
 		// when
-		const { container } = render(
+		const { container } = await renderWithRouter(
 			<IngredientDetail ingredientDto={ingredient} />,
 		);
 
@@ -60,7 +83,7 @@ describe("IngredientDetail", () => {
 		);
 	});
 
-	test("renders selector when ingredient has variants", () => {
+	test("renders selector when ingredient has variants", async () => {
 		// given
 		const ingredient = ingredientFactory.build({
 			ingredientVariants: ingredientVariantFactory.buildList(2, {
@@ -69,7 +92,7 @@ describe("IngredientDetail", () => {
 		});
 
 		// when
-		const { container } = render(
+		const { container } = await renderWithRouter(
 			<IngredientDetail ingredientDto={ingredient} />,
 		);
 
@@ -90,7 +113,7 @@ describe("IngredientDetail", () => {
 		});
 
 		// when
-		render(
+		await renderWithRouter(
 			<IngredientDetail
 				ingredientDto={ingredient}
 				rawVariantId={variant.id}
@@ -111,5 +134,21 @@ describe("IngredientDetail", () => {
 			});
 			expect(screen.queryByRole("dialog")).toBeNull();
 		});
+	});
+
+	test("renders an edit link to the ingredient's edit route", async () => {
+		// given
+		const ingredient = ingredientFactory.build({ ingredientVariants: [] });
+
+		// when
+		await renderWithRouter(<IngredientDetail ingredientDto={ingredient} />);
+
+		// then
+		expect(
+			screen.getByRole("link", { name: "Edit ingredient" }),
+		).toHaveProperty(
+			"href",
+			expect.stringContaining(`/ingredients/${ingredient.id}/edit`),
+		);
 	});
 });

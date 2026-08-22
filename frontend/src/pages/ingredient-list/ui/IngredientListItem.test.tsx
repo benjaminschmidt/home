@@ -5,12 +5,12 @@ import {
 	RouterProvider,
 } from "@tanstack/react-router";
 import { act, render } from "@testing-library/react";
-import type * as React from "react";
+import type { ReactNode } from "react";
 import { describe, expect, test } from "vitest";
 import { IngredientListItem } from "@/pages/ingredient-list/ui/IngredientListItem.tsx";
 import { ingredientFactory, ingredientVariantFactory } from "@/shared/testing";
 
-const createTestRouter = (ui: React.ReactNode) => {
+const createTestRouter = (ui: ReactNode) => {
 	const rootRoute = createRootRoute({ component: () => ui });
 	return createRouter({
 		routeTree: rootRoute,
@@ -18,7 +18,7 @@ const createTestRouter = (ui: React.ReactNode) => {
 	});
 };
 
-const renderWithRouter = async (ui: React.ReactNode) => {
+const renderWithRouter = async (ui: ReactNode) => {
 	const router = createTestRouter(ui);
 	const result = render(<RouterProvider router={router} />);
 	await act(() => router.load());

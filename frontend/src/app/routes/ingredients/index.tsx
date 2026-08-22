@@ -1,11 +1,8 @@
 import { useSuspenseInfiniteQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
-import {
-	createIngredientsQueryOptions,
-	IngredientListPage,
-	useInfiniteScroll,
-} from "@/pages/ingredient-list";
+import { createIngredientsQueryOptions } from "@/entities/ingredients";
+import { IngredientListPage, useInfiniteScroll } from "@/pages/ingredient-list";
 
 const IngredientsPage = () => {
 	const { search } = Route.useSearch();

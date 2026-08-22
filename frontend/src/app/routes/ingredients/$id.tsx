@@ -1,8 +1,8 @@
 import { useSuspenseQuery } from "@tanstack/react-query";
 import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
+import { createIngredientIdQueryOptions } from "@/entities/ingredients";
 import {
-	createIngredientIdQueryOptions,
 	dropUnnecessarySearchParams,
 	IngredientDetail,
 } from "@/pages/ingredient-display";
