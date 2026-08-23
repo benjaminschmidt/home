@@ -1,12 +1,12 @@
 import { render } from "@testing-library/react";
 import { describe, expect, test } from "vitest";
-import { DetailGridElement } from "@/shared/ui/DetailGridElement.tsx";
+import { CompactDescriptionListItem } from "@/shared/ui/dl/CompactDescriptionListItem.tsx";
 
-describe("DetailGridElement", () => {
+describe("CompactDescriptionListItem", () => {
 	test("renders label", () => {
 		// when
 		const { container } = render(
-			<DetailGridElement label="Calories" value="250 kcal" />,
+			<CompactDescriptionListItem label="Calories" value="250 kcal" />,
 		);
 
 		// then
@@ -16,7 +16,7 @@ describe("DetailGridElement", () => {
 	test("renders value", () => {
 		// when
 		const { container } = render(
-			<DetailGridElement label="Calories" value="250 kcal" />,
+			<CompactDescriptionListItem label="Calories" value="250 kcal" />,
 		);
 
 		// then

@@ -9,11 +9,12 @@ import {
 	getIngredientServingDetail,
 	getIngredientVariantOptions,
 } from "@/entities/ingredients";
-import { OverviewGrid } from "@/shared/ui/OverviewGrid.tsx";
-import { OverviewGridElement } from "@/shared/ui/OverviewGridElement.tsx";
-import { RouterCardActionArea } from "@/shared/ui/RouterCardActionArea.tsx";
-import { StyledCardActionSelector } from "@/shared/ui/StyledCardActionSelector.tsx";
-import { StyledCardHeader } from "@/shared/ui/StyledCardHeader.tsx";
+import { CardActionSelector, CardHeader } from "@/shared/ui/card";
+import {
+	CompactDescriptionList,
+	CompactDescriptionListItem,
+} from "@/shared/ui/dl";
+import { RouterCardActionArea } from "@/shared/ui/router";
 
 type IngredientListItemProps = {
 	ingredient: IngredientDto;
@@ -47,22 +48,26 @@ const IngredientListItem = ({ ingredient }: IngredientListItemProps) => {
 						ingredientVariant?.id ? { variantId: ingredientVariant.id } : {}
 					}
 				>
-					<StyledCardHeader title={ingredient.name} forceCompact />
+					<CardHeader title={ingredient.name} forceCompact />
 
 					<CardContent sx={{ pt: 1, pb: 1.5, flexGrow: 1 }}>
-						<OverviewGrid>
-							<OverviewGridElement
+						<CompactDescriptionList>
+							<CompactDescriptionListItem
 								label={servingDetail.label}
 								value={servingDetail.value}
 							/>
 							{nutritionDetailArray.map(({ label, value }) => (
-								<OverviewGridElement key={label} label={label} value={value} />
+								<CompactDescriptionListItem
+									key={label}
+									label={label}
+									value={value}
+								/>
 							))}
-						</OverviewGrid>
+						</CompactDescriptionList>
 					</CardContent>
 				</RouterCardActionArea>
 				<Divider />
-				<StyledCardActionSelector
+				<CardActionSelector
 					selectedIndex={selectedIndex}
 					setSelectedIndex={setSelectedIndex}
 					forceCompact

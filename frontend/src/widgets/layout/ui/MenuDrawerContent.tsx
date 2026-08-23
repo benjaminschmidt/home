@@ -5,7 +5,7 @@ import ListItem from "@mui/material/ListItem";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
 import { type ParsedLocation, useLocation } from "@tanstack/react-router";
-import { RouterListItemButton } from "@/shared/ui/RouterListItemButton.tsx";
+import { RouterListItemButton } from "@/shared/ui/router";
 
 const getCurrent = (location: ParsedLocation) => {
 	if (location.pathname === "/") return "recipes";

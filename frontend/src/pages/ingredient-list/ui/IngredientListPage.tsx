@@ -5,7 +5,7 @@ import Tooltip from "@mui/material/Tooltip";
 import type { IngredientDto } from "home-api";
 import type { RefObject } from "react";
 import { IngredientList } from "@/pages/ingredient-list/ui/IngredientList.tsx";
-import { RouterIconButton } from "@/shared/ui/RouterIconButton.tsx";
+import { RouterIconButton } from "@/shared/ui/router";
 import { SearchField } from "@/shared/ui/SearchField.tsx";
 
 type IngredientListPageProps = {

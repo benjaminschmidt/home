@@ -2,7 +2,7 @@ import CardActions from "@mui/material/CardActions";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 
-type StyledCardActionSelectorProps = {
+type CardActionSelectorProps = {
 	selectedIndex: number;
 	setSelectedIndex: (index: number) => void;
 	forceCompact?: boolean;
@@ -13,12 +13,12 @@ type StyledCardActionSelectorProps = {
 	}[];
 };
 
-const StyledCardActionSelector = ({
+const CardActionSelector = ({
 	selectedIndex,
 	setSelectedIndex,
 	forceCompact = false,
 	options,
-}: StyledCardActionSelectorProps) => {
+}: CardActionSelectorProps) => {
 	if (options.length === 0) {
 		return null;
 	}
@@ -70,4 +70,4 @@ const StyledCardActionSelector = ({
 	);
 };
 
-export { StyledCardActionSelector };
+export { CardActionSelector };

@@ -48,13 +48,20 @@ const ServingGridElement = ({
 					m: 0,
 					border: "1px solid",
 					borderColor: "divider",
-					borderRadius: 2,
-					p: { xs: 1.5, sm: 1.5 },
+					borderRadius: 1,
+					p: 1.5,
+					pt: 2.5,
+					position: "relative",
 					transition: (theme) =>
 						theme.transitions.create(["background-color", "border-color"]),
+					"&:focus-within": {
+						borderColor: "primary.main",
+						borderWidth: 2,
+						"& > .MuiTypography-root": { color: "primary.main" },
+					},
 					"&:hover": {
 						bgcolor: "action.hover",
-						borderColor: "text.secondary",
+						borderColor: "text.primary",
 					},
 					"&.Mui-disabled": {
 						color: "inherit",
@@ -68,9 +75,17 @@ const ServingGridElement = ({
 						alignItems: "center",
 						justifyContent: "space-between",
 						gap: 1,
+						position: "absolute",
+						top: 0,
+						left: 10,
+						transform: "translateY(-50%)",
+						px: 0.5,
+						bgcolor: "background.paper",
 						typography: "body2",
+						fontSize: "0.75rem",
 						color: "text.secondary",
 						whiteSpace: "nowrap",
+						lineHeight: "1.4375em",
 					}}
 				>
 					<span>{servingDetail.label}</span>

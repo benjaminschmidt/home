@@ -9,7 +9,6 @@ import ListSubheader from "@mui/material/ListSubheader";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import Stack from "@mui/material/Stack";
-import TextField from "@mui/material/TextField";
 import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
 import {
@@ -17,6 +16,7 @@ import {
 	getUnitOptions,
 	type Ingredient,
 } from "@/entities/ingredients";
+import { TextField } from "@/shared/ui/form";
 
 type ServingDialogProps = {
 	ingredient: Ingredient;
@@ -188,13 +188,10 @@ const ServingDialog = ({
 								return (
 									<TextField
 										label="Amount"
-										type="text"
-										slotProps={{ htmlInput: { inputMode: "decimal" } }}
+										inputMode="decimal"
 										value={field.state.value}
-										onChange={(event) => field.handleChange(event.target.value)}
-										error={errorMessage !== undefined}
-										helperText={errorMessage ?? " "}
-										fullWidth
+										handleChange={field.handleChange}
+										errorMessage={errorMessage}
 									/>
 								);
 							}}

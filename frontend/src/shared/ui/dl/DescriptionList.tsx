@@ -1,19 +1,19 @@
 import Stack from "@mui/material/Stack";
 import type { ReactNode } from "react";
 
-type OverviewGridProps = {
+type DescriptionListProps = {
 	children: ReactNode;
 };
 
-const OverviewGrid = ({ children }: OverviewGridProps) => {
+const DescriptionList = ({ children }: DescriptionListProps) => {
 	return (
 		<Stack
 			component="dl"
 			sx={{
 				display: "grid",
-				gap: "4px 8px",
+				rowGap: { xs: 1.5, sm: 2 },
+				columnGap: { xs: 1.5, sm: 2 },
 				gridTemplateColumns: "1fr 1fr",
-				m: 0,
 			}}
 		>
 			{children}
@@ -21,4 +21,4 @@ const OverviewGrid = ({ children }: OverviewGridProps) => {
 	);
 };
 
-export { OverviewGrid };
+export { DescriptionList };

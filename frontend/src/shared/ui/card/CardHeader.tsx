@@ -1,20 +1,20 @@
-import CardHeader from "@mui/material/CardHeader";
+import MuiCardHeader from "@mui/material/CardHeader";
 import Typography from "@mui/material/Typography";
 import type { ReactNode } from "react";
 
-type StyledCardHeaderProps = {
+type CardHeaderProps = {
 	title: string;
 	forceCompact?: boolean;
 	action?: ReactNode;
 };
 
-const StyledCardHeader = ({
+const CardHeader = ({
 	title,
 	forceCompact = false,
 	action,
-}: StyledCardHeaderProps) => {
+}: CardHeaderProps) => {
 	return (
-		<CardHeader
+		<MuiCardHeader
 			action={action}
 			title={
 				<Typography
@@ -42,4 +42,4 @@ const StyledCardHeader = ({
 	);
 };
 
-export { StyledCardHeader };
+export { CardHeader };

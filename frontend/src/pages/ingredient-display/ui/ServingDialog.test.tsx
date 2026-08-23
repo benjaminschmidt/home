@@ -48,6 +48,10 @@ describe("ServingDialog", () => {
 
 		// then
 		expect(screen.getByLabelText("Amount")).toBeTruthy();
+		expect(screen.getByLabelText("Amount")).toHaveProperty(
+			"inputMode",
+			"decimal",
+		);
 		expect(screen.getByRole("combobox", { name: "Unit" })).toBeTruthy();
 		expect(
 			screen

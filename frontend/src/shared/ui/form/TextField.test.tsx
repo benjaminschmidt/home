@@ -1,14 +1,14 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, test, vi } from "vitest";
-import { IngredientTextInputField } from "@/pages/ingredient-edit/ui/IngredientTextInputField.tsx";
+import { TextField } from "@/shared/ui/form/TextField.tsx";
 
 afterEach(cleanup);
 
-describe("IngredientTextInputField", () => {
+describe("TextField", () => {
 	test("renders the label and value", () => {
 		// when
 		render(
-			<IngredientTextInputField
+			<TextField
 				label="Ingredient name"
 				value="Flour"
 				handleChange={vi.fn()}
@@ -16,22 +16,20 @@ describe("IngredientTextInputField", () => {
 		);
 
 		// then
-		expect(screen.getByText("Ingredient name")).toBeTruthy();
-		expect(screen.getByLabelText("Ingredient name")).toHaveProperty(
-			"value",
-			"Flour",
-		);
+		const input = screen.getByLabelText("Ingredient name");
+		expect(
+			Array.from(document.querySelectorAll("label")).find(
+				(label) => label.htmlFor === input.id,
+			),
+		).toBeTruthy();
+		expect(input).toHaveProperty("value", "Flour");
 	});
 
 	test("passes the changed value to handleChange", () => {
 		// given
 		const handleChange = vi.fn();
 		render(
-			<IngredientTextInputField
-				label="Name"
-				value="Flour"
-				handleChange={handleChange}
-			/>,
+			<TextField label="Name" value="Flour" handleChange={handleChange} />,
 		);
 
 		// when
@@ -46,7 +44,7 @@ describe("IngredientTextInputField", () => {
 	test("renders the validation error message", () => {
 		// when
 		render(
-			<IngredientTextInputField
+			<TextField
 				label="Name"
 				value="  "
 				handleChange={vi.fn()}

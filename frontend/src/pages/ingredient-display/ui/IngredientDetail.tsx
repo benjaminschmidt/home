@@ -12,11 +12,9 @@ import {
 	getIngredientVariantOptions,
 } from "@/entities/ingredients";
 import { ServingGridElement } from "@/pages/ingredient-display/ui/ServingGridElement.tsx";
-import { DetailGrid } from "@/shared/ui/DetailGrid.tsx";
-import { DetailGridElement } from "@/shared/ui/DetailGridElement.tsx";
-import { RouterIconButton } from "@/shared/ui/RouterIconButton.tsx";
-import { StyledCardActionSelector } from "@/shared/ui/StyledCardActionSelector.tsx";
-import { StyledCardHeader } from "@/shared/ui/StyledCardHeader.tsx";
+import { CardActionSelector, CardHeader } from "@/shared/ui/card";
+import { DescriptionList, DescriptionListItem } from "@/shared/ui/dl";
+import { RouterIconButton } from "@/shared/ui/router";
 
 type IngredientDetailProps = {
 	ingredientDto: IngredientDto;
@@ -81,7 +79,7 @@ const IngredientDetail = ({
 						width: "100%",
 					}}
 				>
-					<StyledCardHeader
+					<CardHeader
 						title={ingredient.name}
 						action={
 							<RouterIconButton
@@ -95,21 +93,21 @@ const IngredientDetail = ({
 					/>
 
 					<CardContent sx={{ pt: { xs: 1, sm: 1.5 }, px: { xs: 2, sm: 2.5 } }}>
-						<DetailGrid>
+						<DescriptionList>
 							<ServingGridElement
 								ingredient={ingredient}
 								onServingChange={onServingChange}
 							/>
 							{nutritionDetailArray.map(({ label, value }) => (
-								<DetailGridElement key={label} label={label} value={value} />
+								<DescriptionListItem key={label} label={label} value={value} />
 							))}
-						</DetailGrid>
+						</DescriptionList>
 					</CardContent>
 
 					{ingredientVariants.length > 0 && (
 						<>
 							<Divider />
-							<StyledCardActionSelector
+							<CardActionSelector
 								selectedIndex={defaultIndex}
 								setSelectedIndex={(index) =>
 									onVariantIdChange?.(ingredientVariants[index]?.id)
