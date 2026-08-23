@@ -1,12 +1,12 @@
 import { render } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
-import { StyledCardActionSelector } from "@/shared/ui/StyledCardActionSelector.tsx";
+import { CardActionSelector } from "@/shared/ui/card/CardActionSelector.tsx";
 
-describe("StyledCardActionSelector", () => {
+describe("CardActionSelector", () => {
 	test("renders null when options is empty", () => {
 		// when
 		const { container } = render(
-			<StyledCardActionSelector
+			<CardActionSelector
 				selectedIndex={0}
 				setSelectedIndex={vi.fn()}
 				forceCompact
@@ -21,7 +21,7 @@ describe("StyledCardActionSelector", () => {
 	test("renders a select when options are provided", () => {
 		// given / when
 		const { container } = render(
-			<StyledCardActionSelector
+			<CardActionSelector
 				selectedIndex={0}
 				setSelectedIndex={vi.fn()}
 				options={[{ default: false, id: "1", value: "Whole" }]}
@@ -35,7 +35,7 @@ describe("StyledCardActionSelector", () => {
 	test("renders the selected option value", () => {
 		// when
 		const { container } = render(
-			<StyledCardActionSelector
+			<CardActionSelector
 				selectedIndex={1}
 				setSelectedIndex={vi.fn()}
 				forceCompact
@@ -53,7 +53,7 @@ describe("StyledCardActionSelector", () => {
 	test("prefixes default option with star", () => {
 		// when
 		const { container } = render(
-			<StyledCardActionSelector
+			<CardActionSelector
 				selectedIndex={0}
 				setSelectedIndex={vi.fn()}
 				options={[{ default: true, id: "1", value: "Whole" }]}
@@ -67,7 +67,7 @@ describe("StyledCardActionSelector", () => {
 	test("does not prefix non-default option with star", () => {
 		// when
 		const { container } = render(
-			<StyledCardActionSelector
+			<CardActionSelector
 				selectedIndex={0}
 				setSelectedIndex={vi.fn()}
 				forceCompact

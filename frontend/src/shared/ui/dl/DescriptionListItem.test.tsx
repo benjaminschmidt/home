@@ -1,12 +1,12 @@
 import { render } from "@testing-library/react";
 import { describe, expect, test } from "vitest";
-import { OverviewGridElement } from "@/shared/ui/OverviewGridElement.tsx";
+import { DescriptionListItem } from "@/shared/ui/dl/DescriptionListItem.tsx";
 
-describe("OverviewGridElement", () => {
+describe("DescriptionListItem", () => {
 	test("renders label", () => {
 		// when
 		const { container } = render(
-			<OverviewGridElement label="Calories" value="250 kcal" />,
+			<DescriptionListItem label="Calories" value="250 kcal" />,
 		);
 
 		// then
@@ -16,7 +16,7 @@ describe("OverviewGridElement", () => {
 	test("renders value", () => {
 		// when
 		const { container } = render(
-			<OverviewGridElement label="Calories" value="250 kcal" />,
+			<DescriptionListItem label="Calories" value="250 kcal" />,
 		);
 
 		// then

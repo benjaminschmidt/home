@@ -1,18 +1,17 @@
 import Stack from "@mui/material/Stack";
 import type { ReactNode } from "react";
 
-type DetailGridProps = {
+type CompactDescriptionListProps = {
 	children: ReactNode;
 };
 
-const DetailGrid = ({ children }: DetailGridProps) => {
+const CompactDescriptionList = ({ children }: CompactDescriptionListProps) => {
 	return (
 		<Stack
 			component="dl"
 			sx={{
 				display: "grid",
-				rowGap: { xs: 1, sm: 1.5 },
-				columnGap: { xs: 1, sm: 1.5 },
+				gap: "4px 8px",
 				gridTemplateColumns: "1fr 1fr",
 				m: 0,
 			}}
@@ -22,4 +21,4 @@ const DetailGrid = ({ children }: DetailGridProps) => {
 	);
 };
 
-export { DetailGrid };
+export { CompactDescriptionList };

@@ -1,15 +1,15 @@
 import { render } from "@testing-library/react";
 import { describe, expect, test } from "vitest";
-import { OverviewGrid } from "@/shared/ui/OverviewGrid.tsx";
-import { OverviewGridElement } from "@/shared/ui/OverviewGridElement.tsx";
+import { DescriptionList } from "@/shared/ui/dl/DescriptionList.tsx";
+import { DescriptionListItem } from "@/shared/ui/dl/DescriptionListItem.tsx";
 
-describe("OverviewGrid", () => {
+describe("DescriptionList", () => {
 	test("renders a single row", () => {
 		// when
 		const { container } = render(
-			<OverviewGrid>
-				<OverviewGridElement label="Calories" value="250 kcal" />
-			</OverviewGrid>,
+			<DescriptionList>
+				<DescriptionListItem label="Calories" value="250 kcal" />
+			</DescriptionList>,
 		);
 
 		// then
@@ -27,11 +27,11 @@ describe("OverviewGrid", () => {
 
 		// when
 		const { container } = render(
-			<OverviewGrid>
+			<DescriptionList>
 				{detailArray.map(({ label, value }) => (
-					<OverviewGridElement key={label} label={label} value={value} />
+					<DescriptionListItem key={label} label={label} value={value} />
 				))}
-			</OverviewGrid>,
+			</DescriptionList>,
 		);
 		const dts = container.querySelectorAll("dt");
 		const dds = container.querySelectorAll("dd");
