@@ -23,7 +23,6 @@ const IngredientDefaultVariantSelector = withForm({
 	},
 	render: ({ form, variants }) => {
 		const variantOptions = getIngredientVariantOptions(variants);
-		if (variantOptions.length === 0) return null;
 
 		return (
 			<form.AppField name="defaultVariantId">

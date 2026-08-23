@@ -11,9 +11,13 @@ const Component = () => {
 
 	return (
 		<EditIngredientPage
+			mode="edit"
 			ingredientDto={data}
 			onCancel={() => {
 				void navigate({ to: "/ingredients/$id", params: { id } });
+			}}
+			onDeleted={() => {
+				void navigate({ to: "/ingredients", replace: true });
 			}}
 		/>
 	);

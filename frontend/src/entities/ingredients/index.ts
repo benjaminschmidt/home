@@ -1,3 +1,5 @@
+export { createIngredientMutationOptions } from "@/entities/ingredients/api/createIngredientMutationOptions.ts";
+export { createDeleteIngredientMutationOptions } from "@/entities/ingredients/api/deleteIngredientMutationOptions.ts";
 export { createIngredientIdQueryOptions } from "@/entities/ingredients/api/ingredientIdQueryOptions.ts";
 export { createIngredientsQueryOptions } from "@/entities/ingredients/api/ingredientsQueryOptions.ts";
 export { createUpdateIngredientMutationOptions } from "@/entities/ingredients/api/updateIngredientMutationOptions.ts";

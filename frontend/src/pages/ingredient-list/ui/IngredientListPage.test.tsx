@@ -44,6 +44,7 @@ describe("IngredientListPage", () => {
 		);
 		expect(screen.getByText("Chicken Breast")).toBeDefined();
 		expect(screen.getByText("Almonds")).toBeDefined();
+		expect(screen.getByLabelText("Add ingredient")).toBeDefined();
 	});
 
 	test("forwards search changes", () => {

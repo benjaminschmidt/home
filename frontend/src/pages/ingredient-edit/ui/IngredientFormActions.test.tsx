@@ -13,6 +13,7 @@ type IngredientFormActionsTestHostProps = {
 	errorMessage?: string;
 	isSubmitting?: boolean;
 	onCancel?: () => void;
+	onDelete?: () => void;
 	onReset?: () => void;
 };
 
@@ -20,6 +21,7 @@ const IngredientFormActionsTestHost = ({
 	errorMessage,
 	isSubmitting = false,
 	onCancel = vi.fn(),
+	onDelete,
 	onReset = vi.fn(),
 }: IngredientFormActionsTestHostProps) => {
 	const form = useAppForm({
@@ -45,6 +47,7 @@ const IngredientFormActionsTestHost = ({
 				form={form}
 				isSubmitting={isSubmitting}
 				onCancel={onCancel}
+				onDelete={onDelete}
 				onReset={onReset}
 			/>
 		</form>
@@ -60,9 +63,9 @@ describe("IngredientFormActions", () => {
 
 		// then
 		expect(screen.getByRole("region", { name: "Form actions" })).toBeTruthy();
-		expect(screen.getByRole("button", { name: "Reset form" })).toBeTruthy();
-		expect(screen.getByRole("button", { name: "Cancel editing" })).toBeTruthy();
-		expect(screen.getByRole("button", { name: "Save changes" })).toBeTruthy();
+		expect(screen.getByRole("button", { name: "Reset" })).toBeTruthy();
+		expect(screen.getByRole("button", { name: "Cancel" })).toBeTruthy();
+		expect(screen.getByRole("button", { name: "Save" })).toBeTruthy();
 		expect(screen.getByText("Name already in use")).toBeTruthy();
 	});
 
@@ -71,7 +74,7 @@ describe("IngredientFormActions", () => {
 		render(<IngredientFormActionsTestHost />);
 
 		// then
-		expect(screen.getByRole("button", { name: "Save changes" })).toHaveProperty(
+		expect(screen.getByRole("button", { name: "Save" })).toHaveProperty(
 			"disabled",
 			true,
 		);
@@ -83,10 +86,31 @@ describe("IngredientFormActions", () => {
 		render(<IngredientFormActionsTestHost onCancel={onCancel} />);
 
 		// when
-		fireEvent.click(screen.getByRole("button", { name: "Cancel editing" }));
+		fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
 
 		// then
 		expect(onCancel).toHaveBeenCalledOnce();
+	});
+
+	test("renders and calls onDelete when provided", () => {
+		// given
+		const onDelete = vi.fn();
+		render(<IngredientFormActionsTestHost onDelete={onDelete} />);
+		const resetButton = screen.getByRole("button", { name: "Reset" });
+		const deleteButton = screen.getByRole("button", {
+			name: "Delete ingredient",
+		});
+
+		expect(
+			resetButton.compareDocumentPosition(deleteButton) &
+				Node.DOCUMENT_POSITION_FOLLOWING,
+		).toBeTruthy();
+
+		// when
+		fireEvent.click(deleteButton);
+
+		// then
+		expect(onDelete).toHaveBeenCalledOnce();
 	});
 
 	test("resets changed values and calls onReset", () => {
@@ -98,7 +122,7 @@ describe("IngredientFormActions", () => {
 		});
 
 		// when
-		fireEvent.click(screen.getByRole("button", { name: "Reset form" }));
+		fireEvent.click(screen.getByRole("button", { name: "Reset" }));
 
 		// then
 		expect(screen.getByLabelText("Test name")).toHaveProperty("value", "Flour");
@@ -110,14 +134,15 @@ describe("IngredientFormActions", () => {
 		render(<IngredientFormActionsTestHost isSubmitting />);
 
 		// then
-		expect(screen.getByRole("button", { name: "Reset form" })).toHaveProperty(
+		expect(screen.getByRole("button", { name: "Reset" })).toHaveProperty(
 			"disabled",
 			true,
 		);
-		expect(
-			screen.getByRole("button", { name: "Cancel editing" }),
-		).toHaveProperty("disabled", true);
-		expect(screen.getByRole("button", { name: "Save changes" })).toHaveProperty(
+		expect(screen.getByRole("button", { name: "Cancel" })).toHaveProperty(
+			"disabled",
+			true,
+		);
+		expect(screen.getByRole("button", { name: "Save" })).toHaveProperty(
 			"disabled",
 			true,
 		);
@@ -131,11 +156,9 @@ describe("IngredientFormActions", () => {
 		});
 
 		// when
-		fireEvent.mouseOver(screen.getByRole("button", { name: "Save changes" }));
+		fireEvent.mouseOver(screen.getByRole("button", { name: "Save" }));
 
 		// then
-		expect((await screen.findByRole("tooltip")).textContent).toBe(
-			"Save changes",
-		);
+		expect((await screen.findByRole("tooltip")).textContent).toBe("Save");
 	});
 });

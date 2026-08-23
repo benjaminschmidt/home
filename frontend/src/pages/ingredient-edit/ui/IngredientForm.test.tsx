@@ -66,9 +66,12 @@ describe("IngredientForm", () => {
 		expect(screen.getByLabelText("Volume amount")).toHaveProperty("value", "");
 		expect(screen.getByText("Weight ↔ volume conversion")).toBeTruthy();
 		expect(screen.getByText("Ingredient")).toBeTruthy();
-		expect(
-			screen.queryByRole("combobox", { name: "Default variant" }),
-		).toBeNull();
+		const defaultVariantSelector = screen.getByRole("combobox", {
+			name: "Default variant",
+		});
+		expect(defaultVariantSelector.textContent).not.toContain("None");
+		fireEvent.mouseDown(defaultVariantSelector);
+		expect(screen.getByRole("option", { name: "None" })).toBeTruthy();
 	});
 
 	test("prefills name and conversion fields from initial values", () => {
@@ -99,14 +102,17 @@ describe("IngredientForm", () => {
 		).toBe("ml");
 	});
 
-	test("does not render a default variant selector without variants", () => {
+	test("renders a default variant selector with None without variants", () => {
 		// when
 		render(<IngredientFormTestHost variants={[]} />);
 
 		// then
-		expect(
-			screen.queryByRole("combobox", { name: "Default variant" }),
-		).toBeNull();
+		const defaultVariantSelector = screen.getByRole("combobox", {
+			name: "Default variant",
+		});
+		expect(defaultVariantSelector.textContent).not.toContain("None");
+		fireEvent.mouseDown(defaultVariantSelector);
+		expect(screen.getByRole("option", { name: "None" })).toBeTruthy();
 	});
 
 	test("renders default variant options plus none, preselecting the current default", () => {

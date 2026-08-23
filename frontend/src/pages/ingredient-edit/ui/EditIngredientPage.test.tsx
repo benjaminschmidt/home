@@ -5,9 +5,10 @@ import {
 	render,
 	screen,
 	waitFor,
+	within,
 } from "@testing-library/react";
 import type { IngredientDto } from "home-api";
-import { updateIngredient } from "home-api";
+import { createIngredient, deleteIngredient, updateIngredient } from "home-api";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { EditIngredientPage } from "@/pages/ingredient-edit/ui/EditIngredientPage.tsx";
 import { ingredientFactory, ingredientVariantFactory } from "@/shared/testing";
@@ -16,17 +17,41 @@ vi.mock("home-api", async () => {
 	const actual = await vi.importActual<typeof import("home-api")>("home-api");
 	return {
 		...actual,
+		createIngredient: vi.fn(),
+		deleteIngredient: vi.fn(),
 		updateIngredient: vi.fn(),
 	};
 });
 
 afterEach(cleanup);
 
-const renderPage = (ingredientDto: IngredientDto, onCancel = vi.fn()) => {
+const renderPage = (
+	ingredientDto: IngredientDto,
+	onCancel = vi.fn(),
+	onDeleted = vi.fn(),
+) => {
 	const queryClient = new QueryClient();
 	render(
 		<QueryClientProvider client={queryClient}>
-			<EditIngredientPage ingredientDto={ingredientDto} onCancel={onCancel} />
+			<EditIngredientPage
+				mode="edit"
+				ingredientDto={ingredientDto}
+				onCancel={onCancel}
+				onDeleted={onDeleted}
+			/>
+		</QueryClientProvider>,
+	);
+};
+
+const renderCreatePage = (onCancel = vi.fn(), onCreated = vi.fn()) => {
+	const queryClient = new QueryClient();
+	render(
+		<QueryClientProvider client={queryClient}>
+			<EditIngredientPage
+				mode="create"
+				onCancel={onCancel}
+				onCreated={onCreated}
+			/>
 		</QueryClientProvider>,
 	);
 };
@@ -92,7 +117,7 @@ describe("EditIngredientPage", () => {
 		});
 
 		// then
-		expect(screen.getByRole("button", { name: "Save changes" })).toHaveProperty(
+		expect(screen.getByRole("button", { name: "Save" })).toHaveProperty(
 			"disabled",
 			true,
 		);
@@ -112,7 +137,7 @@ describe("EditIngredientPage", () => {
 		});
 
 		// then
-		expect(screen.getByRole("button", { name: "Save changes" })).toHaveProperty(
+		expect(screen.getByRole("button", { name: "Save" })).toHaveProperty(
 			"disabled",
 			false,
 		);
@@ -131,7 +156,7 @@ describe("EditIngredientPage", () => {
 		});
 
 		// when
-		fireEvent.click(screen.getByRole("button", { name: "Reset form" }));
+		fireEvent.click(screen.getByRole("button", { name: "Reset" }));
 
 		// then
 		expect(screen.getByLabelText("Name")).toHaveProperty("value", "Flour");
@@ -160,7 +185,7 @@ describe("EditIngredientPage", () => {
 		fireEvent.change(screen.getByLabelText("Name"), {
 			target: { value: "Wheat flour" },
 		});
-		fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
+		fireEvent.click(screen.getByRole("button", { name: "Save" }));
 
 		// then
 		await waitFor(() => {
@@ -175,7 +200,7 @@ describe("EditIngredientPage", () => {
 				body: expect.objectContaining({ name: "Wheat flour" }),
 			}),
 		);
-		expect(screen.getByRole("button", { name: "Save changes" })).toHaveProperty(
+		expect(screen.getByRole("button", { name: "Save" })).toHaveProperty(
 			"disabled",
 			true,
 		);
@@ -183,7 +208,7 @@ describe("EditIngredientPage", () => {
 		fireEvent.change(screen.getByLabelText("Name"), {
 			target: { value: "Whole wheat flour" },
 		});
-		fireEvent.click(screen.getByRole("button", { name: "Reset form" }));
+		fireEvent.click(screen.getByRole("button", { name: "Reset" }));
 
 		expect(screen.getByLabelText("Name")).toHaveProperty(
 			"value",
@@ -219,7 +244,7 @@ describe("EditIngredientPage", () => {
 			screen.getByRole("combobox", { name: "Default variant" }),
 		);
 		fireEvent.click(screen.getByRole("option", { name: "Whole" }));
-		fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
+		fireEvent.click(screen.getByRole("button", { name: "Save" }));
 
 		// then
 		await waitFor(() => {
@@ -255,7 +280,7 @@ describe("EditIngredientPage", () => {
 		fireEvent.change(screen.getByLabelText("Name"), {
 			target: { value: "Wheat flour" },
 		});
-		fireEvent.click(screen.getByRole("button", { name: "Save changes" }));
+		fireEvent.click(screen.getByRole("button", { name: "Save" }));
 
 		// then
 		await waitFor(() => {
@@ -273,9 +298,210 @@ describe("EditIngredientPage", () => {
 
 		// when
 		renderPage(ingredientDto, onCancel);
-		fireEvent.click(screen.getByRole("button", { name: "Cancel editing" }));
+		fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
 
 		// then
 		expect(onCancel).toHaveBeenCalledOnce();
+	});
+
+	test("shows the delete action only for an existing ingredient", () => {
+		// given
+		const ingredientDto = ingredientFactory.build({
+			name: "Flour",
+			ingredientVariants: [],
+		});
+
+		// when
+		renderPage(ingredientDto);
+
+		// then
+		expect(
+			screen.getByRole("button", { name: "Delete ingredient" }),
+		).toBeTruthy();
+
+		cleanup();
+		renderCreatePage();
+		expect(
+			screen.queryByRole("button", { name: "Delete ingredient" }),
+		).toBeNull();
+	});
+
+	test("opens a confirmation dialog for permanent deletion", () => {
+		// given
+		const ingredientDto = ingredientFactory.build({
+			name: "Flour",
+			ingredientVariants: [],
+		});
+		renderPage(ingredientDto);
+
+		// when
+		fireEvent.click(screen.getByRole("button", { name: "Delete ingredient" }));
+
+		// then
+		const dialog = screen.getByRole("dialog");
+		expect(dialog).toBeTruthy();
+		expect(screen.getByText(/Permanently delete "Flour"/)).toBeTruthy();
+		expect(within(dialog).getByRole("button", { name: "Cancel" })).toBeTruthy();
+		expect(within(dialog).getByRole("button", { name: "Delete" })).toBeTruthy();
+		expect(within(dialog).queryByText("Cancel")).toBeNull();
+		expect(within(dialog).queryByText("Delete")).toBeNull();
+	});
+
+	test("cancels deletion without calling the API", async () => {
+		// given
+		const ingredientDto = ingredientFactory.build({
+			name: "Flour",
+			ingredientVariants: [],
+		});
+		renderPage(ingredientDto);
+		fireEvent.click(screen.getByRole("button", { name: "Delete ingredient" }));
+
+		// when
+		fireEvent.click(
+			within(screen.getByRole("dialog")).getByRole("button", {
+				name: "Cancel",
+			}),
+		);
+
+		// then
+		expect(vi.mocked(deleteIngredient)).not.toHaveBeenCalled();
+		await waitFor(() => expect(screen.queryByRole("dialog")).toBeNull());
+	});
+
+	test("deletes the ingredient and forwards the success callback", async () => {
+		// given
+		const ingredientDto = ingredientFactory.build({
+			name: "Flour",
+			ingredientVariants: [],
+		});
+		const onDeleted = vi.fn();
+		vi.mocked(deleteIngredient).mockResolvedValue({
+			data: undefined,
+			error: undefined,
+			request: new Request("http://localhost"),
+			response: new Response(),
+		});
+		renderPage(ingredientDto, vi.fn(), onDeleted);
+		fireEvent.click(screen.getByRole("button", { name: "Delete ingredient" }));
+
+		// when
+		fireEvent.click(
+			within(screen.getByRole("dialog")).getByRole("button", {
+				name: "Delete",
+			}),
+		);
+
+		// then
+		await waitFor(() => {
+			expect(vi.mocked(deleteIngredient)).toHaveBeenCalledWith({
+				path: { ingredientId: ingredientDto.id },
+			});
+			expect(onDeleted).toHaveBeenCalledOnce();
+		});
+	});
+
+	test("keeps the confirmation dialog open when deletion fails", async () => {
+		// given
+		const ingredientDto = ingredientFactory.build({
+			name: "Flour",
+			ingredientVariants: [],
+		});
+		vi.mocked(deleteIngredient).mockResolvedValue({
+			data: undefined,
+			error: { message: "Ingredient is still in use" },
+			request: new Request("http://localhost"),
+			response: new Response(),
+		});
+		renderPage(ingredientDto);
+		fireEvent.click(screen.getByRole("button", { name: "Delete ingredient" }));
+
+		// when
+		fireEvent.click(
+			within(screen.getByRole("dialog")).getByRole("button", {
+				name: "Delete",
+			}),
+		);
+
+		// then
+		await waitFor(() => {
+			expect(screen.getByRole("dialog")).toBeTruthy();
+			expect(screen.getByText("Ingredient is still in use")).toBeTruthy();
+		});
+		expect(screen.getByRole("button", { name: "Cancel" })).toHaveProperty(
+			"disabled",
+			false,
+		);
+	});
+
+	test("renders a blank create form with a None default variant option", () => {
+		// when
+		renderCreatePage();
+
+		// then
+		expect(screen.getByLabelText("Name")).toHaveProperty("value", "");
+		const defaultVariantSelector = screen.getByRole("combobox", {
+			name: "Default variant",
+		});
+		expect(defaultVariantSelector.textContent).not.toContain("None");
+		fireEvent.mouseDown(defaultVariantSelector);
+		expect(screen.getByRole("option", { name: "None" })).toBeTruthy();
+	});
+
+	test("creates an ingredient and forwards the response", async () => {
+		// given
+		const createdIngredientDto = ingredientFactory.build({
+			name: "Flour",
+			ingredientVariants: [],
+		});
+		const onCreated = vi.fn();
+		vi.mocked(createIngredient).mockResolvedValue({
+			data: createdIngredientDto,
+			error: undefined,
+			request: new Request("http://localhost"),
+			response: new Response(),
+		});
+		renderCreatePage(vi.fn(), onCreated);
+
+		// when
+		fireEvent.change(screen.getByLabelText("Name"), {
+			target: { value: "Flour" },
+		});
+		fireEvent.click(screen.getByRole("button", { name: "Save" }));
+
+		// then
+		await waitFor(() => {
+			expect(vi.mocked(createIngredient)).toHaveBeenCalledWith({
+				body: {
+					name: "Flour",
+					weightToVolumeConversionFactor: undefined,
+					conversionWeightUnit: undefined,
+					conversionVolumeUnit: undefined,
+					defaultVariantId: undefined,
+				},
+			});
+		});
+		expect(onCreated).toHaveBeenCalledWith(createdIngredientDto);
+	});
+
+	test("shows the error message when creation fails", async () => {
+		// given
+		vi.mocked(createIngredient).mockResolvedValue({
+			data: undefined,
+			error: { message: "Name already in use" },
+			request: new Request("http://localhost"),
+			response: new Response(),
+		});
+		renderCreatePage();
+
+		// when
+		fireEvent.change(screen.getByLabelText("Name"), {
+			target: { value: "Flour" },
+		});
+		fireEvent.click(screen.getByRole("button", { name: "Save" }));
+
+		// then
+		await waitFor(() => {
+			expect(screen.getByText("Name already in use")).toBeTruthy();
+		});
 	});
 });
