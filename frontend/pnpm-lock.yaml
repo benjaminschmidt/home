@@ -115,8 +115,8 @@ importers:
         specifier: 4.1.10
         version: 4.1.10(@types/node@24.13.3)(jsdom@30.0.1)(vite@8.2.1(@types/node@24.13.3)(jiti@2.7.0))
       web-vitals:
-        specifier: 6.1.0
-        version: 6.1.0
+        specifier: 6.1.1
+        version: 6.1.1
 
 packages:
 
@@ -2041,8 +2041,8 @@ packages:
   web-tree-sitter@0.26.9:
     resolution: {integrity: sha512-YJwSHANl6XFgeEjB8nitgj0qZYt5gkIesJ4w2srS2wcLB4GUa4xcOkM0YaMsU6WNR53YVIkDSY7Ej4pf3IXtCA==}
 
-  web-vitals@6.1.0:
-    resolution: {integrity: sha512-ZNoJ/MbU6aaR2WjKrFVUvy5WQx+G96YvXQFSsmKTz3A/0VlAFywjUcxl00hc/S6wef2stfgQ4yWYIJCWCNudkA==}
+  web-vitals@6.1.1:
+    resolution: {integrity: sha512-r93gKnR6ZC2O8F3JrS0AAGIQ0v0OhXuyg4DAj2oG7K+GPkwXfUSc3ZcWeu50AsV5yIc6xxnTjERipJ6EvSw2vg==}
 
   webidl-conversions@8.0.1:
     resolution: {integrity: sha512-BMhLD/Sw+GbJC21C/UgyaZX41nPt8bUTg+jWyDeg7e7YN4xOM05YPSIXceACnXVtqyEw/LMClUQMtMZ+PGGpqQ==}
@@ -3895,7 +3895,7 @@ snapshots:
 
   web-tree-sitter@0.26.9: {}
 
-  web-vitals@6.1.0: {}
+  web-vitals@6.1.1: {}
 
   webidl-conversions@8.0.1: {}
 
