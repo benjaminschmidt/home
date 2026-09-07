@@ -17,12 +17,18 @@ const CompactDescriptionListItem = ({
 				alignItems: "baseline",
 				gap: 0.5,
 				m: 0,
+				minWidth: 0,
 			}}
 		>
 			<Typography
 				component="dt"
 				variant={"caption"}
-				sx={{ color: "text.secondary", whiteSpace: "nowrap" }}
+				sx={{
+					color: "text.secondary",
+					minWidth: 0,
+					whiteSpace: { xs: "normal", sm: "nowrap" },
+					overflowWrap: "anywhere",
+				}}
 			>
 				{label}
 			</Typography>
@@ -32,7 +38,9 @@ const CompactDescriptionListItem = ({
 				sx={{
 					fontWeight: "fontWeightBold",
 					m: 0,
-					whiteSpace: "nowrap",
+					minWidth: 0,
+					whiteSpace: { xs: "normal", sm: "nowrap" },
+					overflowWrap: "anywhere",
 				}}
 			>
 				{value}

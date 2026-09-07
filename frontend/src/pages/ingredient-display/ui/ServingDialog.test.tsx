@@ -61,7 +61,7 @@ describe("ServingDialog", () => {
 		).toBeTruthy();
 		expect(screen.getByRole("button", { name: "Reset" })).toBeTruthy();
 		expect(screen.getByRole("button", { name: "Cancel" })).toBeTruthy();
-		expect(screen.getByRole("button", { name: "Apply" })).toBeTruthy();
+		expect(screen.getByRole("button", { name: "Save" })).toBeTruthy();
 	});
 
 	test("shows ingredient custom units by name", () => {
@@ -180,7 +180,7 @@ describe("ServingDialog", () => {
 		fireEvent.change(screen.getByLabelText("Amount"), {
 			target: { value: "250" },
 		});
-		fireEvent.click(screen.getByRole("button", { name: "Apply" }));
+		fireEvent.click(screen.getByRole("button", { name: "Save" }));
 
 		// then
 		await waitFor(() => {
@@ -210,7 +210,7 @@ describe("ServingDialog", () => {
 		fireEvent.change(screen.getByLabelText("Amount"), {
 			target: { value: "" },
 		});
-		fireEvent.click(screen.getByRole("button", { name: "Apply" }));
+		fireEvent.click(screen.getByRole("button", { name: "Save" }));
 
 		// then
 		await waitFor(() => {
@@ -245,7 +245,7 @@ describe("ServingDialog", () => {
 		expect(
 			screen.getByText("Amount must be a number greater than 0"),
 		).toBeTruthy();
-		expect(screen.getByRole("button", { name: "Apply" })).toHaveProperty(
+		expect(screen.getByRole("button", { name: "Save" })).toHaveProperty(
 			"disabled",
 			true,
 		);
@@ -276,7 +276,7 @@ describe("ServingDialog", () => {
 		expect(
 			screen.getByText("Amount must be a number greater than 0"),
 		).toBeTruthy();
-		expect(screen.getByRole("button", { name: "Apply" })).toHaveProperty(
+		expect(screen.getByRole("button", { name: "Save" })).toHaveProperty(
 			"disabled",
 			true,
 		);
@@ -296,7 +296,7 @@ describe("ServingDialog", () => {
 			/>,
 		);
 		const amount = screen.getByLabelText("Amount");
-		const apply = screen.getByRole("button", { name: "Apply" });
+		const apply = screen.getByRole("button", { name: "Save" });
 		fireEvent.change(amount, { target: { value: "abc" } });
 
 		// when

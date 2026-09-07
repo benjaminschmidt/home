@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import "@testing-library/jest-dom/vitest";
 import type { ReactNode } from "react";
@@ -27,13 +27,12 @@ describe("MenuDrawerContent", () => {
 
 		// then
 		expect(screen.getByRole("link", { name: /recipes/i })).toHaveAttribute(
-			"aria-selected",
-			"true",
+			"aria-current",
+			"page",
 		);
-		expect(screen.getByRole("link", { name: /ingredients/i })).toHaveAttribute(
-			"aria-selected",
-			"false",
-		);
+		expect(
+			screen.getByRole("link", { name: /ingredients/i }),
+		).not.toHaveAttribute("aria-current");
 	});
 
 	it('selects the Recipes tab for "/"', async () => {
@@ -45,13 +44,12 @@ describe("MenuDrawerContent", () => {
 
 		// then
 		expect(screen.getByRole("link", { name: /recipes/i })).toHaveAttribute(
-			"aria-selected",
-			"true",
+			"aria-current",
+			"page",
 		);
-		expect(screen.getByRole("link", { name: /ingredients/i })).toHaveAttribute(
-			"aria-selected",
-			"false",
-		);
+		expect(
+			screen.getByRole("link", { name: /ingredients/i }),
+		).not.toHaveAttribute("aria-current");
 	});
 
 	it('selects the Ingredients tab for "/ingredients"', async () => {
@@ -62,13 +60,24 @@ describe("MenuDrawerContent", () => {
 		render(<MenuDrawerContent />);
 
 		// then
-		expect(screen.getByRole("link", { name: /recipes/i })).toHaveAttribute(
-			"aria-selected",
-			"false",
+		expect(screen.getByRole("link", { name: /recipes/i })).not.toHaveAttribute(
+			"aria-current",
 		);
 		expect(screen.getByRole("link", { name: /ingredients/i })).toHaveAttribute(
-			"aria-selected",
-			"true",
+			"aria-current",
+			"page",
 		);
+	});
+
+	it("calls onNavigate when a destination is selected", () => {
+		// given
+		const onNavigate = vi.fn();
+
+		// when
+		render(<MenuDrawerContent onNavigate={onNavigate} />);
+		fireEvent.click(screen.getByRole("link", { name: /ingredients/i }));
+
+		// then
+		expect(onNavigate).toHaveBeenCalledOnce();
 	});
 });

@@ -4,7 +4,7 @@ import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
-import { type ReactNode, useState } from "react";
+import { type ReactNode, useRef, useState } from "react";
 import { drawerWidth } from "@/widgets/layout/config/drawerConfig.ts";
 import { MenuDrawer } from "@/widgets/layout/ui/MenuDrawer.tsx";
 
@@ -15,6 +15,7 @@ type LayoutProps = {
 const Layout = ({ children }: LayoutProps) => {
 	const [mobileOpen, setMobileOpen] = useState(false);
 	const [isClosing, setIsClosing] = useState(false);
+	const menuButtonRef = useRef<HTMLButtonElement>(null);
 
 	const handleDrawerToggle = () => {
 		if (!isClosing) {
@@ -32,8 +33,13 @@ const Layout = ({ children }: LayoutProps) => {
 			>
 				<Toolbar>
 					<IconButton
+						ref={menuButtonRef}
 						color="inherit"
-						aria-label="open drawer"
+						aria-label={
+							mobileOpen ? "Close navigation menu" : "Open navigation menu"
+						}
+						aria-controls="mobile-navigation-drawer"
+						aria-expanded={mobileOpen}
 						edge="start"
 						onClick={handleDrawerToggle}
 						sx={{ mr: 2, display: { sm: "none" } }}
@@ -54,13 +60,14 @@ const Layout = ({ children }: LayoutProps) => {
 					mobileOpen={mobileOpen}
 					setMobileOpen={setMobileOpen}
 					setIsClosing={setIsClosing}
+					onMobileCloseComplete={() => menuButtonRef.current?.focus()}
 				/>
 			</Box>
 			<Box
 				component="main"
 				sx={{
 					flexGrow: 1,
-					p: 3,
+					p: { xs: 2, sm: 3 },
 					width: { sm: `calc(100% - ${drawerWidth}px)` },
 				}}
 			>

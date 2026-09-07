@@ -1,0 +1,166 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-07T20:56:54Z",
+  "title": "Design System: Home App",
+  "extensions": {
+    "colorMeta": {
+      "pantry-night": {
+        "role": "neutral",
+        "displayName": "Pantry Night",
+        "canonical": "#121212",
+        "tonalRamp": ["#1a1a1a", "#242424", "#303030", "#424242", "#5c5c5c", "#858585", "#b8b8b8", "#f2f2f2"]
+      },
+      "ledger-blue": {
+        "role": "primary",
+        "displayName": "Cool Ledger Blue",
+        "canonical": "#90caf9",
+        "tonalRamp": ["#0d47a1", "#1565c0", "#1976d2", "#42a5f5", "#64b5f6", "#90caf9", "#bbdefb", "#e3f2fd"]
+      },
+      "ledger-blue-deep": {
+        "role": "primary",
+        "displayName": "Cool Ledger Blue Deep",
+        "canonical": "#42a5f5",
+        "tonalRamp": ["#0b3d91", "#104f9e", "#1264bd", "#1976d2", "#2f8fe0", "#42a5f5", "#80c5fa", "#c5e5fd"]
+      },
+      "text-primary": {
+        "role": "neutral",
+        "displayName": "Ledger White",
+        "canonical": "#fff",
+        "tonalRamp": ["#262626", "#3d3d3d", "#555555", "#707070", "#8a8a8a", "#ababab", "#d1d1d1", "#fff"]
+      },
+      "text-secondary": {
+        "role": "neutral",
+        "displayName": "Ledger Secondary",
+        "canonical": "rgba(255, 255, 255, 0.7)",
+        "tonalRamp": ["rgba(255,255,255,0.25)", "rgba(255,255,255,0.32)", "rgba(255,255,255,0.4)", "rgba(255,255,255,0.48)", "rgba(255,255,255,0.56)", "rgba(255,255,255,0.64)", "rgba(255,255,255,0.7)", "rgba(255,255,255,0.87)"]
+      },
+      "divider": {
+        "role": "neutral",
+        "displayName": "Divider Mist",
+        "canonical": "rgba(255, 255, 255, 0.12)",
+        "tonalRamp": ["rgba(255,255,255,0.04)", "rgba(255,255,255,0.06)", "rgba(255,255,255,0.08)", "rgba(255,255,255,0.1)", "rgba(255,255,255,0.12)", "rgba(255,255,255,0.16)", "rgba(255,255,255,0.2)", "rgba(255,255,255,0.28)"]
+      },
+      "action-hover": {
+        "role": "neutral",
+        "displayName": "Hover Veil",
+        "canonical": "rgba(255, 255, 255, 0.08)",
+        "tonalRamp": ["rgba(255,255,255,0.02)", "rgba(255,255,255,0.04)", "rgba(255,255,255,0.06)", "rgba(255,255,255,0.08)", "rgba(255,255,255,0.1)", "rgba(255,255,255,0.12)", "rgba(255,255,255,0.16)", "rgba(255,255,255,0.22)"]
+      },
+      "action-selected": {
+        "role": "neutral",
+        "displayName": "Selected Veil",
+        "canonical": "rgba(255, 255, 255, 0.16)",
+        "tonalRamp": ["rgba(255,255,255,0.04)", "rgba(255,255,255,0.08)", "rgba(255,255,255,0.12)", "rgba(255,255,255,0.16)", "rgba(255,255,255,0.2)", "rgba(255,255,255,0.24)", "rgba(255,255,255,0.3)", "rgba(255,255,255,0.36)"]
+      },
+      "warning-amber": {
+        "role": "tertiary",
+        "displayName": "Warning Amber",
+        "canonical": "#ffa726",
+        "tonalRamp": ["#7a3f00", "#a65300", "#c66b00", "#e58a00", "#ffa726", "#ffb74d", "#ffcc80", "#ffe0b2"]
+      },
+      "error-red": {
+        "role": "tertiary",
+        "displayName": "Error Red",
+        "canonical": "#f44336",
+        "tonalRamp": ["#7f0000", "#a51b15", "#c62828", "#e53935", "#f44336", "#e57373", "#ef9a9a", "#ffcdd2"]
+      }
+    },
+    "typographyMeta": {
+      "title": { "displayName": "Ledger Title", "purpose": "Ingredient and surface titles; bold at the point of recognition." },
+      "body": { "displayName": "Ledger Body", "purpose": "Default readable text for forms, dialogs, and values." },
+      "label": { "displayName": "Ledger Label", "purpose": "Secondary metadata and nutrition labels." },
+      "button": { "displayName": "Ledger Action", "purpose": "Compact MUI action labels and button text." }
+    },
+    "shadows": [
+      { "name": "navigation-lift", "value": "0px 3px 3px -2px rgba(0,0,0,0.2),0px 3px 4px 0px rgba(0,0,0,0.14),0px 1px 8px 0px rgba(0,0,0,0.12)", "purpose": "MUI elevation 3 for the desktop drawer." },
+      { "name": "sticky-action-lift", "value": "0px 3px 5px -1px rgba(0,0,0,0.2),0px 6px 10px 0px rgba(0,0,0,0.14),0px 1px 18px 0px rgba(0,0,0,0.12)", "purpose": "MUI elevation 6 for persistent edit actions." },
+      { "name": "dialog-lift", "value": "0px 11px 15px -7px rgba(0,0,0,0.2),0px 24px 38px 3px rgba(0,0,0,0.14),0px 9px 46px 8px rgba(0,0,0,0.12)", "purpose": "MUI elevation 24 for modal surfaces." }
+    ],
+    "motion": [
+      { "name": "theme-transition", "value": "MUI standard transition for background-color and border-color", "purpose": "Serving tiles transition their hover background and border states." }
+    ],
+    "breakpoints": [
+      { "name": "sm", "value": "600px" },
+      { "name": "md", "value": "900px" },
+      { "name": "lg", "value": "1200px" },
+      { "name": "xl", "value": "1536px" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Primary Action",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Contained MUI action used for the final confirmation in dialogs.",
+      "html": "<button class=\"ds-btn-primary\" type=\"button\">APPLY</button>",
+      "css": ".ds-btn-primary { background: #90caf9; color: rgba(0, 0, 0, 0.87); padding: 6px 16px; border: 0; border-radius: 12px; font: 500 0.875rem/1.75 \"Roboto\", \"Helvetica\", \"Arial\", sans-serif; letter-spacing: 0.02857em; text-transform: uppercase; cursor: pointer; transition: background-color 180ms ease, box-shadow 180ms ease; } .ds-btn-primary:hover { background: #42a5f5; } .ds-btn-primary:focus-visible { outline: 3px solid rgba(144, 202, 249, 0.5); outline-offset: 2px; } .ds-btn-primary:active { box-shadow: 0 2px 4px rgba(0,0,0,0.28); }"
+    },
+    {
+      "name": "Search Field",
+      "kind": "input",
+      "refersTo": "input-search",
+      "description": "Compact outlined search control with leading search affordance and optional clear action.",
+      "html": "<label class=\"ds-search\"><svg aria-hidden=\"true\" viewBox=\"0 0 24 24\"><path d=\"m21 21-4.35-4.35m2.1-5.4a7.5 7.5 0 1 1-15 0 7.5 7.5 0 0 1 15 0Z\"/></svg><input aria-label=\"Search\" placeholder=\"Search\" /></label>",
+      "css": ".ds-search { display: flex; align-items: center; gap: 8px; width: 100%; min-height: 40px; padding: 0 14px; border: 1px solid rgba(255,255,255,0.23); border-radius: 12px; color: rgba(255,255,255,0.7); background: #121212; transition: border-color 180ms ease, background-color 180ms ease; } .ds-search svg { width: 18px; height: 18px; fill: none; stroke: currentColor; stroke-width: 2; } .ds-search input { min-width: 0; flex: 1; border: 0; outline: 0; background: transparent; color: #fff; font: 400 0.875rem/1.5 \"Roboto\", \"Helvetica\", \"Arial\", sans-serif; } .ds-search:focus-within { border-color: #90caf9; } .ds-search:hover { background: rgba(255,255,255,0.08); }"
+    },
+    {
+      "name": "Outlined Card",
+      "kind": "card",
+      "refersTo": "card-outlined",
+      "description": "Quiet information container with a tonal title band and divider-separated content.",
+      "html": "<article class=\"ds-card\"><header class=\"ds-card-header\">Chicken Breast</header><div class=\"ds-card-body\"><span>Calories</span><strong>165 kcal</strong></div></article>",
+      "css": ".ds-card { overflow: hidden; border: 1px solid rgba(255,255,255,0.12); border-radius: 12px; background: #121212; color: #fff; } .ds-card-header { padding: 16px 20px; border-bottom: 1px solid rgba(255,255,255,0.12); background: rgba(255,255,255,0.08); font: 700 1rem/1.5 \"Roboto\", \"Helvetica\", \"Arial\", sans-serif; } .ds-card-body { display: flex; justify-content: space-between; gap: 16px; padding: 16px; font: 400 0.75rem/1.66 \"Roboto\", \"Helvetica\", \"Arial\", sans-serif; } .ds-card-body span { color: rgba(255,255,255,0.7); } .ds-card-body strong { font: 700 1rem/1.5 \"Roboto\", \"Helvetica\", \"Arial\", sans-serif; } .ds-card:hover { border-color: rgba(255,255,255,0.28); }"
+    },
+    {
+      "name": "Drawer Navigation",
+      "kind": "nav",
+      "description": "Primary destinations in the 240px application drawer.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Navigation\"><a class=\"ds-nav-item is-selected\" href=\"#recipes\"><svg aria-hidden=\"true\" viewBox=\"0 0 24 24\"><path d=\"M4 6h16M4 12h16M4 18h16\"/></svg><span>Recipes</span></a><a class=\"ds-nav-item\" href=\"#ingredients\"><svg aria-hidden=\"true\" viewBox=\"0 0 24 24\"><path d=\"M12 3c4.2 3.1 6.5 6.1 6.5 9.2A6.5 6.5 0 1 1 5.5 12.2C5.5 9.1 7.8 6.1 12 3Z\"/></svg><span>Ingredients</span></a></nav>",
+      "css": ".ds-nav { width: 240px; padding: 8px 0; background: #121212; color: #fff; font: 400 1rem/1.5 \"Roboto\", \"Helvetica\", \"Arial\", sans-serif; } .ds-nav-item { display: flex; align-items: center; gap: 16px; min-height: 48px; padding: 0 16px; color: rgba(255,255,255,0.7); text-decoration: none; transition: background-color 180ms ease, color 180ms ease; } .ds-nav-item svg { width: 24px; height: 24px; fill: none; stroke: currentColor; stroke-width: 1.8; } .ds-nav-item:hover, .ds-nav-item:focus-visible { background: rgba(255,255,255,0.08); color: #fff; } .ds-nav-item.is-selected { background: rgba(255,255,255,0.16); color: #fff; }"
+    },
+    {
+      "name": "Nutrition Detail Grid",
+      "kind": "custom",
+      "description": "Two-column factual grid for servings and nutritional values.",
+      "html": "<dl class=\"ds-nutrition-grid\"><div><dt>Calories</dt><dd>165 kcal</dd></div><div><dt>Protein</dt><dd>31 g</dd></div><div><dt>Fat</dt><dd>3.6 g</dd></div><div><dt>Carbs</dt><dd>0 g</dd></div></dl>",
+      "css": ".ds-nutrition-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 8px; margin: 0; color: #fff; } .ds-nutrition-grid > div { display: flex; flex-direction: column; gap: 4px; margin: 0; padding: 12px; border: 1px solid rgba(255,255,255,0.12); border-radius: 24px; } .ds-nutrition-grid dt { color: rgba(255,255,255,0.7); font: 400 0.75rem/1.66 \"Roboto\", \"Helvetica\", \"Arial\", sans-serif; } .ds-nutrition-grid dd { margin: 0; font: 700 1rem/1.5 \"Roboto\", \"Helvetica\", \"Arial\", sans-serif; white-space: nowrap; }"
+    },
+    {
+      "name": "Variant Selector",
+      "kind": "custom",
+      "description": "Centered compact selector for alternate ingredient variants, with the default marked by a star.",
+      "html": "<label class=\"ds-variant\"><span>Variant</span><select aria-label=\"Variant\"><option>★ Cooked breast</option><option>Raw breast</option></select></label>",
+      "css": ".ds-variant { display: flex; flex-direction: column; gap: 4px; padding: 8px 16px; border-top: 1px solid rgba(255,255,255,0.12); color: rgba(255,255,255,0.7); font: 400 0.75rem/1.66 \"Roboto\", \"Helvetica\", \"Arial\", sans-serif; } .ds-variant select { width: 100%; border: 0; padding: 4px 24px 4px 4px; color: #fff; background: #121212; text-align: center; font: 400 0.875rem/1.5 \"Roboto\", \"Helvetica\", \"Arial\", sans-serif; } .ds-variant select:focus-visible { outline: 2px solid #90caf9; outline-offset: 2px; }"
+    }
+  ],
+  "narrative": {
+    "northStar": "The Pantry Ledger",
+    "overview": "The current interface is a sleek, professional dark workspace for keeping cooking information orderly and easy to scan. Its visual language is built from a near-black canvas, cool blue interaction signals, outlined containers, and compact factual grids. The system stays simple and usable: structure, typography, and state changes do the work instead of decoration.\n\nThe interface should look sleek and professional, but also be very easily usable. Controls should be quietly precise: clear labels, compact layouts, predictable states, and easy scanning. Cards and fields should support organization without competing for attention.",
+    "keyCharacteristics": [
+      "Dark, high-contrast work surface with a restrained cool-blue action signal.",
+      "Roboto-led typography with bold values and quieter secondary labels.",
+      "Rounded outlined containers, tonal headers, and compact two-column information grids.",
+      "Strong responsive shell: permanent navigation on larger screens and a temporary drawer on mobile.",
+      "No excessive decoration or unnecessary visual complexity."
+    ],
+    "rules": [
+      { "name": "The Signal Rule", "body": "Cool Ledger Blue is reserved for interaction and focus; the dark canvas remains the dominant field.", "section": "colors" },
+      { "name": "The Ledger Clarity Rule", "body": "Use Roboto consistently and make labels secondary while values carry weight.", "section": "typography" },
+      { "name": "The Tonal Layer Rule", "body": "Use tonal changes and dividers for everyday grouping; reserve stronger shadow for persistent or transient layers.", "section": "elevation" }
+    ],
+    "dos": [
+      "Do keep Pantry Night as the dominant surface and Cool Ledger Blue as a scarce interaction signal.",
+      "Do make important values bold and keep supporting labels visually secondary.",
+      "Do use outlined cards, dividers, and tonal headers to organize information.",
+      "Do preserve the 240px desktop drawer / temporary mobile drawer behavior.",
+      "Do keep content centered and bounded on focused detail and edit surfaces."
+    ],
+    "donts": [
+      "Don't add excessive decoration, illustration, texture, or ornamental background treatment.",
+      "Don't introduce a second display font or an unrelated color world without an explicit redesign decision.",
+      "Don't replace compact factual grids with visually noisy compositions.",
+      "Don't use unlabeled icon-only actions where the existing tooltip and accessible-label pattern is required.",
+      "Don't make every surface elevated; everyday grouping belongs to tonal layers and dividers."
+    ]
+  }
+}

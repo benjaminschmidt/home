@@ -1,18 +1,18 @@
-import CloseIcon from "@mui/icons-material/Close";
-import DeleteForeverIcon from "@mui/icons-material/DeleteForever";
-import RestartAltIcon from "@mui/icons-material/RestartAlt";
-import SaveOutlinedIcon from "@mui/icons-material/SaveOutlined";
 import Alert from "@mui/material/Alert";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
-import IconButton from "@mui/material/IconButton";
 import Stack from "@mui/material/Stack";
-import Tooltip from "@mui/material/Tooltip";
 import {
 	createIngredientFormDefaultValues,
 	withForm,
 } from "@/pages/ingredient-edit/model/ingredientForm.ts";
 import { ingredientFormSchema } from "@/pages/ingredient-edit/model/ingredientFormSchema.ts";
+import {
+	CancelButton,
+	DeleteButton,
+	ResetButton,
+	SubmitButton,
+} from "@/shared/ui/button";
 
 const noop = (): void => undefined;
 
@@ -74,38 +74,17 @@ const IngredientFormActions = withForm({
 						<Stack direction="row" spacing={0.5}>
 							<form.Subscribe selector={(state) => state.isDirty}>
 								{(isDirty) => (
-									<Tooltip title="Reset">
-										<span>
-											<IconButton
-												aria-label="Reset"
-												type="button"
-												onClick={() => {
-													form.reset();
-													onReset();
-												}}
-												disabled={!isDirty || isSubmitting}
-												sx={{ color: "text.secondary" }}
-											>
-												<RestartAltIcon />
-											</IconButton>
-										</span>
-									</Tooltip>
+									<ResetButton
+										onClick={() => {
+											form.reset();
+											onReset();
+										}}
+										disabled={!isDirty || isSubmitting}
+									/>
 								)}
 							</form.Subscribe>
 							{onDelete !== undefined && (
-								<Tooltip title="Delete ingredient">
-									<span>
-										<IconButton
-											aria-label="Delete ingredient"
-											type="button"
-											onClick={onDelete}
-											disabled={isSubmitting}
-											sx={{ color: "text.secondary" }}
-										>
-											<DeleteForeverIcon />
-										</IconButton>
-									</span>
-								</Tooltip>
+								<DeleteButton onClick={onDelete} disabled={isSubmitting} />
 							)}
 						</Stack>
 
@@ -114,33 +93,10 @@ const IngredientFormActions = withForm({
 								selector={(state) => state.isDirty && state.canSubmit}
 							>
 								{(canSave) => (
-									<Tooltip title="Save">
-										<span>
-											<IconButton
-												aria-label="Save"
-												type="submit"
-												disabled={!canSave || isSubmitting}
-												sx={{ color: "text.secondary" }}
-											>
-												<SaveOutlinedIcon />
-											</IconButton>
-										</span>
-									</Tooltip>
+									<SubmitButton disabled={!canSave || isSubmitting} />
 								)}
 							</form.Subscribe>
-							<Tooltip title="Cancel">
-								<span>
-									<IconButton
-										aria-label="Cancel"
-										type="button"
-										onClick={onCancel}
-										disabled={isSubmitting}
-										sx={{ color: "text.secondary" }}
-									>
-										<CloseIcon />
-									</IconButton>
-								</span>
-							</Tooltip>
+							<CancelButton onClick={onCancel} disabled={isSubmitting} />
 						</Stack>
 					</Stack>
 				</Stack>

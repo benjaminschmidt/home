@@ -97,9 +97,7 @@ describe("IngredientFormActions", () => {
 		const onDelete = vi.fn();
 		render(<IngredientFormActionsTestHost onDelete={onDelete} />);
 		const resetButton = screen.getByRole("button", { name: "Reset" });
-		const deleteButton = screen.getByRole("button", {
-			name: "Delete ingredient",
-		});
+		const deleteButton = screen.getByRole("button", { name: "Delete" });
 
 		expect(
 			resetButton.compareDocumentPosition(deleteButton) &

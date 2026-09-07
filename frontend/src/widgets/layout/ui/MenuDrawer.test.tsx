@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from "@testing-library/react";
+import { cleanup, render, screen, waitFor } from "@testing-library/react";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import "@testing-library/jest-dom/vitest";
 import type { ReactNode } from "react";
@@ -58,5 +58,24 @@ describe("MenuDrawer", () => {
 
 		// then
 		expect(await screen.findByLabelText("desktop-navigation")).toBeVisible();
+	});
+
+	it("notifies when the mobile drawer has finished closing", async () => {
+		// given
+		const onMobileCloseComplete = vi.fn();
+		const drawerProps = {
+			setMobileOpen: () => {},
+			setIsClosing: () => {},
+			onMobileCloseComplete,
+		};
+		const { rerender } = render(
+			<MenuDrawer {...drawerProps} mobileOpen={true} />,
+		);
+
+		// when
+		rerender(<MenuDrawer {...drawerProps} mobileOpen={false} />);
+
+		// then
+		await waitFor(() => expect(onMobileCloseComplete).toHaveBeenCalledOnce());
 	});
 });

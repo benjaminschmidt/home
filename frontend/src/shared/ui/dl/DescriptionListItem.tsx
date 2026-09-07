@@ -14,6 +14,7 @@ const DescriptionListItem = ({ label, value }: DescriptionListItemProps) => {
 				alignItems: "stretch",
 				gap: 0.5,
 				m: 0,
+				minWidth: 0,
 				border: "1px solid",
 				borderColor: "outline",
 				borderRadius: 1,
@@ -34,7 +35,9 @@ const DescriptionListItem = ({ label, value }: DescriptionListItemProps) => {
 					typography: "body2",
 					fontSize: "0.75rem",
 					color: "text.secondary",
-					whiteSpace: "nowrap",
+					minWidth: 0,
+					whiteSpace: { xs: "normal", sm: "nowrap" },
+					overflowWrap: "anywhere",
 					lineHeight: "1.4375em",
 				}}
 			>
@@ -46,7 +49,9 @@ const DescriptionListItem = ({ label, value }: DescriptionListItemProps) => {
 					typography: "body1",
 					fontWeight: "fontWeightBold",
 					m: 0,
-					whiteSpace: "nowrap",
+					minWidth: 0,
+					whiteSpace: { xs: "normal", sm: "nowrap" },
+					overflowWrap: "anywhere",
 				}}
 			>
 				{value}

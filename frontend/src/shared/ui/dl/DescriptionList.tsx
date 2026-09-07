@@ -13,7 +13,7 @@ const DescriptionList = ({ children }: DescriptionListProps) => {
 				display: "grid",
 				rowGap: { xs: 1.5, sm: 2 },
 				columnGap: { xs: 1.5, sm: 2 },
-				gridTemplateColumns: "1fr 1fr",
+				gridTemplateColumns: "minmax(0, 1fr) minmax(0, 1fr)",
 			}}
 		>
 			{children}

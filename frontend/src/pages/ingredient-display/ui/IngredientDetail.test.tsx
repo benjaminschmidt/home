@@ -124,7 +124,7 @@ describe("IngredientDetail", () => {
 		fireEvent.change(screen.getByLabelText("Amount"), {
 			target: { value: "250" },
 		});
-		fireEvent.click(screen.getByRole("button", { name: "Apply" }));
+		fireEvent.click(screen.getByRole("button", { name: "Save" }));
 
 		// then
 		await waitFor(() => {

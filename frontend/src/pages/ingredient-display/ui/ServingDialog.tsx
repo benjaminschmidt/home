@@ -1,4 +1,4 @@
-import Button from "@mui/material/Button";
+import Box from "@mui/material/Box";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -16,6 +16,7 @@ import {
 	getUnitOptions,
 	type Ingredient,
 } from "@/entities/ingredients";
+import { CancelButton, ResetButton, SubmitButton } from "@/shared/ui/button";
 import { TextField } from "@/shared/ui/form";
 
 type ServingDialogProps = {
@@ -199,25 +200,17 @@ const ServingDialog = ({
 					</Stack>
 				</DialogContent>
 				<DialogActions>
-					<Button
-						type="button"
-						onClick={() => {
-							onApply({ servingSize: undefined, unit: undefined });
-							onClose();
-						}}
-						sx={{ mr: "auto" }}
-					>
-						Reset
-					</Button>
-					<Button type="button" onClick={onClose}>
-						Cancel
-					</Button>
+					<Box sx={{ mr: "auto" }}>
+						<ResetButton
+							onClick={() => {
+								onApply({ servingSize: undefined, unit: undefined });
+								onClose();
+							}}
+						/>
+					</Box>
+					<CancelButton onClick={onClose} />
 					<form.Subscribe selector={(state) => state.canSubmit}>
-						{(canSubmit) => (
-							<Button type="submit" variant="contained" disabled={!canSubmit}>
-								Apply
-							</Button>
-						)}
+						{(canSubmit) => <SubmitButton disabled={!canSubmit} />}
 					</form.Subscribe>
 				</DialogActions>
 			</form>

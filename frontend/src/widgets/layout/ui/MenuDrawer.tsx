@@ -7,29 +7,32 @@ type MenuDrawerProps = {
 	mobileOpen: boolean;
 	setMobileOpen: (open: boolean) => void;
 	setIsClosing: (closing: boolean) => void;
+	onMobileCloseComplete?: () => void;
 };
 
 const MenuDrawer = ({
 	mobileOpen,
 	setMobileOpen,
 	setIsClosing,
+	onMobileCloseComplete,
 }: MenuDrawerProps) => {
 	const handleDrawerClose = () => {
 		setIsClosing(true);
 		setMobileOpen(false);
 	};
 
-	const handleDrawerTransitionEnd = () => {
+	const handleDrawerExited = () => {
 		setIsClosing(false);
+		if (!mobileOpen) onMobileCloseComplete?.();
 	};
 
 	return (
 		<>
 			<Drawer
+				id="mobile-navigation-drawer"
 				variant="temporary"
 				open={mobileOpen}
 				aria-label="mobile-navigation"
-				onTransitionEnd={handleDrawerTransitionEnd}
 				onClose={handleDrawerClose}
 				sx={{
 					display: { xs: "block", sm: "none" },
@@ -42,10 +45,13 @@ const MenuDrawer = ({
 					root: {
 						keepMounted: true, // Better open performance on mobile.
 					},
+					transition: {
+						onExited: handleDrawerExited,
+					},
 				}}
 			>
 				<Toolbar />
-				<MenuDrawerContent />
+				<MenuDrawerContent onNavigate={handleDrawerClose} />
 			</Drawer>
 			<Drawer
 				variant="permanent"

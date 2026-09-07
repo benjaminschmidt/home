@@ -7,13 +7,17 @@ import ListItemText from "@mui/material/ListItemText";
 import { type ParsedLocation, useLocation } from "@tanstack/react-router";
 import { RouterListItemButton } from "@/shared/ui/router";
 
+type MenuDrawerContentProps = {
+	onNavigate?: () => void;
+};
+
 const getCurrent = (location: ParsedLocation) => {
 	if (location.pathname === "/") return "recipes";
 	else if (location.pathname.startsWith("/recipes")) return "recipes";
 	else if (location.pathname.startsWith("/ingredients")) return "ingredients";
 };
 
-const MenuDrawerContent = () => {
+const MenuDrawerContent = ({ onNavigate }: MenuDrawerContentProps) => {
 	const location = useLocation();
 	const value = getCurrent(location);
 
@@ -22,7 +26,8 @@ const MenuDrawerContent = () => {
 			<ListItem key="Recipes" disablePadding>
 				<RouterListItemButton
 					selected={value === "recipes"}
-					aria-selected={value === "recipes"}
+					aria-current={value === "recipes" ? "page" : undefined}
+					onClick={onNavigate}
 					to="/recipes"
 				>
 					<ListItemIcon>
@@ -34,7 +39,8 @@ const MenuDrawerContent = () => {
 			<ListItem key="Ingredients" disablePadding>
 				<RouterListItemButton
 					selected={value === "ingredients"}
-					aria-selected={value === "ingredients"}
+					aria-current={value === "ingredients" ? "page" : undefined}
+					onClick={onNavigate}
 					to="/ingredients"
 				>
 					<ListItemIcon>

@@ -1,4 +1,4 @@
-import { render } from "@testing-library/react";
+import { render, within } from "@testing-library/react";
 import { describe, expect, test, vi } from "vitest";
 import { CardActionSelector } from "@/shared/ui/card/CardActionSelector.tsx";
 
@@ -30,6 +30,22 @@ describe("CardActionSelector", () => {
 
 		// then
 		expect(container.querySelector("input")).not.toBeNull();
+	});
+
+	test("labels the variant select", () => {
+		// when
+		const { container } = render(
+			<CardActionSelector
+				selectedIndex={0}
+				setSelectedIndex={vi.fn()}
+				options={[{ default: false, id: "1", value: "Whole" }]}
+			/>,
+		);
+
+		// then
+		expect(
+			within(container).getByRole("combobox", { name: "Ingredient variant" }),
+		).toBeDefined();
 	});
 
 	test("renders the selected option value", () => {

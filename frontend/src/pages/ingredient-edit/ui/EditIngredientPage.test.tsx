@@ -315,15 +315,11 @@ describe("EditIngredientPage", () => {
 		renderPage(ingredientDto);
 
 		// then
-		expect(
-			screen.getByRole("button", { name: "Delete ingredient" }),
-		).toBeTruthy();
+		expect(screen.getByRole("button", { name: "Delete" })).toBeTruthy();
 
 		cleanup();
 		renderCreatePage();
-		expect(
-			screen.queryByRole("button", { name: "Delete ingredient" }),
-		).toBeNull();
+		expect(screen.queryByRole("button", { name: "Delete" })).toBeNull();
 	});
 
 	test("opens a confirmation dialog for permanent deletion", () => {
@@ -335,7 +331,7 @@ describe("EditIngredientPage", () => {
 		renderPage(ingredientDto);
 
 		// when
-		fireEvent.click(screen.getByRole("button", { name: "Delete ingredient" }));
+		fireEvent.click(screen.getByRole("button", { name: "Delete" }));
 
 		// then
 		const dialog = screen.getByRole("dialog");
@@ -354,7 +350,7 @@ describe("EditIngredientPage", () => {
 			ingredientVariants: [],
 		});
 		renderPage(ingredientDto);
-		fireEvent.click(screen.getByRole("button", { name: "Delete ingredient" }));
+		fireEvent.click(screen.getByRole("button", { name: "Delete" }));
 
 		// when
 		fireEvent.click(
@@ -382,7 +378,7 @@ describe("EditIngredientPage", () => {
 			response: new Response(),
 		});
 		renderPage(ingredientDto, vi.fn(), onDeleted);
-		fireEvent.click(screen.getByRole("button", { name: "Delete ingredient" }));
+		fireEvent.click(screen.getByRole("button", { name: "Delete" }));
 
 		// when
 		fireEvent.click(
@@ -413,7 +409,7 @@ describe("EditIngredientPage", () => {
 			response: new Response(),
 		});
 		renderPage(ingredientDto);
-		fireEvent.click(screen.getByRole("button", { name: "Delete ingredient" }));
+		fireEvent.click(screen.getByRole("button", { name: "Delete" }));
 
 		// when
 		fireEvent.click(

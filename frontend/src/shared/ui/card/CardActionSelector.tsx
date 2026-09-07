@@ -36,6 +36,7 @@ const CardActionSelector = ({
 				variant="standard"
 				disableUnderline
 				fullWidth
+				inputProps={{ "aria-label": "Ingredient variant" }}
 				sx={{
 					fontSize: forceCompact ? "0.7rem" : { xs: "0.7rem", sm: "1.05rem" },
 					"& .MuiSelect-select": {
