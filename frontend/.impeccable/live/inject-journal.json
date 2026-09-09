@@ -1,0 +1,19 @@
+{
+  "version": 1,
+  "appRoot": "/home/benjamin/repositories/active/home/frontend",
+  "framework": "vite-generic",
+  "port": 8400,
+  "pid": 87675,
+  "recordedAt": "2026-09-07T21:03:04.111Z",
+  "artifacts": [
+    {
+      "kind": "patched",
+      "path": "index.html",
+      "patch": "live-tag",
+      "markers": [
+        "impeccable-live-start",
+        "data-impeccable-csp-original"
+      ]
+    }
+  ]
+}

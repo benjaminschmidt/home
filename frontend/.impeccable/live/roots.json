@@ -1,0 +1,10 @@
+{
+  "version": 1,
+  "appRoot": "/home/benjamin/repositories/active/home/frontend",
+  "repoRoot": "/home/benjamin/repositories/active/home",
+  "contextRoot": "/home/benjamin/repositories/active/home",
+  "sessionRoot": "/home/benjamin/repositories/active/home/frontend/.impeccable/live",
+  "productPath": "/home/benjamin/repositories/active/home/PRODUCT.md",
+  "designPath": "/home/benjamin/repositories/active/home/DESIGN.md",
+  "resolvedFrom": "target:frontend/index.html"
+}
