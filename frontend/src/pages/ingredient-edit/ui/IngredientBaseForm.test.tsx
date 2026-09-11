@@ -1,6 +1,6 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import type { IngredientVariantDto } from "home-api";
-import { afterEach, describe, expect, test } from "vitest";
+import { afterEach, describe, expect, test, vi } from "vitest";
 import {
 	createIngredientFormDefaultValues,
 	useAppForm,
@@ -31,12 +31,16 @@ type IngredientBaseFormTestHostProps = {
 	};
 	variants?: IngredientVariantDto[];
 	defaultVariantId?: string;
+	onDelete?: () => void;
+	isSubmitting?: boolean;
 };
 
 const IngredientBaseFormTestHost = ({
 	initialValues,
 	variants = [],
 	defaultVariantId,
+	onDelete,
+	isSubmitting = false,
 }: IngredientBaseFormTestHostProps) => {
 	const form = useAppForm({
 		defaultValues: createIngredientFormDefaultValues(
@@ -50,7 +54,12 @@ const IngredientBaseFormTestHost = ({
 
 	return (
 		<form>
-			<IngredientBaseForm form={form} variants={variants} />
+			<IngredientBaseForm
+				form={form}
+				variants={variants}
+				onDelete={onDelete}
+				isSubmitting={isSubmitting}
+			/>
 		</form>
 	);
 };
@@ -100,6 +109,31 @@ describe("IngredientBaseForm", () => {
 		expect(
 			screen.getByRole("combobox", { name: "Volume unit" }).textContent,
 		).toBe("ml");
+	});
+
+	test("renders the delete action in the card header when provided", () => {
+		// given
+		const onDelete = vi.fn();
+
+		// when
+		render(<IngredientBaseFormTestHost onDelete={onDelete} />);
+
+		// then
+		const deleteButton = screen.getByRole("button", { name: "Delete" });
+		expect(deleteButton).toBeTruthy();
+		fireEvent.click(deleteButton);
+		expect(onDelete).toHaveBeenCalledOnce();
+	});
+
+	test("disables the delete action while submitting", () => {
+		// when
+		render(<IngredientBaseFormTestHost onDelete={vi.fn()} isSubmitting />);
+
+		// then
+		expect(screen.getByRole("button", { name: "Delete" })).toHaveProperty(
+			"disabled",
+			true,
+		);
 	});
 
 	test("renders a default variant selector with None without variants", () => {

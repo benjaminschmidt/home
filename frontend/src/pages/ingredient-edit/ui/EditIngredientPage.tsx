@@ -130,7 +130,6 @@ const EditIngredientPage = (props: EditIngredientPageProps) => {
 					<IngredientFormActions
 						form={form}
 						onCancel={props.onCancel}
-						onDelete={props.mode === "edit" ? handleDelete : undefined}
 						onReset={() => activeMutation.reset()}
 						isSubmitting={isSubmitting}
 						errorMessage={activeMutation.error?.message}
@@ -139,6 +138,8 @@ const EditIngredientPage = (props: EditIngredientPageProps) => {
 					<IngredientBaseForm
 						form={form}
 						variants={ingredientDto?.ingredientVariants ?? []}
+						onDelete={props.mode === "edit" ? handleDelete : undefined}
+						isSubmitting={isSubmitting}
 					/>
 				</Stack>
 			</Box>

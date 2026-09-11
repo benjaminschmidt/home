@@ -13,7 +13,6 @@ type IngredientFormActionsTestHostProps = {
 	errorMessage?: string;
 	isSubmitting?: boolean;
 	onCancel?: () => void;
-	onDelete?: () => void;
 	onReset?: () => void;
 };
 
@@ -21,7 +20,6 @@ const IngredientFormActionsTestHost = ({
 	errorMessage,
 	isSubmitting = false,
 	onCancel = vi.fn(),
-	onDelete,
 	onReset = vi.fn(),
 }: IngredientFormActionsTestHostProps) => {
 	const form = useAppForm({
@@ -47,7 +45,6 @@ const IngredientFormActionsTestHost = ({
 				form={form}
 				isSubmitting={isSubmitting}
 				onCancel={onCancel}
-				onDelete={onDelete}
 				onReset={onReset}
 			/>
 		</form>
@@ -90,25 +87,6 @@ describe("IngredientFormActions", () => {
 
 		// then
 		expect(onCancel).toHaveBeenCalledOnce();
-	});
-
-	test("renders and calls onDelete when provided", () => {
-		// given
-		const onDelete = vi.fn();
-		render(<IngredientFormActionsTestHost onDelete={onDelete} />);
-		const resetButton = screen.getByRole("button", { name: "Reset" });
-		const deleteButton = screen.getByRole("button", { name: "Delete" });
-
-		expect(
-			resetButton.compareDocumentPosition(deleteButton) &
-				Node.DOCUMENT_POSITION_FOLLOWING,
-		).toBeTruthy();
-
-		// when
-		fireEvent.click(deleteButton);
-
-		// then
-		expect(onDelete).toHaveBeenCalledOnce();
 	});
 
 	test("resets changed values and calls onReset", () => {
