@@ -3,11 +3,6 @@ import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
 import DialogTitle from "@mui/material/DialogTitle";
-import FormControl from "@mui/material/FormControl";
-import InputLabel from "@mui/material/InputLabel";
-import ListSubheader from "@mui/material/ListSubheader";
-import MenuItem from "@mui/material/MenuItem";
-import Select from "@mui/material/Select";
 import Stack from "@mui/material/Stack";
 import { useForm } from "@tanstack/react-form";
 import { z } from "zod";
@@ -17,7 +12,7 @@ import {
 	type Ingredient,
 } from "@/entities/ingredients";
 import { CancelButton, ResetButton, SubmitButton } from "@/shared/ui/button";
-import { TextField } from "@/shared/ui/form";
+import { SelectField, type SelectFieldItem, TextField } from "@/shared/ui/form";
 
 type ServingDialogProps = {
 	ingredient: Ingredient;
@@ -25,20 +20,6 @@ type ServingDialogProps = {
 	unit: string;
 	onClose: () => void;
 	onApply: (next: { servingSize?: number; unit?: string }) => void;
-};
-
-const unitGroupHeaderSx = {
-	typography: "caption",
-	fontWeight: "fontWeightBold",
-	color: "text.secondary",
-	bgcolor: "background.paper",
-	textTransform: "uppercase",
-	letterSpacing: 0,
-	lineHeight: 2,
-};
-
-const unitMenuItemSx = {
-	pl: 3,
 };
 
 const servingSizeSchema = z.string().transform((draftServingSize, context) => {
@@ -87,6 +68,30 @@ const ServingDialog = ({
 		},
 	});
 	const unitOptions = getUnitOptions(ingredient);
+	const createUnitItems = (
+		key: string,
+		label: string,
+		units: { key: string; value: string; displayText: string }[],
+	): SelectFieldItem[] => {
+		if (units.length === 0) return [];
+
+		return [
+			{ type: "group", key, label },
+			...units.map(
+				(unit): SelectFieldItem => ({
+					type: "option",
+					key: unit.key,
+					value: unit.value,
+					label: unit.displayText,
+				}),
+			),
+		];
+	};
+	const unitItems: SelectFieldItem[] = [
+		...createUnitItems("weight", "Weight", unitOptions.weight),
+		...createUnitItems("volume", "Volume", unitOptions.volume),
+		...createUnitItems("custom", "Custom", unitOptions.custom),
+	];
 	const handleUnitChange = (nextUnit: string) => {
 		const previousUnit = form.getFieldValue("unit");
 		const parsedServingSize = servingSizeSchema.safeParse(
@@ -127,58 +132,12 @@ const ServingDialog = ({
 					<Stack spacing={2} sx={{ pt: 0.5 }}>
 						<form.Field name="unit">
 							{(field) => (
-								<FormControl fullWidth>
-									<InputLabel id="serving-unit-label">Unit</InputLabel>
-									<Select
-										labelId="serving-unit-label"
-										label="Unit"
-										value={field.state.value}
-										onChange={(event) => handleUnitChange(event.target.value)}
-									>
-										{unitOptions.weight.length > 0 && (
-											<ListSubheader sx={unitGroupHeaderSx}>
-												Weight
-											</ListSubheader>
-										)}
-										{unitOptions.weight.map((weightUnit) => (
-											<MenuItem
-												key={weightUnit.key}
-												value={weightUnit.value}
-												sx={unitMenuItemSx}
-											>
-												{weightUnit.displayText}
-											</MenuItem>
-										))}
-										{unitOptions.volume.length > 0 && (
-											<ListSubheader sx={unitGroupHeaderSx}>
-												Volume
-											</ListSubheader>
-										)}
-										{unitOptions.volume.map((volumeUnit) => (
-											<MenuItem
-												key={volumeUnit.key}
-												value={volumeUnit.value}
-												sx={unitMenuItemSx}
-											>
-												{volumeUnit.displayText}
-											</MenuItem>
-										))}
-										{unitOptions.custom.length > 0 && (
-											<ListSubheader sx={unitGroupHeaderSx}>
-												Custom
-											</ListSubheader>
-										)}
-										{unitOptions.custom.map((customUnit) => (
-											<MenuItem
-												key={customUnit.key}
-												value={customUnit.value}
-												sx={unitMenuItemSx}
-											>
-												{customUnit.displayText}
-											</MenuItem>
-										))}
-									</Select>
-								</FormControl>
+								<SelectField
+									label="Unit"
+									value={field.state.value}
+									handleChange={handleUnitChange}
+									items={unitItems}
+								/>
 							)}
 						</form.Field>
 

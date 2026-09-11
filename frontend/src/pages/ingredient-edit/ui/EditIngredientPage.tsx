@@ -15,7 +15,7 @@ import {
 } from "@/pages/ingredient-edit/model/ingredientForm.ts";
 import { ingredientFormSchema } from "@/pages/ingredient-edit/model/ingredientFormSchema.ts";
 import { DeleteIngredientDialog } from "@/pages/ingredient-edit/ui/DeleteIngredientDialog.tsx";
-import { IngredientForm } from "@/pages/ingredient-edit/ui/IngredientForm.tsx";
+import { IngredientBaseForm } from "@/pages/ingredient-edit/ui/IngredientBaseForm.tsx";
 import { IngredientFormActions } from "@/pages/ingredient-edit/ui/IngredientFormActions.tsx";
 
 type EditIngredientPageProps = {
@@ -136,7 +136,7 @@ const EditIngredientPage = (props: EditIngredientPageProps) => {
 						errorMessage={activeMutation.error?.message}
 					/>
 
-					<IngredientForm
+					<IngredientBaseForm
 						form={form}
 						variants={ingredientDto?.ingredientVariants ?? []}
 					/>

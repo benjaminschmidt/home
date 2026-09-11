@@ -3,20 +3,16 @@ import CardContent from "@mui/material/CardContent";
 import Stack from "@mui/material/Stack";
 import type { IngredientVariantDto } from "home-api";
 import {
-	createIngredientFormDefaultValues,
+	ingredientFormCompositionOptions,
 	withForm,
 } from "@/pages/ingredient-edit/model/ingredientForm.ts";
-import { ingredientFormSchema } from "@/pages/ingredient-edit/model/ingredientFormSchema.ts";
 import { IngredientConversionPanel } from "@/pages/ingredient-edit/ui/IngredientConversionPanel.tsx";
 import { IngredientDefaultVariantSelector } from "@/pages/ingredient-edit/ui/IngredientDefaultVariantSelector.tsx";
 import { CardHeader } from "@/shared/ui/card";
 import { TextField } from "@/shared/ui/form";
 
-const IngredientForm = withForm({
-	defaultValues: createIngredientFormDefaultValues(),
-	validators: {
-		onChange: ingredientFormSchema,
-	},
+const IngredientBaseForm = withForm({
+	...ingredientFormCompositionOptions,
 	props: {
 		variants: [] as IngredientVariantDto[],
 	},
@@ -51,4 +47,4 @@ const IngredientForm = withForm({
 	),
 });
 
-export { IngredientForm };
+export { IngredientBaseForm };

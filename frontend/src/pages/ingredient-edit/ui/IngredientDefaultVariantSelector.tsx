@@ -1,12 +1,7 @@
-import FormControl from "@mui/material/FormControl";
-import InputLabel from "@mui/material/InputLabel";
-import MenuItem from "@mui/material/MenuItem";
-import Select from "@mui/material/Select";
 import type { IngredientVariantDto } from "home-api";
 import { getIngredientVariantOptions } from "@/entities/ingredients";
 import { NO_DEFAULT_VARIANT } from "@/pages/ingredient-edit/model/ingredientFormSchema.ts";
-
-const defaultVariantLabelId = "ingredient-default-variant-label";
+import { SelectField, type SelectFieldItem } from "@/shared/ui/form";
 
 type IngredientDefaultVariantSelectorProps = {
 	handleChange: (value: string) => void;
@@ -20,30 +15,30 @@ const IngredientDefaultVariantSelector = ({
 	variants,
 }: IngredientDefaultVariantSelectorProps) => {
 	const variantOptions = getIngredientVariantOptions(variants);
+	const items: SelectFieldItem[] = [
+		{
+			type: "option",
+			key: NO_DEFAULT_VARIANT,
+			value: NO_DEFAULT_VARIANT,
+			label: "None",
+		},
+		...variantOptions.map(
+			(option): SelectFieldItem => ({
+				type: "option",
+				key: option.id,
+				value: option.id,
+				label: option.value,
+			}),
+		),
+	];
 
 	return (
-		<FormControl fullWidth>
-			<InputLabel id={defaultVariantLabelId}>Default variant</InputLabel>
-			<Select
-				labelId={defaultVariantLabelId}
-				label="Default variant"
-				value={value}
-				onChange={(event) => handleChange(event.target.value)}
-				sx={{
-					"& .MuiSelect-select": {
-						typography: "body1",
-						fontWeight: "fontWeightBold",
-					},
-				}}
-			>
-				<MenuItem value={NO_DEFAULT_VARIANT}>None</MenuItem>
-				{variantOptions.map((option) => (
-					<MenuItem key={option.id} value={option.id}>
-						{option.value}
-					</MenuItem>
-				))}
-			</Select>
-		</FormControl>
+		<SelectField
+			label="Default variant"
+			value={value}
+			handleChange={handleChange}
+			items={items}
+		/>
 	);
 };
 

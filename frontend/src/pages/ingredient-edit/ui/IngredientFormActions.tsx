@@ -3,10 +3,9 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Stack from "@mui/material/Stack";
 import {
-	createIngredientFormDefaultValues,
+	ingredientFormCompositionOptions,
 	withForm,
 } from "@/pages/ingredient-edit/model/ingredientForm.ts";
-import { ingredientFormSchema } from "@/pages/ingredient-edit/model/ingredientFormSchema.ts";
 import {
 	CancelButton,
 	DeleteButton,
@@ -17,10 +16,7 @@ import {
 const noop = (): void => undefined;
 
 const IngredientFormActions = withForm({
-	defaultValues: createIngredientFormDefaultValues(),
-	validators: {
-		onChange: ingredientFormSchema,
-	},
+	...ingredientFormCompositionOptions,
 	props: {
 		onCancel: noop,
 		onDelete: undefined as (() => void) | undefined,

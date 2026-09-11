@@ -11,16 +11,12 @@ import {
 	weightUnitDtoArray,
 } from "@/entities/ingredients";
 import {
-	createIngredientFormDefaultValues,
+	ingredientFormCompositionOptions,
 	withForm,
 } from "@/pages/ingredient-edit/model/ingredientForm.ts";
-import { ingredientFormSchema } from "@/pages/ingredient-edit/model/ingredientFormSchema.ts";
 
 const IngredientConversionPanel = withForm({
-	defaultValues: createIngredientFormDefaultValues(),
-	validators: {
-		onChange: ingredientFormSchema,
-	},
+	...ingredientFormCompositionOptions,
 	render: ({ form }) => (
 		<Stack
 			direction="column"

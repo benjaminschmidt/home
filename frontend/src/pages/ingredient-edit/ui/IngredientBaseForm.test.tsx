@@ -6,12 +6,12 @@ import {
 	useAppForm,
 } from "@/pages/ingredient-edit/model/ingredientForm.ts";
 import { ingredientFormSchema } from "@/pages/ingredient-edit/model/ingredientFormSchema.ts";
-import { IngredientForm } from "@/pages/ingredient-edit/ui/IngredientForm.tsx";
+import { IngredientBaseForm } from "@/pages/ingredient-edit/ui/IngredientBaseForm.tsx";
 import { ingredientVariantFactory } from "@/shared/testing";
 
 afterEach(cleanup);
 
-type IngredientFormTestHostProps = {
+type IngredientBaseFormTestHostProps = {
 	initialValues?: {
 		name?: string;
 		weightToVolumeConversionFactor?: number;
@@ -33,11 +33,11 @@ type IngredientFormTestHostProps = {
 	defaultVariantId?: string;
 };
 
-const IngredientFormTestHost = ({
+const IngredientBaseFormTestHost = ({
 	initialValues,
 	variants = [],
 	defaultVariantId,
-}: IngredientFormTestHostProps) => {
+}: IngredientBaseFormTestHostProps) => {
 	const form = useAppForm({
 		defaultValues: createIngredientFormDefaultValues(
 			initialValues,
@@ -50,15 +50,15 @@ const IngredientFormTestHost = ({
 
 	return (
 		<form>
-			<IngredientForm form={form} variants={variants} />
+			<IngredientBaseForm form={form} variants={variants} />
 		</form>
 	);
 };
 
-describe("IngredientForm", () => {
+describe("IngredientBaseForm", () => {
 	test("renders a blank form when there are no initial values", () => {
 		// when
-		render(<IngredientFormTestHost />);
+		render(<IngredientBaseFormTestHost />);
 
 		// then
 		expect(screen.getByLabelText("Name")).toHaveProperty("value", "");
@@ -77,7 +77,7 @@ describe("IngredientForm", () => {
 	test("prefills name and conversion fields from initial values", () => {
 		// when
 		render(
-			<IngredientFormTestHost
+			<IngredientBaseFormTestHost
 				initialValues={{
 					name: "Flour",
 					weightToVolumeConversionFactor: 2.5,
@@ -104,7 +104,7 @@ describe("IngredientForm", () => {
 
 	test("renders a default variant selector with None without variants", () => {
 		// when
-		render(<IngredientFormTestHost variants={[]} />);
+		render(<IngredientBaseFormTestHost variants={[]} />);
 
 		// then
 		const defaultVariantSelector = screen.getByRole("combobox", {
@@ -127,7 +127,7 @@ describe("IngredientForm", () => {
 
 		// when
 		render(
-			<IngredientFormTestHost
+			<IngredientBaseFormTestHost
 				variants={variants}
 				defaultVariantId={slicedVariant.id}
 			/>,
@@ -147,7 +147,7 @@ describe("IngredientForm", () => {
 
 	test("shows a validation error when the name is empty", () => {
 		// given
-		render(<IngredientFormTestHost />);
+		render(<IngredientBaseFormTestHost />);
 
 		// when
 		fireEvent.change(screen.getByLabelText("Name"), {
@@ -160,7 +160,7 @@ describe("IngredientForm", () => {
 
 	test("requires both conversion amounts or neither", () => {
 		// given
-		render(<IngredientFormTestHost />);
+		render(<IngredientBaseFormTestHost />);
 		fireEvent.change(screen.getByLabelText("Name"), {
 			target: { value: "Flour" },
 		});

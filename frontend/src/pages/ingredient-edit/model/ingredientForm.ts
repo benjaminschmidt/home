@@ -55,6 +55,13 @@ const createIngredientFormDefaultValues = (
 	};
 };
 
+const ingredientFormCompositionOptions = {
+	defaultValues: createIngredientFormDefaultValues(),
+	validators: {
+		onChange: ingredientFormSchema,
+	},
+};
+
 const toIngredientWriteRequest = (
 	values: IngredientFormValues,
 ): IngredientWriteRequest => {
@@ -86,6 +93,7 @@ const toIngredientWriteRequest = (
 
 export {
 	createIngredientFormDefaultValues,
+	ingredientFormCompositionOptions,
 	toIngredientWriteRequest,
 	useAppForm,
 	withForm,
