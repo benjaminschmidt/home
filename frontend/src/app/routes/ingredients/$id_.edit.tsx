@@ -26,7 +26,10 @@ const Component = () => {
 export const Route = createFileRoute("/ingredients/$id_/edit")({
 	component: Component,
 	loader: async ({ context: { queryClient }, params: { id } }) => {
-		await queryClient.ensureQueryData(createIngredientIdQueryOptions(id));
+		await queryClient.query({
+			...createIngredientIdQueryOptions(id),
+			staleTime: "static",
+		});
 	},
 	params: {
 		parse: (params) => z.object({ id: z.uuid() }).parse(params),

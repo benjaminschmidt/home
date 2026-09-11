@@ -64,9 +64,10 @@ export const Route = createFileRoute("/ingredients/$id")({
 		unit: search.unit,
 	}),
 	loader: async ({ context: { queryClient }, params: { id }, deps }) => {
-		const data = await queryClient.ensureQueryData(
-			createIngredientIdQueryOptions(id),
-		);
+		const data = await queryClient.query({
+			...createIngredientIdQueryOptions(id),
+			staleTime: "static",
+		});
 
 		const {
 			updatedVariantId,
