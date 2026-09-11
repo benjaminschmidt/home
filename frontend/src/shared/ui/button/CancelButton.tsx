@@ -1,6 +1,5 @@
 import CloseIcon from "@mui/icons-material/Close";
-import IconButton from "@mui/material/IconButton";
-import Tooltip from "@mui/material/Tooltip";
+import { IconActionButton } from "@/shared/ui/button/IconActionButton.tsx";
 
 type CancelButtonProps = {
 	disabled?: boolean;
@@ -8,19 +7,9 @@ type CancelButtonProps = {
 };
 
 const CancelButton = ({ disabled = false, onClick }: CancelButtonProps) => (
-	<Tooltip title="Cancel">
-		<span>
-			<IconButton
-				aria-label="Cancel"
-				type="button"
-				onClick={onClick}
-				disabled={disabled}
-				sx={{ color: "text.secondary" }}
-			>
-				<CloseIcon />
-			</IconButton>
-		</span>
-	</Tooltip>
+	<IconActionButton label="Cancel" disabled={disabled} onClick={onClick}>
+		<CloseIcon />
+	</IconActionButton>
 );
 
 export { CancelButton };

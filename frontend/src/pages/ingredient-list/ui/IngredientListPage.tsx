@@ -38,9 +38,7 @@ const IngredientListPage = ({
 					spacing={1}
 					sx={{ alignItems: "center", maxWidth: { sm: 480 }, mx: "auto" }}
 				>
-					<Box sx={{ flexGrow: 1, minWidth: 0 }}>
-						<SearchField search={search} onSearchChange={onSearchChange} />
-					</Box>
+					<SearchField search={search} onSearchChange={onSearchChange} />
 					<Tooltip title="Add ingredient">
 						<RouterIconButton to="/ingredients/add" aria-label="Add ingredient">
 							<AddIcon />

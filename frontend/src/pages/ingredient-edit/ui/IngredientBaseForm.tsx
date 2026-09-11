@@ -8,6 +8,7 @@ import {
 } from "@/pages/ingredient-edit/model/ingredientForm.ts";
 import { IngredientConversionPanel } from "@/pages/ingredient-edit/ui/IngredientConversionPanel.tsx";
 import { IngredientDefaultVariantSelector } from "@/pages/ingredient-edit/ui/IngredientDefaultVariantSelector.tsx";
+import { DeleteButton } from "@/shared/ui/button";
 import { CardHeader } from "@/shared/ui/card";
 import { TextField } from "@/shared/ui/form";
 
@@ -15,10 +16,19 @@ const IngredientBaseForm = withForm({
 	...ingredientFormCompositionOptions,
 	props: {
 		variants: [] as IngredientVariantDto[],
+		onDelete: undefined as (() => void) | undefined,
+		isSubmitting: false,
 	},
-	render: ({ form, variants }) => (
+	render: ({ form, variants, onDelete, isSubmitting }) => (
 		<Card variant="outlined" sx={{ overflow: "hidden", width: "100%" }}>
-			<CardHeader title="Ingredient" />
+			<CardHeader
+				title="Ingredient"
+				action={
+					onDelete === undefined ? undefined : (
+						<DeleteButton onClick={onDelete} disabled={isSubmitting} />
+					)
+				}
+			/>
 			<CardContent sx={{ pt: { xs: 1.5, sm: 2 }, px: { xs: 1.5, sm: 2 } }}>
 				<Stack spacing={3}>
 					<form.AppField name="name">

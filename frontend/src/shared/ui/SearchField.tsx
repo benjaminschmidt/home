@@ -19,6 +19,7 @@ const SearchField = ({ search, onSearchChange }: SearchFieldProps) => {
 	return (
 		<TextField
 			fullWidth
+			sx={{ flexGrow: 1, minWidth: 0 }}
 			placeholder="Search"
 			size="small"
 			value={draftSearch}

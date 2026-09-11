@@ -6,12 +6,7 @@ import {
 	ingredientFormCompositionOptions,
 	withForm,
 } from "@/pages/ingredient-edit/model/ingredientForm.ts";
-import {
-	CancelButton,
-	DeleteButton,
-	ResetButton,
-	SubmitButton,
-} from "@/shared/ui/button";
+import { CancelButton, ResetButton, SubmitButton } from "@/shared/ui/button";
 
 const noop = (): void => undefined;
 
@@ -19,19 +14,11 @@ const IngredientFormActions = withForm({
 	...ingredientFormCompositionOptions,
 	props: {
 		onCancel: noop,
-		onDelete: undefined as (() => void) | undefined,
 		onReset: noop,
 		isSubmitting: false,
 		errorMessage: undefined as string | undefined,
 	},
-	render: ({
-		form,
-		onCancel,
-		onDelete,
-		onReset,
-		isSubmitting,
-		errorMessage,
-	}) => (
+	render: ({ form, onCancel, onReset, isSubmitting, errorMessage }) => (
 		<Card
 			component="section"
 			aria-label="Form actions"
@@ -79,9 +66,6 @@ const IngredientFormActions = withForm({
 									/>
 								)}
 							</form.Subscribe>
-							{onDelete !== undefined && (
-								<DeleteButton onClick={onDelete} disabled={isSubmitting} />
-							)}
 						</Stack>
 
 						<Stack direction="row" spacing={0.5}>

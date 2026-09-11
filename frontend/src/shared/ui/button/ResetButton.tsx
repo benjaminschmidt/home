@@ -1,6 +1,5 @@
 import RestartAltIcon from "@mui/icons-material/RestartAlt";
-import IconButton from "@mui/material/IconButton";
-import Tooltip from "@mui/material/Tooltip";
+import { IconActionButton } from "@/shared/ui/button/IconActionButton.tsx";
 
 type ResetButtonProps = {
 	disabled?: boolean;
@@ -8,19 +7,9 @@ type ResetButtonProps = {
 };
 
 const ResetButton = ({ disabled = false, onClick }: ResetButtonProps) => (
-	<Tooltip title="Reset">
-		<span>
-			<IconButton
-				aria-label="Reset"
-				type="button"
-				onClick={onClick}
-				disabled={disabled}
-				sx={{ color: "text.secondary" }}
-			>
-				<RestartAltIcon />
-			</IconButton>
-		</span>
-	</Tooltip>
+	<IconActionButton label="Reset" disabled={disabled} onClick={onClick}>
+		<RestartAltIcon />
+	</IconActionButton>
 );
 
 export { ResetButton };
