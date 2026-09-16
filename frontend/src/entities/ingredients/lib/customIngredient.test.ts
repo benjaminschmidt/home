@@ -395,7 +395,7 @@ describe("getCustomIngredient", () => {
 			// then
 			expect(result.name).toBe(ingredient.name);
 			expect(result.calories).toBe(variant.calories);
-			expect(errorContext).contains(
+			expect(errorContext).toContain(
 				"Weight to volume conversion factor is undefined.",
 			);
 		});
@@ -460,7 +460,7 @@ describe("getCustomIngredient", () => {
 
 			// then
 			expect(result.calories).toBe(variant.calories);
-			expect(errorContext).contains(
+			expect(errorContext).toContain(
 				"Custom unit non-existent-unit is missing.",
 			);
 		});
