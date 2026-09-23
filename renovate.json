@@ -5,6 +5,9 @@
   ],
   "minimumReleaseAge": "14 days",
   "minimumReleaseAgeBehaviour": "timestamp-required",
+  "ignorePaths": [
+    "frontend/public/manifest.json"
+  ],
   "prHourlyLimit": 10,
   "prConcurrentLimit": 10,
   "packageRules": [
