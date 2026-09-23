@@ -6,7 +6,7 @@ config_roots = [
     "backend",
     "frontend",
 ]
-lockfile = true
+lockfile = false
 
 [settings]
 minimum_release_age = "13d"

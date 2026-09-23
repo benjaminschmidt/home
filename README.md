@@ -23,7 +23,7 @@ The remaining runtime tools are managed by `mise`. After installing `mise`, enab
 will do that automatically as well:
 
 ```shell
-mise install
+mise install --monorepo
 ```
 
 ### Running The Application
