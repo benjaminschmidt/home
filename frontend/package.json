@@ -33,16 +33,16 @@
     "@tanstack/react-form-devtools": "0.2.34",
     "@tanstack/react-query": "5.102.8",
     "@tanstack/react-query-devtools": "5.102.8",
-    "@tanstack/react-router": "1.170.33",
+    "@tanstack/react-router": "1.170.34",
     "@tanstack/react-router-devtools": "1.167.1",
-    "@tanstack/router-plugin": "1.168.36",
+    "@tanstack/router-plugin": "1.168.37",
     "home-api": "link:../api",
     "react": "19.3.0",
     "react-dom": "19.3.0",
-    "zod": "4.6.0"
+    "zod": "4.6.1"
   },
   "devDependencies": {
-    "@biomejs/biome": "2.5.12",
+    "@biomejs/biome": "2.5.13",
     "@faker-js/faker": "10.6.0",
     "@feature-sliced/steiger-plugin": "0.7.0",
     "@tanstack/devtools-vite": "0.8.5",
@@ -57,7 +57,7 @@
     "jsdom": "30.0.1",
     "steiger": "0.6.0",
     "typescript": "6.0.3",
-    "vite": "8.2.2",
+    "vite": "8.3.0",
     "vitest": "5.0.0",
     "web-vitals": "6.2.1"
   }
