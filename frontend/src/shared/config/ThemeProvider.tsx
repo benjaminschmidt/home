@@ -13,6 +13,17 @@ declare module "@mui/material/styles" {
 }
 
 const themeDark = createTheme({
+	components: {
+		MuiOutlinedInput: {
+			styleOverrides: {
+				root: {
+					"&.Mui-focused .MuiOutlinedInput-notchedOutline": {
+						borderWidth: 1,
+					},
+				},
+			},
+		},
+	},
 	colorSchemes: {
 		light: {
 			palette: {

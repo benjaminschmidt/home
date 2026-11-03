@@ -1,5 +1,6 @@
 import Box from "@mui/material/Box";
 import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import Select from "@mui/material/Select";
 import Stack from "@mui/material/Stack";
@@ -38,7 +39,6 @@ const IngredientConversionPanel = withForm({
 				},
 				"&:focus-within": {
 					borderColor: "primary.main",
-					borderWidth: 2,
 					"& > .MuiTypography-root": { color: "primary.main" },
 				},
 			}}
@@ -83,10 +83,11 @@ const IngredientConversionPanel = withForm({
 
 							return (
 								<TextField
-									variant="standard"
+									label="Amount"
+									size="small"
+									variant="outlined"
 									type="text"
 									slotProps={{
-										input: { disableUnderline: true },
 										htmlInput: {
 											inputMode: "decimal",
 											"aria-label": "Weight amount",
@@ -98,9 +99,8 @@ const IngredientConversionPanel = withForm({
 									helperText={errorMessage}
 									sx={{
 										minWidth: 0,
-										flex: 1,
+										flex: 2,
 										"& .MuiInputBase-input": {
-											p: 0,
 											typography: "body1",
 											fontWeight: "fontWeightBold",
 										},
@@ -113,16 +113,16 @@ const IngredientConversionPanel = withForm({
 					<form.AppField name="weightUnit">
 						{(field) => (
 							<FormControl fullWidth sx={{ minWidth: 0, flex: 1 }}>
+								<InputLabel id="weight-unit-label">Unit</InputLabel>
 								<Select
-									variant="standard"
-									disableUnderline
+									labelId="weight-unit-label"
+									label="Unit"
+									size="small"
 									inputProps={{ "aria-label": "Weight unit" }}
 									value={field.state.value}
 									onChange={(event) => field.handleChange(event.target.value)}
 									sx={{
 										"& .MuiSelect-select": {
-											p: 0,
-											pr: 3,
 											typography: "body1",
 											fontWeight: "fontWeightBold",
 										},
@@ -153,10 +153,11 @@ const IngredientConversionPanel = withForm({
 
 							return (
 								<TextField
-									variant="standard"
+									label="Amount"
+									size="small"
+									variant="outlined"
 									type="text"
 									slotProps={{
-										input: { disableUnderline: true },
 										htmlInput: {
 											inputMode: "decimal",
 											"aria-label": "Volume amount",
@@ -168,9 +169,8 @@ const IngredientConversionPanel = withForm({
 									helperText={errorMessage}
 									sx={{
 										minWidth: 0,
-										flex: 1,
+										flex: 2,
 										"& .MuiInputBase-input": {
-											p: 0,
 											typography: "body1",
 											fontWeight: "fontWeightBold",
 										},
@@ -183,16 +183,16 @@ const IngredientConversionPanel = withForm({
 					<form.AppField name="volumeUnit">
 						{(field) => (
 							<FormControl fullWidth sx={{ minWidth: 0, flex: 1 }}>
+								<InputLabel id="volume-unit-label">Unit</InputLabel>
 								<Select
-									variant="standard"
-									disableUnderline
+									labelId="volume-unit-label"
+									label="Unit"
+									size="small"
 									inputProps={{ "aria-label": "Volume unit" }}
 									value={field.state.value}
 									onChange={(event) => field.handleChange(event.target.value)}
 									sx={{
 										"& .MuiSelect-select": {
-											p: 0,
-											pr: 3,
 											typography: "body1",
 											fontWeight: "fontWeightBold",
 										},
