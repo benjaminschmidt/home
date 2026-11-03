@@ -24,6 +24,8 @@ export default defineConfig({
     },
     test: {
         environment: 'jsdom',
+        pool: 'vmThreads',
+        maxWorkers: 5,
         server: {
             deps: {
                 inline: ['@mui/material', 'react-transition-group'],
