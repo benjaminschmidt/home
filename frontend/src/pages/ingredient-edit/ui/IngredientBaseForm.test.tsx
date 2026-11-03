@@ -14,7 +14,8 @@ afterEach(cleanup);
 type IngredientBaseFormTestHostProps = {
 	initialValues?: {
 		name?: string;
-		weightToVolumeConversionFactor?: number;
+		conversionWeightAmount?: number;
+		conversionVolumeAmount?: number;
 		conversionWeightUnit?:
 			| "GRAM"
 			| "MILLIGRAM"
@@ -89,7 +90,8 @@ describe("IngredientBaseForm", () => {
 			<IngredientBaseFormTestHost
 				initialValues={{
 					name: "Flour",
-					weightToVolumeConversionFactor: 2.5,
+					conversionWeightAmount: 4,
+					conversionVolumeAmount: 10,
 					conversionWeightUnit: "GRAM",
 					conversionVolumeUnit: "MILLILITER",
 				}}
@@ -98,10 +100,10 @@ describe("IngredientBaseForm", () => {
 
 		// then
 		expect(screen.getByLabelText("Name")).toHaveProperty("value", "Flour");
-		expect(screen.getByLabelText("Weight amount")).toHaveProperty("value", "1");
+		expect(screen.getByLabelText("Weight amount")).toHaveProperty("value", "4");
 		expect(screen.getByLabelText("Volume amount")).toHaveProperty(
 			"value",
-			"2.5",
+			"10",
 		);
 		expect(
 			screen.getByRole("combobox", { name: "Weight unit" }).textContent,

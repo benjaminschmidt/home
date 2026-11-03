@@ -48,7 +48,10 @@ public class Ingredient {
     private String name;
 
     @Nullable
-    private Double weightToVolumeConversionFactor;
+    private Double conversionWeightAmount;
+
+    @Nullable
+    private Double conversionVolumeAmount;
 
     @Enumerated(EnumType.STRING)
     @Nullable

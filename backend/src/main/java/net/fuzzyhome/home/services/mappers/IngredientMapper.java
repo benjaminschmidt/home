@@ -21,7 +21,8 @@ public class IngredientMapper {
         return IngredientDto.builder()
             .id(ingredient.getId())
             .name(ingredient.getName())
-            .weightToVolumeConversionFactor(ingredient.getWeightToVolumeConversionFactor())
+            .conversionWeightAmount(ingredient.getConversionWeightAmount())
+            .conversionVolumeAmount(ingredient.getConversionVolumeAmount())
             .conversionWeightUnit(UnitUtils.mapWeightUnitToDto(ingredient.getConversionWeightUnit()))
             .conversionVolumeUnit(UnitUtils.mapVolumeUnitToDto(ingredient.getConversionVolumeUnit()))
             .ingredientVariants(Optional.ofNullable(ingredient.getIngredientVariants())
@@ -41,7 +42,8 @@ public class IngredientMapper {
     public Ingredient mapWriteRequestToIngredient(@NonNull final IngredientWriteRequest ingredientWriteRequest) {
         return Ingredient.builder()
             .name(ingredientWriteRequest.getName())
-            .weightToVolumeConversionFactor(ingredientWriteRequest.getWeightToVolumeConversionFactor())
+            .conversionWeightAmount(ingredientWriteRequest.getConversionWeightAmount())
+            .conversionVolumeAmount(ingredientWriteRequest.getConversionVolumeAmount())
             .conversionWeightUnit(UnitUtils.mapDtoToWeightUnit(ingredientWriteRequest.getConversionWeightUnit()))
             .conversionVolumeUnit(UnitUtils.mapDtoToVolumeUnit(ingredientWriteRequest.getConversionVolumeUnit()))
             .build();
@@ -53,7 +55,8 @@ public class IngredientMapper {
         @NonNull final IngredientWriteRequest ingredientWriteRequest
     ) {
         ingredient.setName(ingredientWriteRequest.getName());
-        ingredient.setWeightToVolumeConversionFactor(ingredientWriteRequest.getWeightToVolumeConversionFactor());
+        ingredient.setConversionWeightAmount(ingredientWriteRequest.getConversionWeightAmount());
+        ingredient.setConversionVolumeAmount(ingredientWriteRequest.getConversionVolumeAmount());
         ingredient.setConversionWeightUnit(
             UnitUtils.mapDtoToWeightUnit(ingredientWriteRequest.getConversionWeightUnit())
         );

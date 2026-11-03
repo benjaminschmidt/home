@@ -41,8 +41,8 @@ const createFormDefaultValues = (ingredientDto: IngredientDto) => {
 	return createIngredientFormDefaultValues(
 		{
 			name: ingredientDto.name,
-			weightToVolumeConversionFactor:
-				ingredientDto.weightToVolumeConversionFactor,
+			conversionWeightAmount: ingredientDto.conversionWeightAmount,
+			conversionVolumeAmount: ingredientDto.conversionVolumeAmount,
 			conversionWeightUnit: ingredientDto.conversionWeightUnit,
 			conversionVolumeUnit: ingredientDto.conversionVolumeUnit,
 		},

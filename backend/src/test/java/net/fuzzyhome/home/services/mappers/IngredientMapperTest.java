@@ -63,16 +63,19 @@ class IngredientMapperTest {
     }
 
     @Test
-    void maps_to_dto_field_weightToVolumeConversionFactor() {
+    void maps_to_dto_conversion_amounts() {
         // given
-        final var ingredient = Instancio.of(Ingredient.class).create();
+        final var ingredient = Instancio.of(Ingredient.class)
+            .set(field(Ingredient::getConversionWeightAmount), 100.0)
+            .set(field(Ingredient::getConversionVolumeAmount), 92.0)
+            .create();
 
         // when
         final var result = ingredientMapper.mapIngredientToDto(ingredient);
 
         // then
-        assertThat(result).extracting(IngredientDto::getWeightToVolumeConversionFactor)
-            .isEqualTo(ingredient.getWeightToVolumeConversionFactor());
+        assertThat(result.getConversionWeightAmount()).isEqualTo(100.0);
+        assertThat(result.getConversionVolumeAmount()).isEqualTo(92.0);
     }
 
     @Test
@@ -182,16 +185,19 @@ class IngredientMapperTest {
     }
 
     @Test
-    void maps_to_entity_field_weightToVolumeConversionFactor() {
+    void maps_to_entity_conversion_amounts() {
         // given
-        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class).create();
+        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class)
+            .set(field(IngredientWriteRequest::getConversionWeightAmount), 100.0)
+            .set(field(IngredientWriteRequest::getConversionVolumeAmount), 92.0)
+            .create();
 
         // when
         final var result = ingredientMapper.mapWriteRequestToIngredient(ingredientWriteRequest);
 
         // then
-        assertThat(result).extracting(Ingredient::getWeightToVolumeConversionFactor)
-            .isEqualTo(ingredientWriteRequest.getWeightToVolumeConversionFactor());
+        assertThat(result.getConversionWeightAmount()).isEqualTo(100.0);
+        assertThat(result.getConversionVolumeAmount()).isEqualTo(92.0);
     }
 
     @Test
@@ -263,17 +269,20 @@ class IngredientMapperTest {
     }
 
     @Test
-    void updates_entity_field_weightToVolumeConversionFactor() {
+    void updates_entity_conversion_amounts() {
         // given
         final var ingredient = Instancio.of(Ingredient.class).create();
-        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class).create();
+        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class)
+            .set(field(IngredientWriteRequest::getConversionWeightAmount), 100.0)
+            .set(field(IngredientWriteRequest::getConversionVolumeAmount), 92.0)
+            .create();
 
         // when
         final var result = ingredientMapper.updateIngredientFromWriteRequest(ingredient, ingredientWriteRequest);
 
         // then
-        assertThat(result).extracting(Ingredient::getWeightToVolumeConversionFactor)
-            .isEqualTo(ingredientWriteRequest.getWeightToVolumeConversionFactor());
+        assertThat(result.getConversionWeightAmount()).isEqualTo(100.0);
+        assertThat(result.getConversionVolumeAmount()).isEqualTo(92.0);
     }
 
     @Test

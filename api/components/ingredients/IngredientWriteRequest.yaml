@@ -1,6 +1,9 @@
 title: IngredientWriteRequest
 type: object
-description: "Writable ingredient properties. Variants and custom units are managed through their nested resource endpoints."
+description: >-
+  Writable ingredient properties. Variants and custom units are managed through
+  their nested resource endpoints. A weight-volume conversion must include both
+  amounts and both units, or omit all four.
 required: [
   "name"
 ]
@@ -8,9 +11,16 @@ properties:
   name:
     type: string
     nullable: false
-  weightToVolumeConversionFactor:
+  conversionWeightAmount:
     type: number
     format: double
+    minimum: 0
+    exclusiveMinimum: true
+  conversionVolumeAmount:
+    type: number
+    format: double
+    minimum: 0
+    exclusiveMinimum: true
   conversionWeightUnit:
     $ref: './WeightUnitDto.yaml'
   conversionVolumeUnit:

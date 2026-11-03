@@ -24,4 +24,12 @@ type Ingredient = {
 	sugar?: number;
 };
 
-export type { Ingredient };
+type IngredientConversionContext = Pick<
+	Ingredient,
+	| "weightToVolumeConversionFactor"
+	| "conversionWeightUnit"
+	| "conversionVolumeUnit"
+	| "customUnits"
+>;
+
+export type { Ingredient, IngredientConversionContext };

@@ -61,7 +61,8 @@ describe("EditIngredientPage", () => {
 		// given
 		const ingredientDto = ingredientFactory.build({
 			name: "Flour",
-			weightToVolumeConversionFactor: 2.5,
+			conversionWeightAmount: 4,
+			conversionVolumeAmount: 10,
 			conversionWeightUnit: "GRAM",
 			conversionVolumeUnit: "MILLILITER",
 			ingredientVariants: [],
@@ -72,6 +73,11 @@ describe("EditIngredientPage", () => {
 
 		// then
 		expect(screen.getByLabelText("Name")).toHaveProperty("value", "Flour");
+		expect(screen.getByLabelText("Weight amount")).toHaveProperty("value", "4");
+		expect(screen.getByLabelText("Volume amount")).toHaveProperty(
+			"value",
+			"10",
+		);
 		expect(screen.getByText("Ingredient")).toBeTruthy();
 	});
 
@@ -252,7 +258,8 @@ describe("EditIngredientPage", () => {
 				expect.objectContaining({
 					body: {
 						name: "Flour",
-						weightToVolumeConversionFactor: 2.5,
+						conversionWeightAmount: 2,
+						conversionVolumeAmount: 5,
 						conversionWeightUnit: "GRAM",
 						conversionVolumeUnit: "MILLILITER",
 						defaultVariantId: defaultVariant.id,
@@ -469,7 +476,8 @@ describe("EditIngredientPage", () => {
 			expect(vi.mocked(createIngredient)).toHaveBeenCalledWith({
 				body: {
 					name: "Flour",
-					weightToVolumeConversionFactor: undefined,
+					conversionWeightAmount: undefined,
+					conversionVolumeAmount: undefined,
 					conversionWeightUnit: undefined,
 					conversionVolumeUnit: undefined,
 					defaultVariantId: undefined,

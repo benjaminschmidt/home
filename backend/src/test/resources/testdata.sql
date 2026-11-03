@@ -7,8 +7,8 @@ DECLARE
 BEGIN
     -- 1. Chicken Breast
     ing_id := gen_random_uuid();
-    INSERT INTO ingredient (id, name, weight_to_volume_conversion_factor, conversion_weight_unit, conversion_volume_unit)
-    VALUES (ing_id, 'Chicken Breast', 1.04, 'GRAM', 'MILLILITER');
+    INSERT INTO ingredient (id, name, conversion_weight_amount, conversion_volume_amount, conversion_weight_unit, conversion_volume_unit)
+    VALUES (ing_id, 'Chicken Breast', 100, 104, 'GRAM', 'MILLILITER');
 
     INSERT INTO ingredient_variant (id, description, default_variant, unit, serving_size, calories, carbohydrate, fat, protein, ingredient_id)
     VALUES (gen_random_uuid(), 'Raw, Skinless', true, 'GRAM', 100, 165, 0, 3.6, 31, ing_id);
@@ -18,16 +18,16 @@ BEGIN
 
     -- 2. Olive Oil
     ing_id := gen_random_uuid();
-    INSERT INTO ingredient (id, name, weight_to_volume_conversion_factor, conversion_weight_unit, conversion_volume_unit)
-    VALUES (ing_id, 'Olive Oil', 0.92, 'GRAM', 'MILLILITER');
+    INSERT INTO ingredient (id, name, conversion_weight_amount, conversion_volume_amount, conversion_weight_unit, conversion_volume_unit)
+    VALUES (ing_id, 'Olive Oil', 100, 92, 'GRAM', 'MILLILITER');
 
     INSERT INTO ingredient_variant (id, description, default_variant, unit, serving_size, calories, fat, saturated_fat, ingredient_id)
     VALUES (gen_random_uuid(), 'Extra Virgin', true, 'TABLESPOON', 1, 119, 13.5, 1.9, ing_id);
 
     -- 3. Whole Milk
     ing_id := gen_random_uuid();
-    INSERT INTO ingredient (id, name, weight_to_volume_conversion_factor, conversion_weight_unit, conversion_volume_unit)
-    VALUES (ing_id, 'Whole Milk', 1.03, 'GRAM', 'MILLILITER');
+    INSERT INTO ingredient (id, name, conversion_weight_amount, conversion_volume_amount, conversion_weight_unit, conversion_volume_unit)
+    VALUES (ing_id, 'Whole Milk', 100, 103, 'GRAM', 'MILLILITER');
 
     INSERT INTO ingredient_variant (id, description, default_variant, unit, serving_size, calories, carbohydrate, fat, protein, sugar, sodium, ingredient_id)
     VALUES (gen_random_uuid(), 'Standard 3.5%', true, 'CUP', 1, 149, 12, 8, 8, 12, 105, ing_id);
@@ -79,8 +79,8 @@ BEGIN
 
     -- 10. Honey
     ing_id := gen_random_uuid();
-    INSERT INTO ingredient (id, name, weight_to_volume_conversion_factor, conversion_weight_unit, conversion_volume_unit)
-    VALUES (ing_id, 'Honey', 1.42, 'GRAM', 'MILLILITER');
+    INSERT INTO ingredient (id, name, conversion_weight_amount, conversion_volume_amount, conversion_weight_unit, conversion_volume_unit)
+    VALUES (ing_id, 'Honey', 100, 142, 'GRAM', 'MILLILITER');
 
     INSERT INTO ingredient_variant (id, description, default_variant, unit, serving_size, calories, carbohydrate, sugar, ingredient_id)
     VALUES (gen_random_uuid(), 'Raw Wildflower', true, 'TABLESPOON', 1, 64, 17, 17, ing_id);
@@ -163,8 +163,8 @@ BEGIN
 
     -- 22. Coconut Milk (With Custom Unit)
     ing_id := gen_random_uuid();
-    INSERT INTO ingredient (id, name, weight_to_volume_conversion_factor, conversion_weight_unit, conversion_volume_unit)
-    VALUES (ing_id, 'Coconut Milk', 1.01, 'GRAM', 'MILLILITER');
+    INSERT INTO ingredient (id, name, conversion_weight_amount, conversion_volume_amount, conversion_weight_unit, conversion_volume_unit)
+    VALUES (ing_id, 'Coconut Milk', 100, 101, 'GRAM', 'MILLILITER');
 
     INSERT INTO custom_unit (id, name, custom_unit_to_conversion_unit_factor, conversion_unit, ingredient_id)
     VALUES (gen_random_uuid(), 'Can', 400, 'MILLILITER', ing_id);
@@ -225,8 +225,8 @@ BEGIN
 
     -- 29. Maple Syrup (With Custom Unit)
     ing_id := gen_random_uuid();
-    INSERT INTO ingredient (id, name, weight_to_volume_conversion_factor, conversion_weight_unit, conversion_volume_unit)
-    VALUES (ing_id, 'Maple Syrup', 1.32, 'GRAM', 'MILLILITER');
+    INSERT INTO ingredient (id, name, conversion_weight_amount, conversion_volume_amount, conversion_weight_unit, conversion_volume_unit)
+    VALUES (ing_id, 'Maple Syrup', 100, 132, 'GRAM', 'MILLILITER');
 
     INSERT INTO custom_unit (id, name, custom_unit_to_conversion_unit_factor, conversion_unit, ingredient_id)
     VALUES (gen_random_uuid(), 'Shot', 30, 'MILLILITER', ing_id);

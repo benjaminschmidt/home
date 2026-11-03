@@ -7,7 +7,10 @@ export {
 	calculateConversionFactorFromDefaultUnitToUnit,
 	calculateConversionFactorFromUnitToUnit,
 } from "@/entities/ingredients/lib/conversion.ts";
-export { getCustomIngredient } from "@/entities/ingredients/lib/customIngredient.ts";
+export {
+	getCustomIngredient,
+	getIngredientConversionContext,
+} from "@/entities/ingredients/lib/customIngredient.ts";
 export {
 	getIngredientNutritionDetailArray,
 	getIngredientServingDetail,

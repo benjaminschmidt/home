@@ -113,7 +113,9 @@ const IngredientConversionPanel = withForm({
 					<form.AppField name="weightUnit">
 						{(field) => (
 							<FormControl fullWidth sx={{ minWidth: 0, flex: 1 }}>
-								<InputLabel id="weight-unit-label">Unit</InputLabel>
+								<InputLabel id="weight-unit-label" aria-label="Weight unit">
+									Unit
+								</InputLabel>
 								<Select
 									labelId="weight-unit-label"
 									label="Unit"
@@ -183,7 +185,9 @@ const IngredientConversionPanel = withForm({
 					<form.AppField name="volumeUnit">
 						{(field) => (
 							<FormControl fullWidth sx={{ minWidth: 0, flex: 1 }}>
-								<InputLabel id="volume-unit-label">Unit</InputLabel>
+								<InputLabel id="volume-unit-label" aria-label="Volume unit">
+									Unit
+								</InputLabel>
 								<Select
 									labelId="volume-unit-label"
 									label="Unit"

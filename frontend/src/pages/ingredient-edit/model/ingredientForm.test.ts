@@ -23,7 +23,8 @@ describe("ingredient form model", () => {
 		const defaults = createIngredientFormDefaultValues(
 			{
 				name: "Flour",
-				weightToVolumeConversionFactor: 2.5,
+				conversionWeightAmount: 4,
+				conversionVolumeAmount: 10,
 				conversionWeightUnit: "GRAM",
 				conversionVolumeUnit: "MILLILITER",
 			},
@@ -33,12 +34,27 @@ describe("ingredient form model", () => {
 		// then
 		expect(defaults).toEqual({
 			name: "Flour",
-			weightAmount: "1",
+			weightAmount: "4",
 			weightUnit: "GRAM",
-			volumeAmount: "2.5",
+			volumeAmount: "10",
 			volumeUnit: "MILLILITER",
 			defaultVariantId: "550e8400-e29b-41d4-a716-446655440000",
 		});
+	});
+
+	test("retains stored amount precision in the form draft", () => {
+		const weightAmount = 0.1234567890123456;
+		const volumeAmount = 0.009876543210987654;
+
+		const defaults = createIngredientFormDefaultValues({
+			conversionWeightAmount: weightAmount,
+			conversionVolumeAmount: volumeAmount,
+			conversionWeightUnit: "GRAM",
+			conversionVolumeUnit: "MILLILITER",
+		});
+
+		expect(defaults.weightAmount).toBe(String(weightAmount));
+		expect(defaults.volumeAmount).toBe(String(volumeAmount));
 	});
 
 	test("maps an unset conversion and no default variant to the write request", () => {
@@ -51,7 +67,8 @@ describe("ingredient form model", () => {
 		// then
 		expect(writeRequest).toEqual({
 			name: "Flour",
-			weightToVolumeConversionFactor: undefined,
+			conversionWeightAmount: undefined,
+			conversionVolumeAmount: undefined,
 			conversionWeightUnit: undefined,
 			conversionVolumeUnit: undefined,
 			defaultVariantId: undefined,
@@ -71,7 +88,8 @@ describe("ingredient form model", () => {
 		// then
 		expect(writeRequest).toEqual({
 			name: "Flour",
-			weightToVolumeConversionFactor: 2.5,
+			conversionWeightAmount: 2,
+			conversionVolumeAmount: 5,
 			conversionWeightUnit: "GRAM",
 			conversionVolumeUnit: "MILLILITER",
 			defaultVariantId: "550e8400-e29b-41d4-a716-446655440000",

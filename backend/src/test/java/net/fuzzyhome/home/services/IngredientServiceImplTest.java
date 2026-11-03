@@ -62,6 +62,16 @@ class IngredientServiceImplTest {
     @Mock
     private IngredientVariantRepository ingredientVariantRepository;
 
+    private IngredientWriteRequest noConversionRequest(final UUID defaultVariantId) {
+        return Instancio.of(IngredientWriteRequest.class)
+            .set(field(IngredientWriteRequest::getConversionWeightAmount), null)
+            .set(field(IngredientWriteRequest::getConversionVolumeAmount), null)
+            .set(field(IngredientWriteRequest::getConversionWeightUnit), null)
+            .set(field(IngredientWriteRequest::getConversionVolumeUnit), null)
+            .set(field(IngredientWriteRequest::getDefaultVariantId), defaultVariantId)
+            .create();
+    }
+
     @Test
     void retrieves_ingredients() {
         // given
@@ -90,9 +100,7 @@ class IngredientServiceImplTest {
         final var ingredient = Instancio.of(Ingredient.class)
             .set(field(Ingredient::getIngredientVariants), new ArrayList<>())
             .create();
-        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class)
-            .set(field(IngredientWriteRequest::getDefaultVariantId), null)
-            .create();
+        final var ingredientWriteRequest = noConversionRequest(null);
         final var ingredientDto = Instancio.of(IngredientDto.class).create();
 
         when(ingredientRepository.save(any())).thenReturn(ingredient);
@@ -116,9 +124,7 @@ class IngredientServiceImplTest {
             .set(field(Ingredient::getIngredientVariants), new ArrayList<>())
             .create();
         final var defaultVariantId = UUID.randomUUID();
-        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class)
-            .set(field(IngredientWriteRequest::getDefaultVariantId), defaultVariantId)
-            .create();
+        final var ingredientWriteRequest = noConversionRequest(defaultVariantId);
 
         when(ingredientRepository.save(any())).thenReturn(ingredient);
         when(ingredientMapper.mapWriteRequestToIngredient(any())).thenReturn(ingredient);
@@ -178,9 +184,7 @@ class IngredientServiceImplTest {
             .set(field(Ingredient::getId), id)
             .set(field(Ingredient::getIngredientVariants), new ArrayList<>())
             .create();
-        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class)
-            .set(field(IngredientWriteRequest::getDefaultVariantId), null)
-            .create();
+        final var ingredientWriteRequest = noConversionRequest(null);
         final var ingredientDto = Instancio.of(IngredientDto.class)
             .set(field(IngredientDto::getId), id)
             .create();
@@ -217,9 +221,7 @@ class IngredientServiceImplTest {
             .set(field(Ingredient::getId), id)
             .set(field(Ingredient::getIngredientVariants), new ArrayList<>(List.of(previousDefault, newDefault)))
             .create();
-        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class)
-            .set(field(IngredientWriteRequest::getDefaultVariantId), newDefault.getId())
-            .create();
+        final var ingredientWriteRequest = noConversionRequest(newDefault.getId());
         final var ingredientDto = Instancio.of(IngredientDto.class)
             .set(field(IngredientDto::getId), id)
             .create();
@@ -253,9 +255,7 @@ class IngredientServiceImplTest {
             .set(field(Ingredient::getId), id)
             .set(field(Ingredient::getIngredientVariants), new ArrayList<>(List.of(currentDefault)))
             .create();
-        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class)
-            .set(field(IngredientWriteRequest::getDefaultVariantId), null)
-            .create();
+        final var ingredientWriteRequest = noConversionRequest(null);
         final var ingredientDto = Instancio.of(IngredientDto.class)
             .set(field(IngredientDto::getId), id)
             .create();
@@ -286,9 +286,7 @@ class IngredientServiceImplTest {
             .set(field(Ingredient::getIngredientVariants), new ArrayList<>(List.of(otherIngredientVariant)))
             .create();
         final var defaultVariantId = UUID.randomUUID();
-        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class)
-            .set(field(IngredientWriteRequest::getDefaultVariantId), defaultVariantId)
-            .create();
+        final var ingredientWriteRequest = noConversionRequest(defaultVariantId);
         when(ingredientRepository.findById(any())).thenReturn(Optional.of(updatedIngredient));
         when(ingredientRepository.save(any())).thenReturn(updatedIngredient);
         when(ingredientMapper.updateIngredientFromWriteRequest(

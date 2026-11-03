@@ -12,7 +12,8 @@ CREATE TABLE ingredient
 (
     id                                 UUID         NOT NULL,
     name                               VARCHAR(255) NOT NULL,
-    weight_to_volume_conversion_factor DOUBLE PRECISION,
+    conversion_weight_amount          DOUBLE PRECISION,
+    conversion_volume_amount          DOUBLE PRECISION,
     conversion_weight_unit             VARCHAR(255),
     conversion_volume_unit             VARCHAR(255),
     CONSTRAINT pk_ingredient PRIMARY KEY (id)

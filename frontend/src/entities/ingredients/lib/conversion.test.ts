@@ -1,10 +1,23 @@
+import type { VolumeUnitDto, WeightUnitDto } from "home-api";
 import { describe, expect, it } from "vitest";
 import {
 	calculateConversionFactorFromDefaultUnitToCustomUnit,
 	calculateConversionFactorFromDefaultUnitToUnit,
 	calculateConversionFactorFromUnitToUnit,
 } from "@/entities/ingredients/lib/conversion.ts";
+import type { IngredientConversionContext } from "@/entities/ingredients/model/ingredient.ts";
 import { customUnitFactory, ingredientFactory } from "@/shared/testing";
+
+const createIngredientConversionContext = (
+	weightToVolumeConversionFactor?: number,
+	conversionWeightUnit?: WeightUnitDto,
+	conversionVolumeUnit?: VolumeUnitDto,
+): IngredientConversionContext => ({
+	customUnits: [],
+	weightToVolumeConversionFactor,
+	conversionWeightUnit,
+	conversionVolumeUnit,
+});
 
 describe("calculateConversionFactorFromDefaultUnitToUnit", () => {
 	describe("weight to weight", () => {
@@ -140,11 +153,11 @@ describe("calculateConversionFactorFromDefaultUnitToUnit", () => {
 	describe("weight to volume", () => {
 		it("returns undefined and pushes error when weightToVolumeConversionFactor is missing", () => {
 			// given
-			const ingredient = ingredientFactory.build({
-				weightToVolumeConversionFactor: undefined,
-				conversionWeightUnit: "GRAM",
-				conversionVolumeUnit: "MILLILITER",
-			});
+			const ingredient = createIngredientConversionContext(
+				undefined,
+				"GRAM",
+				"MILLILITER",
+			);
 			const errorContext: string[] = [];
 
 			// when
@@ -164,11 +177,11 @@ describe("calculateConversionFactorFromDefaultUnitToUnit", () => {
 
 		it("returns undefined and pushes error when conversionWeightUnit is missing", () => {
 			// given
-			const ingredient = ingredientFactory.build({
-				weightToVolumeConversionFactor: 1,
-				conversionWeightUnit: undefined,
-				conversionVolumeUnit: "MILLILITER",
-			});
+			const ingredient = createIngredientConversionContext(
+				1,
+				undefined,
+				"MILLILITER",
+			);
 			const errorContext: string[] = [];
 
 			// when
@@ -186,11 +199,11 @@ describe("calculateConversionFactorFromDefaultUnitToUnit", () => {
 
 		it("returns undefined and pushes error when weightToVolumeConversionFactor is 0", () => {
 			// given
-			const ingredient = ingredientFactory.build({
-				weightToVolumeConversionFactor: 0,
-				conversionWeightUnit: "GRAM",
-				conversionVolumeUnit: "MILLILITER",
-			});
+			const ingredient = createIngredientConversionContext(
+				0,
+				"GRAM",
+				"MILLILITER",
+			);
 			const errorContext: string[] = [];
 
 			// when
@@ -210,11 +223,11 @@ describe("calculateConversionFactorFromDefaultUnitToUnit", () => {
 
 		it("returns undefined and pushes error when conversionVolumeUnit is missing", () => {
 			// given
-			const ingredient = ingredientFactory.build({
-				weightToVolumeConversionFactor: 1,
-				conversionWeightUnit: "GRAM",
-				conversionVolumeUnit: undefined,
-			});
+			const ingredient = createIngredientConversionContext(
+				1,
+				"GRAM",
+				undefined,
+			);
 			const errorContext: string[] = [];
 
 			// when
@@ -232,11 +245,11 @@ describe("calculateConversionFactorFromDefaultUnitToUnit", () => {
 
 		it("converts GRAM to MILLILITER using conversion factor", () => {
 			// given
-			const ingredient = ingredientFactory.build({
-				weightToVolumeConversionFactor: 2,
-				conversionWeightUnit: "GRAM",
-				conversionVolumeUnit: "MILLILITER",
-			});
+			const ingredient = createIngredientConversionContext(
+				2,
+				"GRAM",
+				"MILLILITER",
+			);
 			const errorContext: string[] = [];
 
 			// when
@@ -254,11 +267,11 @@ describe("calculateConversionFactorFromDefaultUnitToUnit", () => {
 
 		it("converts KILOGRAM to LITER using conversion factor", () => {
 			// given
-			const ingredient = ingredientFactory.build({
-				weightToVolumeConversionFactor: 2,
-				conversionWeightUnit: "GRAM",
-				conversionVolumeUnit: "MILLILITER",
-			});
+			const ingredient = createIngredientConversionContext(
+				2,
+				"GRAM",
+				"MILLILITER",
+			);
 			const errorContext: string[] = [];
 
 			// when
@@ -278,11 +291,11 @@ describe("calculateConversionFactorFromDefaultUnitToUnit", () => {
 	describe("volume to weight", () => {
 		it("converts MILLILITER to GRAM using conversion factor", () => {
 			// given
-			const ingredient = ingredientFactory.build({
-				weightToVolumeConversionFactor: 2,
-				conversionWeightUnit: "GRAM",
-				conversionVolumeUnit: "MILLILITER",
-			});
+			const ingredient = createIngredientConversionContext(
+				2,
+				"GRAM",
+				"MILLILITER",
+			);
 			const errorContext: string[] = [];
 
 			// when
@@ -300,11 +313,11 @@ describe("calculateConversionFactorFromDefaultUnitToUnit", () => {
 
 		it("converts LITER to KILOGRAM using conversion factor", () => {
 			// given
-			const ingredient = ingredientFactory.build({
-				weightToVolumeConversionFactor: 2,
-				conversionWeightUnit: "GRAM",
-				conversionVolumeUnit: "MILLILITER",
-			});
+			const ingredient = createIngredientConversionContext(
+				2,
+				"GRAM",
+				"MILLILITER",
+			);
 			const errorContext: string[] = [];
 
 			// when
@@ -479,11 +492,11 @@ describe("calculateConversionFactorFromDefaultUnitToCustomUnit", () => {
 
 	it("converts GRAM default unit to a custom unit based on MILLILITER using ingredient conversion factor", () => {
 		// given
-		const ingredient = ingredientFactory.build({
-			weightToVolumeConversionFactor: 2,
-			conversionWeightUnit: "GRAM",
-			conversionVolumeUnit: "MILLILITER",
-		});
+		const ingredient = createIngredientConversionContext(
+			2,
+			"GRAM",
+			"MILLILITER",
+		);
 		const customUnit = customUnitFactory.build({
 			conversionUnit: "MILLILITER",
 			customUnitToConversionUnitFactor: 1 / 3,

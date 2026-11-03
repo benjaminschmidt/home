@@ -1,5 +1,6 @@
 title: IngredientDto
 type: object
+description: "A weight-volume conversion includes both amounts and both units, or omits all four."
 required: [
   "id", "name", "ingredientVariants", "customUnits"
 ]
@@ -11,9 +12,16 @@ properties:
   name:
     type: string
     nullable: false
-  weightToVolumeConversionFactor:
+  conversionWeightAmount:
     type: number
     format: double
+    minimum: 0
+    exclusiveMinimum: true
+  conversionVolumeAmount:
+    type: number
+    format: double
+    minimum: 0
+    exclusiveMinimum: true
   conversionWeightUnit:
     $ref: './WeightUnitDto.yaml'
   conversionVolumeUnit:

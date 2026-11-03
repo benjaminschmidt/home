@@ -62,6 +62,7 @@ public class IngredientServiceImpl implements IngredientService {
     @NonNull
     @Override
     public IngredientDto createIngredient(@NonNull final IngredientWriteRequest ingredientWriteRequest) {
+        validateConversion(ingredientWriteRequest);
         final var savedIngredient = ingredientRepository.save(
             ingredientMapper.mapWriteRequestToIngredient(ingredientWriteRequest)
         );
@@ -83,6 +84,7 @@ public class IngredientServiceImpl implements IngredientService {
         @NonNull final UUID ingredientId,
         @NonNull final IngredientWriteRequest ingredientWriteRequest
     ) {
+        validateConversion(ingredientWriteRequest);
         return ingredientRepository.findById(ingredientId)
             .map(ingredient -> ingredientMapper.updateIngredientFromWriteRequest(ingredient, ingredientWriteRequest))
             .map(ingredientRepository::save)
@@ -92,6 +94,36 @@ public class IngredientServiceImpl implements IngredientService {
             })
             .map(ingredientMapper::mapIngredientToDto)
             .orElseThrow(() -> new NotFoundException(String.format("Ingredient not found for id: %s", ingredientId)));
+    }
+
+    private void validateConversion(@NonNull final IngredientWriteRequest ingredientWriteRequest) {
+        final var hasWeightAmount = ingredientWriteRequest.getConversionWeightAmount() != null;
+        final var hasVolumeAmount = ingredientWriteRequest.getConversionVolumeAmount() != null;
+        final var hasWeightUnit = ingredientWriteRequest.getConversionWeightUnit() != null;
+        final var hasVolumeUnit = ingredientWriteRequest.getConversionVolumeUnit() != null;
+        final var hasAnyConversionValue = hasWeightAmount || hasVolumeAmount || hasWeightUnit || hasVolumeUnit;
+        final var hasCompleteConversion = hasWeightAmount && hasVolumeAmount && hasWeightUnit && hasVolumeUnit;
+
+        if (hasAnyConversionValue && !hasCompleteConversion) {
+            throw new BadRequestException(
+                "Conversion weight amount, volume amount, weight unit, and volume unit must all be provided together."
+            );
+        }
+
+        if (hasCompleteConversion && (
+            !Double.isFinite(ingredientWriteRequest.getConversionWeightAmount())
+                || !Double.isFinite(ingredientWriteRequest.getConversionVolumeAmount())
+                || ingredientWriteRequest.getConversionWeightAmount() <= 0
+                || ingredientWriteRequest.getConversionVolumeAmount() <= 0
+                || !Double.isFinite(
+                    ingredientWriteRequest.getConversionVolumeAmount()
+                        / ingredientWriteRequest.getConversionWeightAmount()
+                )
+        )) {
+            throw new BadRequestException(
+                "Conversion amounts must be finite, greater than 0, and produce a finite ratio."
+            );
+        }
     }
 
     private void reconcileDefaultVariant(

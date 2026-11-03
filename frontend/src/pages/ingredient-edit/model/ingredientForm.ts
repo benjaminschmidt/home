@@ -22,33 +22,39 @@ const { useAppForm, withForm } = createFormHook({
 
 type IngredientFormInitialValues = {
 	name?: string;
-	weightToVolumeConversionFactor?: number;
+	conversionWeightAmount?: number;
+	conversionVolumeAmount?: number;
 	conversionWeightUnit?: WeightUnitDto;
 	conversionVolumeUnit?: VolumeUnitDto;
 };
 
-const formatDraftAmount = (amount: number) =>
-	`${Number(amount.toPrecision(12))}`;
+const formatDraftAmount = (amount: number) => String(amount);
 
 const createIngredientFormDefaultValues = (
 	initialValues?: IngredientFormInitialValues,
 	defaultVariantId?: string,
 ): IngredientFormValues => {
+	const conversionWeightAmount = initialValues?.conversionWeightAmount;
+	const conversionVolumeAmount = initialValues?.conversionVolumeAmount;
 	const hasStoredConversion =
-		initialValues?.weightToVolumeConversionFactor !== undefined &&
-		initialValues.conversionWeightUnit !== undefined &&
-		initialValues.conversionVolumeUnit !== undefined;
+		conversionWeightAmount !== undefined &&
+		conversionVolumeAmount !== undefined &&
+		initialValues?.conversionWeightUnit !== undefined &&
+		initialValues?.conversionVolumeUnit !== undefined;
+	let weightAmount = "";
+	let volumeAmount = "";
+
+	if (hasStoredConversion) {
+		weightAmount = formatDraftAmount(conversionWeightAmount);
+		volumeAmount = formatDraftAmount(conversionVolumeAmount);
+	}
 
 	return {
 		name: initialValues?.name ?? "",
-		weightAmount: hasStoredConversion ? "1" : "",
+		weightAmount,
 		weightUnit: (initialValues?.conversionWeightUnit ??
 			weightUnitDtoArray[0]) as string,
-		volumeAmount:
-			hasStoredConversion &&
-			initialValues?.weightToVolumeConversionFactor !== undefined
-				? formatDraftAmount(initialValues.weightToVolumeConversionFactor)
-				: "",
+		volumeAmount,
 		volumeUnit: (initialValues?.conversionVolumeUnit ??
 			volumeUnitDtoArray[0]) as string,
 		defaultVariantId: defaultVariantId ?? NO_DEFAULT_VARIANT,
@@ -66,24 +72,24 @@ const toIngredientWriteRequest = (
 	values: IngredientFormValues,
 ): IngredientWriteRequest => {
 	const parsedValue = ingredientFormSchema.parse(values);
+	const hasConversion =
+		parsedValue.weightAmount !== undefined &&
+		parsedValue.volumeAmount !== undefined;
 
 	return {
 		name: parsedValue.name,
-		weightToVolumeConversionFactor:
-			parsedValue.weightAmount !== undefined &&
-			parsedValue.volumeAmount !== undefined
-				? parsedValue.volumeAmount / parsedValue.weightAmount
-				: undefined,
-		conversionWeightUnit:
-			parsedValue.weightAmount !== undefined &&
-			parsedValue.volumeAmount !== undefined
-				? (parsedValue.weightUnit as WeightUnitDto)
-				: undefined,
-		conversionVolumeUnit:
-			parsedValue.weightAmount !== undefined &&
-			parsedValue.volumeAmount !== undefined
-				? (parsedValue.volumeUnit as VolumeUnitDto)
-				: undefined,
+		conversionWeightAmount: hasConversion
+			? parsedValue.weightAmount
+			: undefined,
+		conversionVolumeAmount: hasConversion
+			? parsedValue.volumeAmount
+			: undefined,
+		conversionWeightUnit: hasConversion
+			? (parsedValue.weightUnit as WeightUnitDto)
+			: undefined,
+		conversionVolumeUnit: hasConversion
+			? (parsedValue.volumeUnit as VolumeUnitDto)
+			: undefined,
 		defaultVariantId:
 			parsedValue.defaultVariantId === NO_DEFAULT_VARIANT
 				? undefined

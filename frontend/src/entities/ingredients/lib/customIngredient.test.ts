@@ -1,4 +1,5 @@
 import { describe, expect, it } from "vitest";
+import { calculateConversionFactorFromDefaultUnitToUnit } from "@/entities/ingredients/lib/conversion.ts";
 import { getCustomIngredient } from "@/entities/ingredients/lib/customIngredient.ts";
 import {
 	customUnitFactory,
@@ -175,7 +176,8 @@ describe("getCustomIngredient", () => {
 			});
 			const ingredient = ingredientFactory.build({
 				ingredientVariants: [variant],
-				weightToVolumeConversionFactor: 1,
+				conversionWeightAmount: 100,
+				conversionVolumeAmount: 92,
 				conversionWeightUnit: "GRAM",
 				conversionVolumeUnit: "MILLILITER",
 				customUnits: [customUnit],
@@ -194,10 +196,26 @@ describe("getCustomIngredient", () => {
 			// then
 			expect(result.unit).toBe("KILOGRAM");
 			expect(result.defaultUnit).toBe("GRAM");
-			expect(result.weightToVolumeConversionFactor).toBe(1);
+			expect(result.weightToVolumeConversionFactor).toBe(0.92);
 			expect(result.conversionWeightUnit).toBe("GRAM");
 			expect(result.conversionVolumeUnit).toBe("MILLILITER");
 			expect(result.customUnits).toEqual([customUnit]);
+			expect(
+				calculateConversionFactorFromDefaultUnitToUnit(
+					result,
+					"GRAM",
+					"MILLILITER",
+					errorContext,
+				),
+			).toBeCloseTo(0.92);
+			expect(
+				calculateConversionFactorFromDefaultUnitToUnit(
+					result,
+					"MILLILITER",
+					"GRAM",
+					errorContext,
+				),
+			).toBeCloseTo(1 / 0.92);
 			expect(errorContext).toHaveLength(0);
 		});
 

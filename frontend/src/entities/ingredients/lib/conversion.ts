@@ -10,7 +10,7 @@ import {
 	isVolumeUnit,
 	isWeightUnit,
 } from "@/entities/ingredients/lib/unitType.ts";
-import type { Ingredient } from "@/entities/ingredients/model/ingredient.ts";
+import type { IngredientConversionContext } from "@/entities/ingredients/model/ingredient.ts";
 
 const weightToGramConversionFactors: Record<WeightUnitDto, number> = {
 	GRAM: 1,
@@ -76,7 +76,7 @@ const calculateConversionFactorFromVolumeUnitAToWeightUnitB = (
 };
 
 const calculateConversionFactorFromUnitAToB = (
-	ingredient: Ingredient,
+	ingredient: IngredientConversionContext,
 	unitA: GenericUnitDto,
 	unitB: GenericUnitDto,
 	errorContext: string[],
@@ -131,7 +131,7 @@ const calculateConversionFactorFromUnitAToB = (
 };
 
 const calculateConversionFactorFromDefaultUnitToCustomUnit = (
-	ingredient: Ingredient,
+	ingredient: IngredientConversionContext,
 	defaultUnit: GenericUnitDto | undefined,
 	customUnit: CustomUnitDto | undefined,
 	errorContext: string[],
@@ -176,7 +176,7 @@ const calculateConversionFactorFromDefaultUnitToCustomUnit = (
 };
 
 const calculateConversionFactorFromDefaultUnitToUnit = (
-	ingredient: Ingredient,
+	ingredient: IngredientConversionContext,
 	defaultUnit: GenericUnitDto | undefined,
 	targetUnit: string,
 	errorContext: string[],
@@ -202,7 +202,7 @@ const calculateConversionFactorFromDefaultUnitToUnit = (
 };
 
 const calculateConversionFactorFromUnitToUnit = (
-	ingredient: Ingredient,
+	ingredient: IngredientConversionContext,
 	defaultUnit: GenericUnitDto | undefined,
 	sourceUnit: string,
 	targetUnit: string,

@@ -1,7 +1,10 @@
 import type { IngredientDto, IngredientVariantDto } from "home-api";
 import { findIngredientVariant } from "@/entities/ingredients";
 import { calculateConversionFactorFromDefaultUnitToUnit } from "@/entities/ingredients/lib/conversion.ts";
-import type { Ingredient } from "@/entities/ingredients/model/ingredient.ts";
+import type {
+	Ingredient,
+	IngredientConversionContext,
+} from "@/entities/ingredients/model/ingredient.ts";
 
 const nutrientFields = [
 	"calories",
@@ -77,21 +80,25 @@ const copyIngredient = (
 const getIngredientConversionContext = (
 	ingredient: IngredientDto,
 	variant?: IngredientVariantDto,
-): Pick<
-	Ingredient,
-	| "defaultUnit"
-	| "weightToVolumeConversionFactor"
-	| "conversionWeightUnit"
-	| "conversionVolumeUnit"
-	| "customUnits"
-> => ({
-	defaultUnit: variant?.unit ?? undefined,
-	weightToVolumeConversionFactor:
-		ingredient.weightToVolumeConversionFactor ?? undefined,
-	conversionWeightUnit: ingredient.conversionWeightUnit ?? undefined,
-	conversionVolumeUnit: ingredient.conversionVolumeUnit ?? undefined,
-	customUnits: ingredient.customUnits ?? [],
-});
+): IngredientConversionContext & Pick<Ingredient, "defaultUnit"> => {
+	const conversionWeightAmount = ingredient.conversionWeightAmount;
+	const conversionVolumeAmount = ingredient.conversionVolumeAmount;
+	const hasValidConversionAmounts =
+		conversionWeightAmount !== undefined &&
+		conversionWeightAmount > 0 &&
+		conversionVolumeAmount !== undefined &&
+		conversionVolumeAmount > 0;
+
+	return {
+		defaultUnit: variant?.unit ?? undefined,
+		weightToVolumeConversionFactor: hasValidConversionAmounts
+			? conversionVolumeAmount / conversionWeightAmount
+			: undefined,
+		conversionWeightUnit: ingredient.conversionWeightUnit ?? undefined,
+		conversionVolumeUnit: ingredient.conversionVolumeUnit ?? undefined,
+		customUnits: ingredient.customUnits ?? [],
+	};
+};
 
 const getCustomIngredient = (
 	ingredient: IngredientDto,
@@ -124,7 +131,7 @@ const getCustomIngredient = (
 
 	const unit = rawUnit ?? variant.unit;
 	const conversionFactor = calculateConversionFactorFromDefaultUnitToUnit(
-		ingredient,
+		getIngredientConversionContext(ingredient, variant),
 		variant.unit,
 		unit,
 		errorContext,
@@ -151,4 +158,4 @@ const getCustomIngredient = (
 	);
 };
 
-export { getCustomIngredient };
+export { getCustomIngredient, getIngredientConversionContext };

@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.zonky.test.db.AutoConfigureEmbeddedDatabase;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -11,6 +12,8 @@ import lombok.SneakyThrows;
 import net.fuzzyhome.home.database.entities.CustomUnit;
 import net.fuzzyhome.home.database.entities.Ingredient;
 import net.fuzzyhome.home.database.entities.IngredientVariant;
+import net.fuzzyhome.home.database.enums.VolumeUnit;
+import net.fuzzyhome.home.database.enums.WeightUnit;
 import net.fuzzyhome.home.database.repositories.CustomUnitRepository;
 import net.fuzzyhome.home.database.repositories.IngredientRepository;
 import net.fuzzyhome.home.database.repositories.IngredientVariantRepository;
@@ -23,6 +26,8 @@ import org.openapitools.model.IngredientDto;
 import org.openapitools.model.IngredientVariantDto;
 import org.openapitools.model.IngredientVariantWriteRequest;
 import org.openapitools.model.IngredientWriteRequest;
+import org.openapitools.model.VolumeUnitDto;
+import org.openapitools.model.WeightUnitDto;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -46,6 +51,16 @@ class IngredientsApiITest {
     private MockMvc mockMvc;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
+
+    private IngredientWriteRequest noConversionRequest(final UUID defaultVariantId) {
+        return Instancio.of(IngredientWriteRequest.class)
+            .set(field(IngredientWriteRequest::getConversionWeightAmount), null)
+            .set(field(IngredientWriteRequest::getConversionVolumeAmount), null)
+            .set(field(IngredientWriteRequest::getConversionWeightUnit), null)
+            .set(field(IngredientWriteRequest::getConversionVolumeUnit), null)
+            .set(field(IngredientWriteRequest::getDefaultVariantId), defaultVariantId)
+            .create();
+    }
 
     @Autowired
     private IngredientRepository ingredientRepository;
@@ -135,9 +150,7 @@ class IngredientsApiITest {
     @Test
     void createIngredientWithoutChildren() {
         // given
-        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class)
-            .set(field(IngredientWriteRequest::getDefaultVariantId), null)
-            .create();
+        final var ingredientWriteRequest = noConversionRequest(null);
 
         // when
         final var result = mockMvc.perform(post("/ingredients")
@@ -155,6 +168,174 @@ class IngredientsApiITest {
             .isEqualTo(ingredientWriteRequest.getName());
         assertThat(ingredientVariantRepository.findAll()).isEmpty();
         assertThat(customUnitRepository.findAll()).isEmpty();
+    }
+
+    @SneakyThrows
+    @Test
+    void createIngredientWithConversionAmounts() {
+        // given
+        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class)
+            .set(field(IngredientWriteRequest::getName), "Olive oil")
+            .set(field(IngredientWriteRequest::getConversionWeightAmount), 100.0)
+            .set(field(IngredientWriteRequest::getConversionVolumeAmount), 92.0)
+            .set(field(IngredientWriteRequest::getConversionWeightUnit), WeightUnitDto.GRAM)
+            .set(field(IngredientWriteRequest::getConversionVolumeUnit), VolumeUnitDto.MILLILITER)
+            .set(field(IngredientWriteRequest::getDefaultVariantId), null)
+            .create();
+
+        // when
+        final var result = mockMvc.perform(post("/ingredients")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(ingredientWriteRequest)))
+            .andExpect(status().isCreated())
+            .andReturn();
+
+        // then
+        final var response = objectMapper.readValue(result.getResponse().getContentAsString(), IngredientDto.class);
+        assertThat(response.getConversionWeightAmount()).isEqualTo(100.0);
+        assertThat(response.getConversionVolumeAmount()).isEqualTo(92.0);
+        assertThat(response.getConversionWeightUnit()).isEqualTo(WeightUnitDto.GRAM);
+        assertThat(response.getConversionVolumeUnit()).isEqualTo(VolumeUnitDto.MILLILITER);
+
+        final var getResult = mockMvc.perform(get("/ingredients/{ingredientId}", response.getId()))
+            .andExpect(status().isOk())
+            .andReturn();
+        final var fetchedIngredient = objectMapper.readValue(
+            getResult.getResponse().getContentAsString(),
+            IngredientDto.class
+        );
+        assertThat(fetchedIngredient.getConversionWeightAmount()).isEqualTo(100.0);
+        assertThat(fetchedIngredient.getConversionVolumeAmount()).isEqualTo(92.0);
+    }
+
+    @SneakyThrows
+    @Test
+    void createIngredientRejectsIncompleteConversion() {
+        mockMvc.perform(post("/ingredients")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(Map.of(
+                    "name", "Olive oil",
+                    "conversionWeightAmount", 100.0,
+                    "conversionVolumeAmount", 92.0,
+                    "conversionWeightUnit", "GRAM"
+                ))))
+            .andExpect(status().isBadRequest());
+    }
+
+    @SneakyThrows
+    @Test
+    void createIngredientRejectsPartialAmounts() {
+        mockMvc.perform(post("/ingredients")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(Map.of(
+                    "name", "Olive oil",
+                    "conversionWeightAmount", 100.0,
+                    "conversionWeightUnit", "GRAM",
+                    "conversionVolumeUnit", "MILLILITER"
+                ))))
+            .andExpect(status().isBadRequest());
+    }
+
+    @SneakyThrows
+    @Test
+    void createIngredientRejectsNonPositiveConversionAmounts() {
+        mockMvc.perform(post("/ingredients")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(Map.of(
+                    "name", "Olive oil",
+                    "conversionWeightAmount", 0.0,
+                    "conversionVolumeAmount", 92.0,
+                    "conversionWeightUnit", "GRAM",
+                    "conversionVolumeUnit", "MILLILITER"
+                ))))
+            .andExpect(status().isBadRequest());
+    }
+
+    @SneakyThrows
+    @Test
+    void updateIngredientWithConversionAmounts() {
+        // given
+        final var ingredient = Ingredient.builder()
+            .name("Olive oil")
+            .build();
+        ingredientRepository.saveAndFlush(ingredient);
+        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class)
+            .set(field(IngredientWriteRequest::getName), "Olive oil")
+            .set(field(IngredientWriteRequest::getConversionWeightAmount), 100.0)
+            .set(field(IngredientWriteRequest::getConversionVolumeAmount), 92.0)
+            .set(field(IngredientWriteRequest::getConversionWeightUnit), WeightUnitDto.GRAM)
+            .set(field(IngredientWriteRequest::getConversionVolumeUnit), VolumeUnitDto.MILLILITER)
+            .set(field(IngredientWriteRequest::getDefaultVariantId), null)
+            .create();
+
+        // when
+        final var result = mockMvc.perform(put("/ingredients/{ingredientId}", ingredient.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(ingredientWriteRequest)))
+            .andExpect(status().isOk())
+            .andReturn();
+
+        // then
+        final var response = objectMapper.readValue(result.getResponse().getContentAsString(), IngredientDto.class);
+        assertThat(response.getConversionWeightAmount()).isEqualTo(100.0);
+        assertThat(response.getConversionVolumeAmount()).isEqualTo(92.0);
+        assertThat(ingredientRepository.findById(ingredient.getId()))
+            .get()
+            .extracting(Ingredient::getConversionWeightAmount, Ingredient::getConversionVolumeAmount)
+            .containsExactly(100.0, 92.0);
+    }
+
+    @SneakyThrows
+    @Test
+    void updateIngredientRejectsIncompleteConversion() {
+        // given
+        final var ingredient = Ingredient.builder()
+            .name("Olive oil")
+            .build();
+        ingredientRepository.saveAndFlush(ingredient);
+
+        // when
+        mockMvc.perform(put("/ingredients/{ingredientId}", ingredient.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(Map.of(
+                    "name", "Olive oil",
+                    "conversionWeightAmount", 100.0,
+                    "conversionVolumeAmount", 92.0,
+                    "conversionWeightUnit", "GRAM"
+                ))))
+            .andExpect(status().isBadRequest());
+
+        // then
+        final var unchangedIngredient = ingredientRepository.findById(ingredient.getId()).orElseThrow();
+        assertThat(unchangedIngredient.getConversionWeightAmount()).isNull();
+        assertThat(unchangedIngredient.getConversionVolumeAmount()).isNull();
+    }
+
+    @SneakyThrows
+    @Test
+    void updateIngredientClearsConversionWhenAllFieldsAreOmitted() {
+        // given
+        final var ingredient = Ingredient.builder()
+            .name("Olive oil")
+            .conversionWeightAmount(100.0)
+            .conversionVolumeAmount(92.0)
+            .conversionWeightUnit(WeightUnit.GRAM)
+            .conversionVolumeUnit(VolumeUnit.MILLILITER)
+            .build();
+        ingredientRepository.saveAndFlush(ingredient);
+
+        // when
+        mockMvc.perform(put("/ingredients/{ingredientId}", ingredient.getId())
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(noConversionRequest(null))))
+            .andExpect(status().isOk());
+
+        // then
+        final var clearedIngredient = ingredientRepository.findById(ingredient.getId()).orElseThrow();
+        assertThat(clearedIngredient.getConversionWeightAmount()).isNull();
+        assertThat(clearedIngredient.getConversionVolumeAmount()).isNull();
+        assertThat(clearedIngredient.getConversionWeightUnit()).isNull();
+        assertThat(clearedIngredient.getConversionVolumeUnit()).isNull();
     }
 
     @SneakyThrows
@@ -215,7 +396,8 @@ class IngredientsApiITest {
 
         // then
         final var response = objectMapper.readTree(result.getResponse().getContentAsString());
-        assertThat(response.has("weightToVolumeConversionFactor")).isFalse();
+        assertThat(response.has("conversionWeightAmount")).isFalse();
+        assertThat(response.has("conversionVolumeAmount")).isFalse();
         assertThat(response.has("conversionWeightUnit")).isFalse();
         assertThat(response.has("conversionVolumeUnit")).isFalse();
         assertThat(response.get("ingredientVariants").get(0).has("unit")).isFalse();
@@ -244,9 +426,7 @@ class IngredientsApiITest {
         customUnit.setIngredient(ingredient);
         ingredientRepository.saveAndFlush(ingredient);
 
-        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class)
-            .set(field(IngredientWriteRequest::getDefaultVariantId), null)
-            .create();
+        final var ingredientWriteRequest = noConversionRequest(null);
 
         // when
         final var result = mockMvc.perform(put("/ingredients/{ingredientId}", ingredient.getId())
@@ -288,9 +468,7 @@ class IngredientsApiITest {
         variantB.setIngredient(ingredient);
         ingredientRepository.saveAndFlush(ingredient);
 
-        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class)
-            .set(field(IngredientWriteRequest::getDefaultVariantId), variantB.getId())
-            .create();
+        final var ingredientWriteRequest = noConversionRequest(variantB.getId());
 
         // when
         final var result = mockMvc.perform(put("/ingredients/{ingredientId}", ingredient.getId())
@@ -330,9 +508,7 @@ class IngredientsApiITest {
         ingredientVariant.setIngredient(ingredient);
         ingredientRepository.saveAndFlush(ingredient);
 
-        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class)
-            .set(field(IngredientWriteRequest::getDefaultVariantId), null)
-            .create();
+        final var ingredientWriteRequest = noConversionRequest(null);
 
         // when
         mockMvc.perform(put("/ingredients/{ingredientId}", ingredient.getId())
@@ -362,9 +538,7 @@ class IngredientsApiITest {
         ingredientVariant.setIngredient(ingredient);
         ingredientRepository.saveAndFlush(ingredient);
 
-        final var ingredientWriteRequest = Instancio.of(IngredientWriteRequest.class)
-            .set(field(IngredientWriteRequest::getDefaultVariantId), UUID.randomUUID())
-            .create();
+        final var ingredientWriteRequest = noConversionRequest(UUID.randomUUID());
 
         // when
         mockMvc.perform(put("/ingredients/{ingredientId}", ingredient.getId())

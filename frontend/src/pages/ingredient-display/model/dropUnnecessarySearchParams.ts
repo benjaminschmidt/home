@@ -3,6 +3,7 @@ import {
 	calculateConversionFactorFromDefaultUnitToUnit,
 	findIngredientVariant,
 	getDefaultIngredientVariant,
+	getIngredientConversionContext,
 } from "@/entities/ingredients";
 
 const dropUnnecessarySearchParams = (
@@ -26,7 +27,7 @@ const dropUnnecessarySearchParams = (
 		}
 
 		const conversionFactor = calculateConversionFactorFromDefaultUnitToUnit(
-			ingredient,
+			getIngredientConversionContext(ingredient, variant),
 			variant.unit,
 			effectiveUnit,
 			[],
