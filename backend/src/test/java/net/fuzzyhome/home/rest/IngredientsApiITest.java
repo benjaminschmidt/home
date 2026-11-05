@@ -371,6 +371,40 @@ class IngredientsApiITest {
 
     @SneakyThrows
     @Test
+    void getIngredient_sortsVariantsByDescription() {
+        // given
+        final var wholeVariant = IngredientVariant.builder()
+            .description("Whole")
+            .defaultVariant(false)
+            .build();
+        final var slicedVariant = IngredientVariant.builder()
+            .description("Sliced")
+            .defaultVariant(false)
+            .build();
+        final var ingredient = Ingredient.builder()
+            .name("ingredient")
+            .ingredientVariants(List.of(wholeVariant, slicedVariant))
+            .build();
+        wholeVariant.setIngredient(ingredient);
+        slicedVariant.setIngredient(ingredient);
+        ingredientRepository.saveAndFlush(ingredient);
+
+        // when
+        final var result = mockMvc.perform(get("/ingredients/{ingredientId}", ingredient.getId()))
+            .andExpect(status().isOk())
+            .andReturn();
+
+        // then
+        final var response = objectMapper.readValue(
+            result.getResponse().getContentAsString(),
+            IngredientDto.class
+        );
+        assertThat(response.getIngredientVariants()).extracting(IngredientVariantDto::getDescription)
+            .containsExactly("Sliced", "Whole");
+    }
+
+    @SneakyThrows
+    @Test
     void getIngredient_omitsNullValues() {
         // given
         final var ingredientVariant = IngredientVariant.builder()
@@ -584,11 +618,19 @@ class IngredientsApiITest {
         final var ingredient = Instancio.of(Ingredient.class)
             .ignore(field(Ingredient::getId))
             .ignore(field(Ingredient::getCustomUnits))
-            .ignore(field(IngredientVariant::getId))
-            .set(field(IngredientVariant::getDefaultVariant), false)
+            .ignore(field(Ingredient::getIngredientVariants))
             .create();
-        Optional.ofNullable(ingredient.getIngredientVariants())
-            .ifPresent(ingredientVariants -> ingredientVariants.forEach(variant -> variant.setIngredient(ingredient)));
+        final var wholeVariant = IngredientVariant.builder()
+            .description("Whole")
+            .defaultVariant(false)
+            .ingredient(ingredient)
+            .build();
+        final var slicedVariant = IngredientVariant.builder()
+            .description("Sliced")
+            .defaultVariant(false)
+            .ingredient(ingredient)
+            .build();
+        ingredient.setIngredientVariants(List.of(wholeVariant, slicedVariant));
         ingredientRepository.saveAndFlush(ingredient);
 
         // when
@@ -602,7 +644,8 @@ class IngredientsApiITest {
             new TypeReference<List<IngredientVariantDto>>() {
             }
         );
-        assertThat(response).hasSize(ingredient.getIngredientVariants().size());
+        assertThat(response).extracting(IngredientVariantDto::getDescription)
+            .containsExactly("Sliced", "Whole");
     }
 
     @SneakyThrows
@@ -799,7 +842,7 @@ class IngredientsApiITest {
             .andExpect(status().isNoContent());
 
         // then
-        assertThat(ingredientVariantRepository.findAllByIngredientId(
+        assertThat(ingredientVariantRepository.findAllByIngredientIdOrderByDescriptionAsc(
             Objects.requireNonNull(ingredient.getId()))
         ).isEmpty();
     }

@@ -1,4 +1,5 @@
 export { createIngredientMutationOptions } from "@/entities/ingredients/api/createIngredientMutationOptions.ts";
+export { createIngredientVariantMutationOptions } from "@/entities/ingredients/api/createIngredientVariantMutationOptions.ts";
 export { createDeleteIngredientMutationOptions } from "@/entities/ingredients/api/deleteIngredientMutationOptions.ts";
 export { createDeleteIngredientVariantMutationOptions } from "@/entities/ingredients/api/deleteIngredientVariantMutationOptions.ts";
 export { createIngredientIdQueryOptions } from "@/entities/ingredients/api/ingredientIdQueryOptions.ts";
@@ -23,6 +24,7 @@ export {
 	findIngredientVariant,
 	getDefaultIngredientVariant,
 } from "@/entities/ingredients/lib/searchVariants.ts";
+export { sortIngredientVariants } from "@/entities/ingredients/lib/sortVariants.ts";
 export { getUnitOptions } from "@/entities/ingredients/lib/unitOptions.ts";
 export {
 	genericUnitDtoArray,

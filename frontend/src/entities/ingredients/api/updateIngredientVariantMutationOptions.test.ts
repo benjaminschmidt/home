@@ -27,16 +27,18 @@ describe("createUpdateIngredientVariantMutationOptions", () => {
 			name: "Flour",
 			ingredientVariants: [
 				{
-					id: variantId,
-					description: "Whole",
-					defaultVariant: true,
+					id: "salted-id",
+					description: "Salted",
+					defaultVariant: false,
 				},
+				{ id: variantId, description: "Unsalted", defaultVariant: false },
 			],
 			customUnits: [],
 		};
 		const updatedVariant = {
-			...ingredient.ingredientVariants[0],
-			description: "Sliced",
+			id: variantId,
+			description: "Test",
+			defaultVariant: false,
 		};
 		queryClient.setQueryData(["ingredient", ingredientId], ingredient);
 		const invalidateQueries = vi
@@ -56,7 +58,7 @@ describe("createUpdateIngredientVariantMutationOptions", () => {
 				ingredientId,
 				variantId,
 				ingredientVariantWriteRequest: {
-					description: "Sliced",
+					description: "Test",
 				},
 			},
 			{} as never,
@@ -68,7 +70,7 @@ describe("createUpdateIngredientVariantMutationOptions", () => {
 				ingredientId,
 				variantId,
 				ingredientVariantWriteRequest: {
-					description: "Sliced",
+					description: "Test",
 				},
 			},
 			undefined,
@@ -79,13 +81,13 @@ describe("createUpdateIngredientVariantMutationOptions", () => {
 		expect(result).toEqual(updatedVariant);
 		expect(vi.mocked(updateIngredientVariant)).toHaveBeenCalledWith({
 			path: { ingredientId, variantId },
-			body: { description: "Sliced" },
+			body: { description: "Test" },
 		});
 		expect(
 			queryClient.getQueryData<IngredientDto>(["ingredient", ingredientId]),
 		).toEqual({
 			...ingredient,
-			ingredientVariants: [updatedVariant],
+			ingredientVariants: [ingredient.ingredientVariants[0], updatedVariant],
 		});
 		expect(invalidateQueries).toHaveBeenCalledWith({
 			queryKey: ["ingredient", ingredientId],

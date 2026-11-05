@@ -324,7 +324,7 @@ class IngredientServiceImplTest {
         final var ingredientVariantDtos = Instancio.ofList(IngredientVariantDto.class)
             .size(2)
             .create();
-        when(ingredientVariantRepository.findAllByIngredientId(any())).thenReturn(ingredientVariants);
+        when(ingredientVariantRepository.findAllByIngredientIdOrderByDescriptionAsc(any())).thenReturn(ingredientVariants);
         when(ingredientVariantMapper.mapIngredientVariantToDto(any(IngredientVariant.class)))
             .thenReturn(ingredientVariantDtos.get(0))
             .thenReturn(ingredientVariantDtos.get(1));
@@ -333,7 +333,7 @@ class IngredientServiceImplTest {
         final var result = ingredientServiceImpl.getIngredientVariantsByIngredientId(id);
 
         // then
-        verify(ingredientVariantRepository).findAllByIngredientId(id);
+        verify(ingredientVariantRepository).findAllByIngredientIdOrderByDescriptionAsc(id);
         assertThat(result).containsExactlyElementsOf(ingredientVariantDtos);
     }
 

@@ -5,6 +5,7 @@ import type {
 	IngredientVariantWriteRequest,
 } from "home-api";
 import { updateIngredientVariant } from "home-api";
+import { sortIngredientVariants } from "@/entities/ingredients/lib/sortVariants.ts";
 
 type UpdateIngredientVariantVariables = {
 	ingredientId: string;
@@ -45,8 +46,10 @@ const createUpdateIngredientVariantMutationOptions = (
 
 				return {
 					...currentIngredient,
-					ingredientVariants: currentIngredient.ingredientVariants.map(
-						(variant) => (variant.id === variantId ? updatedVariant : variant),
+					ingredientVariants: sortIngredientVariants(
+						currentIngredient.ingredientVariants.map((variant) =>
+							variant.id === variantId ? updatedVariant : variant,
+						),
 					),
 				};
 			},

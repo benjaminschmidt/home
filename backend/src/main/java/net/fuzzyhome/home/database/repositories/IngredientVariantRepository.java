@@ -8,7 +8,7 @@ import org.jspecify.annotations.NonNull;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface IngredientVariantRepository extends JpaRepository<@NonNull IngredientVariant, @NonNull UUID> {
-    @NonNull List<IngredientVariant> findAllByIngredientId(@NonNull UUID ingredientId);
+    @NonNull List<IngredientVariant> findAllByIngredientIdOrderByDescriptionAsc(@NonNull UUID ingredientId);
 
     @NonNull Optional<IngredientVariant> findByIdAndIngredientId(
         @NonNull UUID id,

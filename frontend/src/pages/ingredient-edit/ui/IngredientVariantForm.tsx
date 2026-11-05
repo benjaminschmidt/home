@@ -16,6 +16,7 @@ import {
 } from "react";
 import {
 	createDeleteIngredientVariantMutationOptions,
+	createIngredientVariantMutationOptions,
 	createUpdateIngredientVariantMutationOptions,
 } from "@/entities/ingredients";
 import { useAppForm } from "@/pages/ingredient-edit/model/ingredientForm.ts";
@@ -33,6 +34,7 @@ import { SelectField, TextField } from "@/shared/ui/form";
 type IngredientVariantEditorState = {
 	id: string;
 	description: string;
+	isDraft: boolean;
 	isDirty: boolean;
 	canSubmit: boolean;
 	isSubmitting: boolean;
@@ -47,9 +49,11 @@ type IngredientVariantEditorHandle = {
 type IngredientVariantFormProps = {
 	ingredientId: string;
 	variant: IngredientVariantDto;
+	isDraft?: boolean;
 	duplicateDescription: boolean;
 	pageIsSubmitting: boolean;
 	onDeleted: () => void;
+	onCreated?: (variant: IngredientVariantDto) => void;
 	onStateChange: (state: IngredientVariantEditorState) => void;
 };
 
@@ -61,9 +65,11 @@ const IngredientVariantForm = forwardRef<
 		{
 			ingredientId,
 			variant,
+			isDraft = false,
 			duplicateDescription,
 			pageIsSubmitting,
 			onDeleted,
+			onCreated,
 			onStateChange,
 		},
 		ref,
@@ -73,6 +79,9 @@ const IngredientVariantForm = forwardRef<
 		const [formVersion, setFormVersion] = useState(0);
 		const updateMutation = useMutation(
 			createUpdateIngredientVariantMutationOptions(queryClient),
+		);
+		const createMutation = useMutation(
+			createIngredientVariantMutationOptions(queryClient),
 		);
 		const deleteMutation = useMutation(
 			createDeleteIngredientVariantMutationOptions(queryClient),
@@ -86,15 +95,23 @@ const IngredientVariantForm = forwardRef<
 				onChange: ingredientVariantFormSchema,
 			},
 			onSubmit: async ({ value }) => {
-				const updatedVariant = await updateMutation.mutateAsync({
-					ingredientId,
-					variantId: variant.id,
-					ingredientVariantWriteRequest: toIngredientVariantWriteRequest(value),
-				});
+				const ingredientVariantWriteRequest =
+					toIngredientVariantWriteRequest(value);
+				const savedVariant = isDraft
+					? await createMutation.mutateAsync({
+							ingredientId,
+							ingredientVariantWriteRequest,
+						})
+					: await updateMutation.mutateAsync({
+							ingredientId,
+							variantId: variant.id,
+							ingredientVariantWriteRequest,
+						});
 
-				setBaselineVariant(updatedVariant);
+				setBaselineVariant(savedVariant);
 				setFormVersion((currentVersion) => currentVersion + 1);
 				lastSubmissionSucceeded.current = true;
+				if (isDraft) onCreated?.(savedVariant);
 			},
 		});
 
@@ -105,25 +122,32 @@ const IngredientVariantForm = forwardRef<
 		const isDirty = useSelector(form.store, (state) => state.isDirty);
 		const canSubmit = useSelector(form.store, (state) => state.canSubmit);
 		const isSubmitting = useSelector(form.store, (state) => state.isSubmitting);
-		const variantIsSubmitting = isSubmitting || deleteMutation.isPending;
+		const variantIsSubmitting =
+			isSubmitting ||
+			createMutation.isPending ||
+			updateMutation.isPending ||
+			deleteMutation.isPending;
 		const inputsDisabled = pageIsSubmitting || variantIsSubmitting;
+		const mutationError = isDraft ? createMutation.error : updateMutation.error;
 
 		useEffect(() => {
 			onStateChange({
 				id: variant.id,
 				description,
+				isDraft,
 				isDirty,
 				canSubmit,
 				isSubmitting: variantIsSubmitting,
-				errorMessage: updateMutation.error?.message,
+				errorMessage: mutationError?.message,
 			});
 		}, [
 			canSubmit,
 			description,
+			isDraft,
 			isDirty,
+			mutationError?.message,
 			variantIsSubmitting,
 			onStateChange,
-			updateMutation.error?.message,
 			variant.id,
 		]);
 
@@ -141,8 +165,9 @@ const IngredientVariantForm = forwardRef<
 
 		const reset = useCallback(() => {
 			updateMutation.reset();
+			createMutation.reset();
 			form.reset();
-		}, [form, updateMutation]);
+		}, [createMutation, form, updateMutation]);
 
 		const handleDeleteCancel = useCallback(() => {
 			if (deleteMutation.isPending) return;
@@ -153,10 +178,20 @@ const IngredientVariantForm = forwardRef<
 
 		const handleDelete = useCallback(() => {
 			if (pageIsSubmitting || variantIsSubmitting) return;
+			if (isDraft) {
+				onDeleted();
+				return;
+			}
 
 			deleteMutation.reset();
 			setDeleteDialogOpen(true);
-		}, [deleteMutation, pageIsSubmitting, variantIsSubmitting]);
+		}, [
+			deleteMutation,
+			isDraft,
+			onDeleted,
+			pageIsSubmitting,
+			variantIsSubmitting,
+		]);
 
 		useImperativeHandle(ref, () => ({ submit, reset }), [reset, submit]);
 
@@ -344,25 +379,27 @@ const IngredientVariantForm = forwardRef<
 							</Box>
 						</Stack>
 					</CardContent>
-					{updateMutation.error?.message !== undefined && (
+					{mutationError?.message !== undefined && (
 						<Alert severity="error" variant="outlined" sx={{ mx: 2, mb: 1 }}>
-							{updateMutation.error.message}
+							{mutationError.message}
 						</Alert>
 					)}
 				</Card>
-				<DeleteIngredientVariantDialog
-					variantDescription={variant.description.trim() || "Variant"}
-					open={deleteDialogOpen}
-					isDeleting={deleteMutation.isPending}
-					errorMessage={deleteMutation.error?.message}
-					onCancel={handleDeleteCancel}
-					onConfirm={() => {
-						deleteMutation.mutate(
-							{ ingredientId, variantId: variant.id },
-							{ onSuccess: onDeleted },
-						);
-					}}
-				/>
+				{!isDraft && (
+					<DeleteIngredientVariantDialog
+						variantDescription={variant.description.trim() || "Variant"}
+						open={deleteDialogOpen}
+						isDeleting={deleteMutation.isPending}
+						errorMessage={deleteMutation.error?.message}
+						onCancel={handleDeleteCancel}
+						onConfirm={() => {
+							deleteMutation.mutate(
+								{ ingredientId, variantId: variant.id },
+								{ onSuccess: onDeleted },
+							);
+						}}
+					/>
+				)}
 			</>
 		);
 	},

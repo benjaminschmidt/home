@@ -11,6 +11,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 import java.util.List;
 import java.util.Objects;
@@ -63,6 +64,7 @@ public class Ingredient {
 
     @Nullable
     @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER, mappedBy = "ingredient", orphanRemoval = true)
+    @OrderBy("description ASC")
     private List<IngredientVariant> ingredientVariants;
 
     @Nullable

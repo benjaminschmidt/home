@@ -3,12 +3,13 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { useSelector } from "@tanstack/react-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { IngredientDto } from "home-api";
+import type { IngredientDto, IngredientVariantDto } from "home-api";
 import { useCallback, useMemo, useRef, useState } from "react";
 import {
 	createDeleteIngredientMutationOptions,
 	createIngredientMutationOptions,
 	createUpdateIngredientMutationOptions,
+	sortIngredientVariants,
 } from "@/entities/ingredients";
 import {
 	createIngredientFormDefaultValues,
@@ -27,6 +28,7 @@ import {
 	type IngredientVariantEditorState,
 	IngredientVariantForm,
 } from "@/pages/ingredient-edit/ui/IngredientVariantForm.tsx";
+import { AddButton } from "@/shared/ui/button";
 
 type EditIngredientPageProps = {
 	mode: "edit" | "create";
@@ -42,6 +44,8 @@ type EditIngredientPageProps = {
 			onCreated: (ingredientDto: IngredientDto) => void;
 	  }
 );
+
+const EMPTY_VARIANTS: IngredientVariantDto[] = [];
 
 const createFormDefaultValues = (ingredientDto: IngredientDto) => {
 	const currentDefaultVariantId = ingredientDto.ingredientVariants.find(
@@ -60,6 +64,12 @@ const createFormDefaultValues = (ingredientDto: IngredientDto) => {
 	);
 };
 
+const createDraftVariant = (id: string): IngredientVariantDto => ({
+	id,
+	description: "",
+	defaultVariant: false,
+});
+
 const EditIngredientPageContent = (props: EditIngredientPageProps) => {
 	const queryClient = useQueryClient();
 	const createMutation = useMutation(
@@ -77,6 +87,10 @@ const EditIngredientPageContent = (props: EditIngredientPageProps) => {
 	const [deletedVariantIds, setDeletedVariantIds] = useState<Set<string>>(
 		new Set(),
 	);
+	const [draftVariants, setDraftVariants] = useState<IngredientVariantDto[]>(
+		[],
+	);
+	const draftIdCounter = useRef(0);
 	const [variantStates, setVariantStates] = useState<
 		Record<string, IngredientVariantEditorState>
 	>({});
@@ -86,9 +100,21 @@ const EditIngredientPageContent = (props: EditIngredientPageProps) => {
 	const activeMutation =
 		props.mode === "create" ? createMutation : updateMutation;
 	const ingredientDto = props.mode === "edit" ? props.ingredientDto : undefined;
-	const allVariants = ingredientDto?.ingredientVariants ?? [];
-	const variants = allVariants.filter(
-		(variant) => !deletedVariantIds.has(variant.id),
+	const allVariants = ingredientDto?.ingredientVariants ?? EMPTY_VARIANTS;
+	const persistedVariants = useMemo(
+		() =>
+			sortIngredientVariants(
+				allVariants.filter((variant) => !deletedVariantIds.has(variant.id)),
+			),
+		[allVariants, deletedVariantIds],
+	);
+	const variants = useMemo(
+		() => [...draftVariants, ...persistedVariants],
+		[persistedVariants, draftVariants],
+	);
+	const draftVariantIds = useMemo(
+		() => new Set(draftVariants.map((variant) => variant.id)),
+		[draftVariants],
 	);
 	const initialIngredientFormValues =
 		ingredientDto === undefined
@@ -145,6 +171,7 @@ const EditIngredientPageContent = (props: EditIngredientPageProps) => {
 				const previousState = currentStates[state.id];
 				if (
 					previousState?.description === state.description &&
+					previousState?.isDraft === state.isDraft &&
 					previousState?.isDirty === state.isDirty &&
 					previousState?.canSubmit === state.canSubmit &&
 					previousState?.isSubmitting === state.isSubmitting &&
@@ -159,8 +186,27 @@ const EditIngredientPageContent = (props: EditIngredientPageProps) => {
 		[],
 	);
 
+	const clearVariantEditorState = useCallback((variantId: string) => {
+		setVariantStates((currentStates) => {
+			if (currentStates[variantId] === undefined) return currentStates;
+
+			const nextStates = { ...currentStates };
+			delete nextStates[variantId];
+			return nextStates;
+		});
+		delete variantEditorRefs.current[variantId];
+	}, []);
+
 	const handleVariantDeleted = useCallback(
-		(variantId: string) => {
+		(variantId: string, isDraft: boolean) => {
+			clearVariantEditorState(variantId);
+			if (isDraft) {
+				setDraftVariants((currentVariants) =>
+					currentVariants.filter((variant) => variant.id !== variantId),
+				);
+				return;
+			}
+
 			setDeletedVariantIds((currentIds) => {
 				if (currentIds.has(variantId)) return currentIds;
 
@@ -176,7 +222,17 @@ const EditIngredientPageContent = (props: EditIngredientPageProps) => {
 				form.setFieldValue("defaultVariantId", NO_DEFAULT_VARIANT);
 			}
 		},
-		[form],
+		[clearVariantEditorState, form],
+	);
+
+	const handleVariantCreated = useCallback(
+		(draftId: string) => {
+			clearVariantEditorState(draftId);
+			setDraftVariants((currentVariants) =>
+				currentVariants.filter((variant) => variant.id !== draftId),
+			);
+		},
+		[clearVariantEditorState],
 	);
 
 	const registerVariantEditor = useCallback(
@@ -210,7 +266,10 @@ const EditIngredientPageContent = (props: EditIngredientPageProps) => {
 	);
 	const dirtyVariantStates = variants
 		.map((variant) => variantStates[variant.id])
-		.filter((state): state is IngredientVariantEditorState => state?.isDirty);
+		.filter(
+			(state): state is IngredientVariantEditorState =>
+				state?.isDirty || state?.isDraft === true,
+		);
 	const descriptionTransitionConflict = useMemo(() => {
 		const originalDescriptions = new Map(
 			variants.map((variant) => [variant.id, variant.description.trim()]),
@@ -262,6 +321,14 @@ const EditIngredientPageContent = (props: EditIngredientPageProps) => {
 		activeMutation.isPending ||
 		deleteMutation.isPending ||
 		Object.values(variantStates).some((state) => state.isSubmitting);
+	const handleAddVariant = useCallback(() => {
+		const draftId = `draft-variant-${draftIdCounter.current}`;
+		draftIdCounter.current += 1;
+		setDraftVariants((currentVariants) => [
+			...currentVariants,
+			createDraftVariant(draftId),
+		]);
+	}, []);
 
 	const submitIngredientForm = useCallback(async () => {
 		try {
@@ -277,11 +344,12 @@ const EditIngredientPageContent = (props: EditIngredientPageProps) => {
 
 		setSaveAllError(undefined);
 		activeMutation.reset();
+		setDraftVariants([]);
 		form.reset(ingredientFormBaseline.current);
-		for (const variant of variants) {
+		for (const variant of persistedVariants) {
 			variantEditorRefs.current[variant.id]?.reset();
 		}
-	}, [activeMutation, form, isSubmitting, variants]);
+	}, [activeMutation, form, isSubmitting, persistedVariants]);
 
 	const handleSaveAll = useCallback(async () => {
 		if (!canSaveAll) return;
@@ -340,36 +408,56 @@ const EditIngredientPageContent = (props: EditIngredientPageProps) => {
 
 					<IngredientBaseForm
 						form={form}
-						variants={variants}
+						variants={persistedVariants}
 						onSubmit={() => void submitIngredientForm()}
 						isSubmitting={isSubmitting}
 					/>
 
-					{props.mode === "edit" && variants.length > 0 && (
+					{props.mode === "edit" && (
 						<Stack
 							component="section"
 							aria-labelledby="ingredient-variants-heading"
 							spacing={1.5}
 						>
-							<Typography
-								id="ingredient-variants-heading"
-								variant="h5"
+							<Stack
+								direction="row"
 								sx={{
-									fontWeight: "fontWeightBold",
-									typography: { xs: "body1", sm: "h5" },
+									alignItems: "center",
+									justifyContent: "space-between",
 								}}
 							>
-								Variants
-							</Typography>
+								<Typography
+									id="ingredient-variants-heading"
+									variant="h5"
+									sx={{
+										fontWeight: "fontWeightBold",
+										typography: { xs: "body1", sm: "h5" },
+									}}
+								>
+									Variants
+								</Typography>
+								<AddButton
+									label="Add variant"
+									onClick={handleAddVariant}
+									disabled={isSubmitting}
+								/>
+							</Stack>
 							{variants.map((variant) => (
 								<IngredientVariantForm
 									key={variant.id}
 									ref={(editor) => registerVariantEditor(variant.id, editor)}
 									ingredientId={props.ingredientDto.id}
 									variant={variant}
+									isDraft={draftVariantIds.has(variant.id)}
 									duplicateDescription={duplicateVariantIds.has(variant.id)}
 									pageIsSubmitting={isSubmitting}
-									onDeleted={() => handleVariantDeleted(variant.id)}
+									onDeleted={() =>
+										handleVariantDeleted(
+											variant.id,
+											draftVariantIds.has(variant.id),
+										)
+									}
+									onCreated={() => handleVariantCreated(variant.id)}
 									onStateChange={handleVariantStateChange}
 								/>
 							))}

@@ -196,7 +196,7 @@ class IngredientsDbTest {
 
         // when
         final var result = Optional.ofNullable(ingredient.getId())
-            .map(ingredientVariantRepository::findAllByIngredientId)
+            .map(ingredientVariantRepository::findAllByIngredientIdOrderByDescriptionAsc)
             .orElse(List.of());
 
         // then

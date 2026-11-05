@@ -9,6 +9,7 @@ import {
 } from "@testing-library/react";
 import type { IngredientDto } from "home-api";
 import {
+	addIngredientVariant,
 	createIngredient,
 	deleteIngredient,
 	deleteIngredientVariant,
@@ -23,6 +24,7 @@ vi.mock("home-api", async () => {
 	const actual = await vi.importActual<typeof import("home-api")>("home-api");
 	return {
 		...actual,
+		addIngredientVariant: vi.fn(),
 		createIngredient: vi.fn(),
 		deleteIngredient: vi.fn(),
 		deleteIngredientVariant: vi.fn(),
@@ -153,6 +155,193 @@ describe("EditIngredientPage", () => {
 		expect(
 			screen.getByRole("combobox", { name: "Default variant" }).textContent,
 		).toBe("Sliced");
+	});
+
+	test("sorts persisted variants alphabetically", () => {
+		// given
+		const ingredientDto = ingredientFactory.build({
+			ingredientVariants: [
+				ingredientVariantFactory.build({ description: "Unsalted" }),
+				ingredientVariantFactory.build({ description: "Test" }),
+				ingredientVariantFactory.build({ description: "Salted" }),
+			],
+		});
+
+		// when
+		renderPage(ingredientDto);
+
+		// then
+		expect(
+			screen
+				.getAllByRole("form", { name: /Ingredient variant:/ })
+				.map((form) => form.getAttribute("aria-label")),
+		).toEqual([
+			"Ingredient variant: Salted",
+			"Ingredient variant: Test",
+			"Ingredient variant: Unsalted",
+		]);
+	});
+
+	test("shows Add variant when an ingredient has no variants", () => {
+		// given
+		const ingredientDto = ingredientFactory.build({ ingredientVariants: [] });
+
+		// when
+		renderPage(ingredientDto);
+
+		// then
+		expect(screen.getByText("Variants")).toBeTruthy();
+		expect(screen.getByRole("button", { name: "Add variant" })).toBeTruthy();
+	});
+
+	test("shows multiple empty variant drafts at the top", () => {
+		// given
+		const existingVariant = ingredientVariantFactory.build({
+			description: "Whole",
+		});
+		const ingredientDto = ingredientFactory.build({
+			ingredientVariants: [existingVariant],
+		});
+		renderPage(ingredientDto);
+
+		// when
+		const addButton = screen.getByRole("button", { name: "Add variant" });
+		fireEvent.click(addButton);
+		fireEvent.click(addButton);
+
+		// then
+		expect(
+			screen
+				.getAllByRole("form", { name: /Ingredient variant:/ })
+				.map((form) => form.getAttribute("aria-label")),
+		).toEqual([
+			"Ingredient variant: Variant",
+			"Ingredient variant: Variant",
+			"Ingredient variant: Whole",
+		]);
+		expect(screen.getAllByLabelText("Description")).toHaveLength(3);
+		expect(screen.getByText("2 unsaved changes")).toBeTruthy();
+	});
+
+	test("creates a draft variant from its card Save action", async () => {
+		// given
+		const ingredientDto = ingredientFactory.build({ ingredientVariants: [] });
+		const createdVariant = ingredientVariantFactory.build({
+			description: "Whole",
+		});
+		vi.mocked(addIngredientVariant).mockResolvedValue({
+			data: createdVariant,
+			error: undefined,
+			request: new Request("http://localhost"),
+			response: new Response(),
+		});
+		renderPage(ingredientDto);
+		fireEvent.click(screen.getByRole("button", { name: "Add variant" }));
+		const draftForm = screen.getByRole("form", {
+			name: "Ingredient variant: Variant",
+		});
+
+		// when
+		fireEvent.change(within(draftForm).getByLabelText("Description"), {
+			target: { value: "Whole" },
+		});
+		fireEvent.click(within(draftForm).getByRole("button", { name: "Save" }));
+
+		// then
+		await waitFor(() => {
+			expect(vi.mocked(addIngredientVariant)).toHaveBeenCalledWith({
+				path: { ingredientId: ingredientDto.id },
+				body: expect.objectContaining({ description: "Whole" }),
+			});
+			expect(
+				screen.queryByRole("form", {
+					name: "Ingredient variant: Variant",
+				}),
+			).toBeNull();
+		});
+		expect(screen.getByLabelText("Name")).toHaveProperty("disabled", false);
+		expect(screen.getByRole("button", { name: "Add variant" })).toHaveProperty(
+			"disabled",
+			false,
+		);
+	});
+
+	test("removes an unsaved draft locally", () => {
+		// given
+		const ingredientDto = ingredientFactory.build({ ingredientVariants: [] });
+		renderPage(ingredientDto);
+		fireEvent.click(screen.getByRole("button", { name: "Add variant" }));
+		const draftForm = screen.getByRole("form", {
+			name: "Ingredient variant: Variant",
+		});
+
+		// when
+		fireEvent.click(within(draftForm).getByRole("button", { name: "Delete" }));
+
+		// then
+		expect(
+			screen.queryByRole("form", { name: "Ingredient variant: Variant" }),
+		).toBeNull();
+		expect(vi.mocked(addIngredientVariant)).not.toHaveBeenCalled();
+	});
+
+	test("creates valid drafts before saving the ingredient in Save all", async () => {
+		// given
+		const ingredientDto = ingredientFactory.build({
+			name: "Bread",
+			ingredientVariants: [],
+		});
+		const createdVariant = ingredientVariantFactory.build({
+			description: "Whole",
+		});
+		vi.mocked(addIngredientVariant).mockResolvedValue({
+			data: createdVariant,
+			error: undefined,
+			request: new Request("http://localhost"),
+			response: new Response(),
+		});
+		vi.mocked(updateIngredient).mockResolvedValue({
+			data: { ...ingredientDto, name: "Sourdough" },
+			error: undefined,
+			request: new Request("http://localhost"),
+			response: new Response(),
+		});
+		renderPage(ingredientDto);
+		fireEvent.click(screen.getByRole("button", { name: "Add variant" }));
+		fireEvent.change(screen.getByLabelText("Description"), {
+			target: { value: "Whole" },
+		});
+		fireEvent.change(screen.getByLabelText("Name"), {
+			target: { value: "Sourdough" },
+		});
+
+		// when
+		fireEvent.click(screen.getByRole("button", { name: "Save all" }));
+
+		// then
+		await waitFor(() => {
+			expect(vi.mocked(addIngredientVariant)).toHaveBeenCalledOnce();
+			expect(vi.mocked(updateIngredient)).toHaveBeenCalledOnce();
+		});
+		expect(
+			Math.max(...vi.mocked(addIngredientVariant).mock.invocationCallOrder),
+		).toBeLessThan(vi.mocked(updateIngredient).mock.invocationCallOrder[0]);
+	});
+
+	test("resets unsaved drafts without calling the API", () => {
+		// given
+		const ingredientDto = ingredientFactory.build({ ingredientVariants: [] });
+		renderPage(ingredientDto);
+		fireEvent.click(screen.getByRole("button", { name: "Add variant" }));
+
+		// when
+		fireEvent.click(screen.getByRole("button", { name: "Reset" }));
+
+		// then
+		expect(
+			screen.queryByRole("form", { name: "Ingredient variant: Variant" }),
+		).toBeNull();
+		expect(vi.mocked(addIngredientVariant)).not.toHaveBeenCalled();
 	});
 
 	test("renders an editor card for each ingredient variant", () => {
@@ -577,14 +766,18 @@ describe("EditIngredientPage", () => {
 		renderPage(ingredientDto);
 
 		// when
-		const variantForms = screen.getAllByRole("form", {
-			name: /Ingredient variant:/,
+		const wholeForm = screen.getByRole("form", {
+			name: "Ingredient variant: Whole",
 		});
-		for (const [index, variantForm] of variantForms.entries()) {
-			fireEvent.change(within(variantForm).getByLabelText("Description"), {
-				target: { value: variants[(index + 1) % variants.length].description },
-			});
-		}
+		const slicedForm = screen.getByRole("form", {
+			name: "Ingredient variant: Sliced",
+		});
+		fireEvent.change(within(wholeForm).getByLabelText("Description"), {
+			target: { value: "Sliced" },
+		});
+		fireEvent.change(within(slicedForm).getByLabelText("Description"), {
+			target: { value: "Whole" },
+		});
 
 		// then
 		await waitFor(() =>

@@ -165,7 +165,7 @@ public class IngredientServiceImpl implements IngredientService {
     @NonNull
     @Override
     public List<IngredientVariantDto> getIngredientVariantsByIngredientId(@NonNull final UUID ingredientId) {
-        return ingredientVariantRepository.findAllByIngredientId(ingredientId)
+        return ingredientVariantRepository.findAllByIngredientIdOrderByDescriptionAsc(ingredientId)
             .stream()
             .map(ingredientVariantMapper::mapIngredientVariantToDto)
             .toList();
