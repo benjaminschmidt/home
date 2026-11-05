@@ -75,7 +75,16 @@ describe("MenuDrawerContent", () => {
 
 		// when
 		render(<MenuDrawerContent onNavigate={onNavigate} />);
-		fireEvent.click(screen.getByRole("link", { name: /ingredients/i }));
+		const ingredientsLink = screen.getByRole("link", {
+			name: /ingredients/i,
+		});
+		// The mocked router link is a native anchor, so prevent jsdom's unsupported navigation.
+		ingredientsLink.addEventListener(
+			"click",
+			(event) => event.preventDefault(),
+			{ once: true },
+		);
+		fireEvent.click(ingredientsLink);
 
 		// then
 		expect(onNavigate).toHaveBeenCalledOnce();

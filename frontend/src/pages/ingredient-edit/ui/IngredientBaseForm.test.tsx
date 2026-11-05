@@ -56,15 +56,13 @@ const IngredientBaseFormTestHost = ({
 	});
 
 	return (
-		<form>
-			<IngredientBaseForm
-				form={form}
-				variants={variants}
-				onDelete={onDelete}
-				onSubmit={onSubmit}
-				isSubmitting={isSubmitting}
-			/>
-		</form>
+		<IngredientBaseForm
+			form={form}
+			variants={variants}
+			onDelete={onDelete}
+			onSubmit={onSubmit}
+			isSubmitting={isSubmitting}
+		/>
 	);
 };
 
