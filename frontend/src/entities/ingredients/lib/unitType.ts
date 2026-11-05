@@ -46,6 +46,7 @@ const isWeightUnit = (value: string): value is WeightUnitDto =>
 	(weightUnitDtoArray as readonly string[]).includes(value);
 
 export {
+	genericUnitDtoArray,
 	isGenericUnit,
 	isVolumeUnit,
 	isWeightUnit,

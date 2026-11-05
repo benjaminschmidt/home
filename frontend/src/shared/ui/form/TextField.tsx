@@ -2,6 +2,7 @@ import MuiTextField from "@mui/material/TextField";
 import type { InputHTMLAttributes } from "react";
 
 type TextFieldProps = {
+	disabled?: boolean;
 	errorMessage?: string;
 	handleChange: (value: string) => void;
 	inputMode?: InputHTMLAttributes<HTMLInputElement>["inputMode"];
@@ -10,6 +11,7 @@ type TextFieldProps = {
 };
 
 const TextField = ({
+	disabled = false,
 	errorMessage,
 	handleChange,
 	inputMode,
@@ -17,6 +19,7 @@ const TextField = ({
 	value,
 }: TextFieldProps) => (
 	<MuiTextField
+		disabled={disabled}
 		label={label}
 		type="text"
 		slotProps={{ htmlInput: { inputMode } }}

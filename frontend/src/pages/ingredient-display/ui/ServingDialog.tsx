@@ -11,7 +11,7 @@ import {
 	getUnitOptions,
 	type Ingredient,
 } from "@/entities/ingredients";
-import { CancelButton, ResetButton, SubmitButton } from "@/shared/ui/button";
+import { CancelButton, ResetButton, SaveButton } from "@/shared/ui/button";
 import { SelectField, type SelectFieldItem, TextField } from "@/shared/ui/form";
 
 type ServingDialogProps = {
@@ -169,7 +169,7 @@ const ServingDialog = ({
 					</Box>
 					<CancelButton onClick={onClose} />
 					<form.Subscribe selector={(state) => state.canSubmit}>
-						{(canSubmit) => <SubmitButton disabled={!canSubmit} />}
+						{(canSubmit) => <SaveButton disabled={!canSubmit} />}
 					</form.Subscribe>
 				</DialogActions>
 			</form>

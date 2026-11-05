@@ -1,13 +1,13 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { afterEach, describe, expect, test } from "vitest";
-import { SubmitButton } from "@/shared/ui/button/SubmitButton.tsx";
+import { SaveButton } from "@/shared/ui/button/SaveButton.tsx";
 
 afterEach(cleanup);
 
-describe("SubmitButton", () => {
+describe("SaveButton", () => {
 	test("renders an accessible submit button with the save tooltip", async () => {
 		// when
-		render(<SubmitButton />);
+		render(<SaveButton />);
 		const button = screen.getByRole("button", { name: "Save" });
 
 		// then
@@ -18,7 +18,7 @@ describe("SubmitButton", () => {
 
 	test("renders a disabled submit button", () => {
 		// when
-		render(<SubmitButton disabled />);
+		render(<SaveButton disabled />);
 
 		// then
 		expect(screen.getByRole("button", { name: "Save" })).toHaveProperty(

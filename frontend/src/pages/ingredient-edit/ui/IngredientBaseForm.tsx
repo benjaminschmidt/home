@@ -9,7 +9,7 @@ import {
 } from "@/pages/ingredient-edit/model/ingredientForm.ts";
 import { NO_DEFAULT_VARIANT } from "@/pages/ingredient-edit/model/ingredientFormSchema.ts";
 import { IngredientConversionPanel } from "@/pages/ingredient-edit/ui/IngredientConversionPanel.tsx";
-import { DeleteButton } from "@/shared/ui/button";
+import { DeleteButton, SaveButton } from "@/shared/ui/button";
 import { CardHeader } from "@/shared/ui/card";
 import { SelectField, type SelectFieldItem, TextField } from "@/shared/ui/form";
 
@@ -18,9 +18,10 @@ const IngredientBaseForm = withForm({
 	props: {
 		variants: [] as IngredientVariantDto[],
 		onDelete: undefined as (() => void) | undefined,
+		onSubmit: (() => undefined) as () => void,
 		isSubmitting: false,
 	},
-	render: ({ form, variants, onDelete, isSubmitting }) => {
+	render: ({ form, variants, onDelete, onSubmit, isSubmitting }) => {
 		const defaultVariantItems: SelectFieldItem[] = [
 			{
 				type: "option",
@@ -39,13 +40,32 @@ const IngredientBaseForm = withForm({
 		];
 
 		return (
-			<Card variant="outlined" sx={{ overflow: "hidden", width: "100%" }}>
+			<Card
+				component="form"
+				aria-label="Ingredient"
+				variant="outlined"
+				sx={{ overflow: "hidden", width: "100%" }}
+				onSubmit={(event) => {
+					event.preventDefault();
+					event.stopPropagation();
+					onSubmit();
+				}}
+			>
 				<CardHeader
 					title="Ingredient"
 					action={
-						onDelete === undefined ? undefined : (
-							<DeleteButton onClick={onDelete} disabled={isSubmitting} />
-						)
+						<Stack direction="row" spacing={1}>
+							<form.Subscribe
+								selector={(state) => state.isDirty && state.canSubmit}
+							>
+								{(canSave) => (
+									<SaveButton disabled={!canSave || isSubmitting} />
+								)}
+							</form.Subscribe>
+							{onDelete === undefined ? null : (
+								<DeleteButton onClick={onDelete} disabled={isSubmitting} />
+							)}
+						</Stack>
 					}
 				/>
 				<CardContent sx={{ pt: { xs: 1.5, sm: 2 }, px: { xs: 1.5, sm: 2 } }}>

@@ -8,7 +8,12 @@ import {
 	within,
 } from "@testing-library/react";
 import type { IngredientDto } from "home-api";
-import { createIngredient, deleteIngredient, updateIngredient } from "home-api";
+import {
+	createIngredient,
+	deleteIngredient,
+	updateIngredient,
+	updateIngredientVariant,
+} from "home-api";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { EditIngredientPage } from "@/pages/ingredient-edit/ui/EditIngredientPage.tsx";
 import { ingredientFactory, ingredientVariantFactory } from "@/shared/testing";
@@ -20,6 +25,7 @@ vi.mock("home-api", async () => {
 		createIngredient: vi.fn(),
 		deleteIngredient: vi.fn(),
 		updateIngredient: vi.fn(),
+		updateIngredientVariant: vi.fn(),
 	};
 });
 
@@ -81,6 +87,44 @@ describe("EditIngredientPage", () => {
 		expect(screen.getByText("Ingredient")).toBeTruthy();
 	});
 
+	test("resets the editor when switching to another ingredient", () => {
+		// given
+		const firstIngredient = ingredientFactory.build({
+			name: "Flour",
+			ingredientVariants: [
+				ingredientVariantFactory.build({ description: "Whole" }),
+			],
+		});
+		const secondIngredient = ingredientFactory.build({
+			name: "Butter",
+			ingredientVariants: [
+				ingredientVariantFactory.build({ description: "Salted" }),
+			],
+		});
+		const queryClient = new QueryClient();
+		const renderIngredient = (ingredientDto: IngredientDto) => (
+			<QueryClientProvider client={queryClient}>
+				<EditIngredientPage
+					mode="edit"
+					ingredientDto={ingredientDto}
+					onCancel={vi.fn()}
+					onDeleted={vi.fn()}
+				/>
+			</QueryClientProvider>
+		);
+
+		// when
+		const { rerender } = render(renderIngredient(firstIngredient));
+		rerender(renderIngredient(secondIngredient));
+
+		// then
+		expect(screen.getByLabelText("Name")).toHaveProperty("value", "Butter");
+		expect(screen.getByLabelText("Description")).toHaveProperty(
+			"value",
+			"Salted",
+		);
+	});
+
 	test("preselects the current default variant", () => {
 		// given
 		const variants = [
@@ -107,6 +151,340 @@ describe("EditIngredientPage", () => {
 		expect(
 			screen.getByRole("combobox", { name: "Default variant" }).textContent,
 		).toBe("Sliced");
+	});
+
+	test("renders an editor card for each ingredient variant", () => {
+		// given
+		const variants = [
+			ingredientVariantFactory.build({
+				id: "whole-id",
+				description: "Whole",
+				unit: "GRAM",
+				servingSize: 100,
+				calories: 165,
+			}),
+			ingredientVariantFactory.build({
+				id: "sliced-id",
+				description: "Sliced",
+				unit: "GRAM",
+				servingSize: 80,
+				calories: 120,
+			}),
+		];
+		const ingredientDto = ingredientFactory.build({
+			name: "Bread",
+			ingredientVariants: variants,
+		});
+
+		// when
+		renderPage(ingredientDto);
+
+		// then
+		expect(screen.getByText("Variants")).toBeTruthy();
+		expect(
+			screen.getByRole("form", { name: "Ingredient variant: Whole" }),
+		).toBeTruthy();
+		expect(
+			screen.getByRole("form", { name: "Ingredient variant: Sliced" }),
+		).toBeTruthy();
+		expect(screen.getAllByLabelText("Description")).toHaveLength(2);
+		expect(screen.getAllByLabelText("Serving size")).toHaveLength(2);
+	});
+
+	test("saves an individual variant and resets its baseline", async () => {
+		// given
+		const variant = ingredientVariantFactory.build({
+			id: "whole-id",
+			description: "Whole",
+			unit: "GRAM",
+			servingSize: 100,
+			calories: 165,
+		});
+		const ingredientDto = ingredientFactory.build({
+			name: "Bread",
+			ingredientVariants: [variant],
+		});
+		const updatedVariant = { ...variant, description: "Sliced" };
+		vi.mocked(updateIngredientVariant).mockResolvedValue({
+			data: updatedVariant,
+			error: undefined,
+			request: new Request("http://localhost"),
+			response: new Response(),
+		});
+		renderPage(ingredientDto);
+		const variantForm = screen.getByRole("form", {
+			name: "Ingredient variant: Whole",
+		});
+
+		// when
+		fireEvent.change(within(variantForm).getByLabelText("Description"), {
+			target: { value: "Sliced" },
+		});
+		fireEvent.click(within(variantForm).getByRole("button", { name: "Save" }));
+
+		// then
+		await waitFor(() => {
+			expect(vi.mocked(updateIngredientVariant)).toHaveBeenCalledWith({
+				path: { ingredientId: ingredientDto.id, variantId: variant.id },
+				body: expect.objectContaining({
+					description: "Sliced",
+					unit: variant.unit,
+					servingSize: variant.servingSize,
+				}),
+			});
+			expect(screen.getByLabelText("Description")).toHaveProperty(
+				"value",
+				"Sliced",
+			);
+		});
+		expect(screen.queryByText("1 unsaved change")).toBeNull();
+	});
+
+	test("disables variant inputs while saving", async () => {
+		// given
+		const variant = ingredientVariantFactory.build({
+			id: "whole-id",
+			description: "Whole",
+			calories: 100,
+		});
+		const ingredientDto = ingredientFactory.build({
+			ingredientVariants: [variant],
+		});
+		type UpdateResult = {
+			data: typeof variant;
+			error: undefined;
+			request: Request;
+			response: Response;
+		};
+		let resolveUpdate!: (value: UpdateResult) => void;
+		vi.mocked(updateIngredientVariant).mockImplementation(
+			() =>
+				new Promise<UpdateResult>((resolve) => {
+					resolveUpdate = resolve;
+				}),
+		);
+		renderPage(ingredientDto);
+		const variantForm = screen.getByRole("form", {
+			name: "Ingredient variant: Whole",
+		});
+
+		// when
+		fireEvent.change(within(variantForm).getByLabelText("Calories"), {
+			target: { value: "200" },
+		});
+		fireEvent.click(within(variantForm).getByRole("button", { name: "Save" }));
+
+		// then
+		await waitFor(() => expect(resolveUpdate).toBeDefined());
+		expect(within(variantForm).getByLabelText("Description")).toHaveProperty(
+			"disabled",
+			true,
+		);
+		expect(within(variantForm).getByLabelText("Calories")).toHaveProperty(
+			"disabled",
+			true,
+		);
+
+		resolveUpdate({
+			data: { ...variant, calories: 200 },
+			error: undefined,
+			request: new Request("http://localhost"),
+			response: new Response(),
+		});
+		await waitFor(() =>
+			expect(within(variantForm).getByLabelText("Calories")).toHaveProperty(
+				"disabled",
+				false,
+			),
+		);
+	});
+
+	test("saves variants before the ingredient in Save all", async () => {
+		// given
+		const variants = ingredientVariantFactory.buildList(2, {
+			unit: "GRAM",
+			servingSize: 100,
+		});
+		const ingredientDto = ingredientFactory.build({
+			name: "Bread",
+			ingredientVariants: variants,
+		});
+		vi.mocked(updateIngredientVariant).mockImplementation(async ({ path }) => {
+			const variant = variants.find((item) => item.id === path.variantId);
+			if (variant === undefined) throw new Error("Variant not found");
+
+			return {
+				data: { ...variant, description: `${variant.description} updated` },
+				error: undefined,
+				request: new Request("http://localhost"),
+				response: new Response(),
+			};
+		});
+		vi.mocked(updateIngredient).mockResolvedValue({
+			data: { ...ingredientDto, name: "Updated bread" },
+			error: undefined,
+			request: new Request("http://localhost"),
+			response: new Response(),
+		});
+		renderPage(ingredientDto);
+
+		// when
+		fireEvent.change(screen.getByLabelText("Name"), {
+			target: { value: "Updated bread" },
+		});
+		for (const variant of variants) {
+			const variantForm = screen.getByRole("form", {
+				name: `Ingredient variant: ${variant.description}`,
+			});
+			fireEvent.change(within(variantForm).getByLabelText("Description"), {
+				target: { value: `${variant.description} updated` },
+			});
+		}
+		await waitFor(() => {
+			expect(screen.getByRole("button", { name: "Save all" })).toHaveProperty(
+				"disabled",
+				false,
+			);
+		});
+		fireEvent.click(screen.getByRole("button", { name: "Save all" }));
+
+		// then
+		await waitFor(() => {
+			expect(vi.mocked(updateIngredientVariant)).toHaveBeenCalledTimes(2);
+			expect(vi.mocked(updateIngredient)).toHaveBeenCalledOnce();
+		});
+		const variantCallOrder = vi.mocked(updateIngredientVariant).mock
+			.invocationCallOrder;
+		const ingredientCallOrder =
+			vi.mocked(updateIngredient).mock.invocationCallOrder[0];
+		expect(Math.max(...variantCallOrder)).toBeLessThan(ingredientCallOrder);
+	});
+
+	test("does not save the ingredient when a variant save fails", async () => {
+		// given
+		const variant = ingredientVariantFactory.build({
+			id: "whole-id",
+			description: "Whole",
+			unit: "GRAM",
+			servingSize: 100,
+		});
+		const ingredientDto = ingredientFactory.build({
+			name: "Bread",
+			ingredientVariants: [variant],
+		});
+		vi.mocked(updateIngredientVariant).mockResolvedValue({
+			data: undefined,
+			error: { message: "Variant unavailable" },
+			request: new Request("http://localhost"),
+			response: new Response(),
+		});
+		vi.mocked(updateIngredient).mockClear();
+		renderPage(ingredientDto);
+		const variantForm = screen.getByRole("form", {
+			name: "Ingredient variant: Whole",
+		});
+
+		// when
+		fireEvent.change(screen.getByLabelText("Name"), {
+			target: { value: "Updated bread" },
+		});
+		fireEvent.change(within(variantForm).getByLabelText("Description"), {
+			target: { value: "Updated whole" },
+		});
+		await waitFor(() => {
+			expect(screen.getByRole("button", { name: "Save all" })).toHaveProperty(
+				"disabled",
+				false,
+			);
+		});
+		fireEvent.click(screen.getByRole("button", { name: "Save all" }));
+
+		// then
+		await waitFor(() => {
+			expect(screen.getByText("Variant unavailable")).toBeTruthy();
+			expect(
+				screen.getByText(
+					"Some variant changes could not be saved. Review the highlighted variants.",
+				),
+			).toBeTruthy();
+		});
+		expect(vi.mocked(updateIngredient)).not.toHaveBeenCalled();
+	});
+
+	test("blocks Save all when variant descriptions are duplicated", async () => {
+		// given
+		const variants = [
+			ingredientVariantFactory.build({ id: "whole-id", description: "Whole" }),
+			ingredientVariantFactory.build({
+				id: "sliced-id",
+				description: "Sliced",
+			}),
+		];
+		const ingredientDto = ingredientFactory.build({
+			ingredientVariants: variants,
+		});
+		renderPage(ingredientDto);
+
+		// when
+		const slicedForm = screen.getByRole("form", {
+			name: "Ingredient variant: Sliced",
+		});
+		fireEvent.change(within(slicedForm).getByLabelText("Description"), {
+			target: { value: "Whole" },
+		});
+
+		// then
+		await waitFor(() => {
+			expect(
+				within(slicedForm).getByText(
+					"Description must be unique for this ingredient",
+				),
+			).toBeTruthy();
+		});
+		expect(screen.getByRole("button", { name: "Save all" })).toHaveProperty(
+			"disabled",
+			true,
+		);
+	});
+
+	test("blocks Save all when variant descriptions depend on save order", async () => {
+		// given
+		const variants = [
+			ingredientVariantFactory.build({ id: "whole-id", description: "Whole" }),
+			ingredientVariantFactory.build({
+				id: "sliced-id",
+				description: "Sliced",
+			}),
+		];
+		const ingredientDto = ingredientFactory.build({
+			ingredientVariants: variants,
+		});
+		vi.mocked(updateIngredientVariant).mockClear();
+		renderPage(ingredientDto);
+
+		// when
+		const variantForms = screen.getAllByRole("form", {
+			name: /Ingredient variant:/,
+		});
+		for (const [index, variantForm] of variantForms.entries()) {
+			fireEvent.change(within(variantForm).getByLabelText("Description"), {
+				target: { value: variants[(index + 1) % variants.length].description },
+			});
+		}
+
+		// then
+		await waitFor(() =>
+			expect(
+				screen.getByText(
+					"These variant description changes depend on save order. Save them one at a time.",
+				),
+			).toBeTruthy(),
+		);
+		expect(screen.getByRole("button", { name: "Save all" })).toHaveProperty(
+			"disabled",
+			true,
+		);
+		expect(vi.mocked(updateIngredientVariant)).not.toHaveBeenCalled();
 	});
 
 	test("disables Save when the shared page form is invalid", () => {
@@ -191,7 +569,12 @@ describe("EditIngredientPage", () => {
 		fireEvent.change(screen.getByLabelText("Name"), {
 			target: { value: "Wheat flour" },
 		});
-		fireEvent.click(screen.getByRole("button", { name: "Save" }));
+		fireEvent.click(
+			within(screen.getByRole("form", { name: "Ingredient" })).getByRole(
+				"button",
+				{ name: "Save" },
+			),
+		);
 
 		// then
 		await waitFor(() => {
@@ -250,7 +633,12 @@ describe("EditIngredientPage", () => {
 			screen.getByRole("combobox", { name: "Default variant" }),
 		);
 		fireEvent.click(screen.getByRole("option", { name: "Whole" }));
-		fireEvent.click(screen.getByRole("button", { name: "Save" }));
+		fireEvent.click(
+			within(screen.getByRole("form", { name: "Ingredient" })).getByRole(
+				"button",
+				{ name: "Save" },
+			),
+		);
 
 		// then
 		await waitFor(() => {

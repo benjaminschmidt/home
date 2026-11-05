@@ -1,113 +1,69 @@
 import { cleanup, fireEvent, render, screen } from "@testing-library/react";
+import type { ComponentProps } from "react";
 import { afterEach, describe, expect, test, vi } from "vitest";
-import {
-	createIngredientFormDefaultValues,
-	useAppForm,
-} from "@/pages/ingredient-edit/model/ingredientForm.ts";
-import { ingredientFormSchema } from "@/pages/ingredient-edit/model/ingredientFormSchema.ts";
 import { IngredientFormActions } from "@/pages/ingredient-edit/ui/IngredientFormActions.tsx";
 
 afterEach(cleanup);
 
-type IngredientFormActionsTestHostProps = {
-	errorMessage?: string;
-	isSubmitting?: boolean;
-	onCancel?: () => void;
-	onReset?: () => void;
-};
+const renderActions = (
+	overrides: Partial<ComponentProps<typeof IngredientFormActions>> = {},
+) => {
+	const props: ComponentProps<typeof IngredientFormActions> = {
+		canSaveAll: true,
+		onCancel: vi.fn(),
+		onDiscardAll: vi.fn(),
+		onSaveAll: vi.fn(),
+		unsavedCount: 1,
+		...overrides,
+	};
 
-const IngredientFormActionsTestHost = ({
-	errorMessage,
-	isSubmitting = false,
-	onCancel = vi.fn(),
-	onReset = vi.fn(),
-}: IngredientFormActionsTestHostProps) => {
-	const form = useAppForm({
-		defaultValues: createIngredientFormDefaultValues({ name: "Flour" }),
-		validators: {
-			onChange: ingredientFormSchema,
-		},
-	});
-
-	return (
-		<form>
-			<form.AppField name="name">
-				{(field) => (
-					<input
-						aria-label="Test name"
-						value={field.state.value}
-						onChange={(event) => field.handleChange(event.target.value)}
-					/>
-				)}
-			</form.AppField>
-			<IngredientFormActions
-				errorMessage={errorMessage}
-				form={form}
-				isSubmitting={isSubmitting}
-				onCancel={onCancel}
-				onReset={onReset}
-			/>
-		</form>
-	);
+	render(<IngredientFormActions {...props} />);
+	return props;
 };
 
 describe("IngredientFormActions", () => {
-	test("renders the actions and update error", () => {
+	test("renders the actions, unsaved count, and update error", () => {
 		// when
-		render(
-			<IngredientFormActionsTestHost errorMessage="Name already in use" />,
-		);
+		renderActions({ errorMessage: "Some changes could not be saved." });
 
 		// then
 		expect(screen.getByRole("region", { name: "Form actions" })).toBeTruthy();
 		expect(screen.getByRole("button", { name: "Reset" })).toBeTruthy();
 		expect(screen.getByRole("button", { name: "Cancel" })).toBeTruthy();
-		expect(screen.getByRole("button", { name: "Save" })).toBeTruthy();
-		expect(screen.getByText("Name already in use")).toBeTruthy();
+		expect(screen.getByRole("button", { name: "Save all" })).toBeTruthy();
+		expect(screen.getByText("1 unsaved change")).toBeTruthy();
+		expect(screen.getByText("Some changes could not be saved.")).toBeTruthy();
 	});
 
-	test("disables Save when the form is pristine", () => {
+	test("disables Save all when there are no unsaved changes", () => {
 		// when
-		render(<IngredientFormActionsTestHost />);
+		renderActions({ canSaveAll: false, unsavedCount: 0 });
 
 		// then
-		expect(screen.getByRole("button", { name: "Save" })).toHaveProperty(
+		expect(screen.getByRole("button", { name: "Save all" })).toHaveProperty(
 			"disabled",
 			true,
 		);
 	});
 
-	test("calls onCancel when cancel is clicked", () => {
+	test("calls the top-level actions", () => {
 		// given
-		const onCancel = vi.fn();
-		render(<IngredientFormActionsTestHost onCancel={onCancel} />);
-
-		// when
-		fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
-
-		// then
-		expect(onCancel).toHaveBeenCalledOnce();
-	});
-
-	test("resets changed values and calls onReset", () => {
-		// given
-		const onReset = vi.fn();
-		render(<IngredientFormActionsTestHost onReset={onReset} />);
-		fireEvent.change(screen.getByLabelText("Test name"), {
-			target: { value: "Whole wheat" },
-		});
+		const props = renderActions();
 
 		// when
 		fireEvent.click(screen.getByRole("button", { name: "Reset" }));
+		fireEvent.click(screen.getByRole("button", { name: "Save all" }));
+		fireEvent.click(screen.getByRole("button", { name: "Cancel" }));
 
 		// then
-		expect(screen.getByLabelText("Test name")).toHaveProperty("value", "Flour");
-		expect(onReset).toHaveBeenCalledOnce();
+		expect(props.onDiscardAll).toHaveBeenCalledOnce();
+		expect(props.onSaveAll).toHaveBeenCalledOnce();
+		expect(props.onCancel).toHaveBeenCalledOnce();
 	});
 
-	test("disables all actions while the update is pending", () => {
+	test("disables all actions while submitting", () => {
 		// when
-		render(<IngredientFormActionsTestHost isSubmitting />);
+		renderActions({ isSubmitting: true });
 
 		// then
 		expect(screen.getByRole("button", { name: "Reset" })).toHaveProperty(
@@ -118,23 +74,20 @@ describe("IngredientFormActions", () => {
 			"disabled",
 			true,
 		);
-		expect(screen.getByRole("button", { name: "Save" })).toHaveProperty(
+		expect(screen.getByRole("button", { name: "Save all" })).toHaveProperty(
 			"disabled",
 			true,
 		);
 	});
 
-	test("provides tooltips for each action", async () => {
+	test("provides a tooltip for Save all", async () => {
 		// given
-		render(<IngredientFormActionsTestHost />);
-		fireEvent.change(screen.getByLabelText("Test name"), {
-			target: { value: "Whole wheat" },
-		});
+		renderActions();
 
 		// when
-		fireEvent.mouseOver(screen.getByRole("button", { name: "Save" }));
+		fireEvent.mouseOver(screen.getByRole("button", { name: "Save all" }));
 
 		// then
-		expect((await screen.findByRole("tooltip")).textContent).toBe("Save");
+		expect((await screen.findByRole("tooltip")).textContent).toBe("Save all");
 	});
 });

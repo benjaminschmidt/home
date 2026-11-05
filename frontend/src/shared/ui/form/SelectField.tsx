@@ -19,6 +19,7 @@ type SelectFieldItem =
 	  };
 
 type SelectFieldProps = {
+	disabled?: boolean;
 	handleChange: (value: string) => void;
 	items: SelectFieldItem[];
 	label: string;
@@ -26,6 +27,7 @@ type SelectFieldProps = {
 };
 
 const SelectField = ({
+	disabled = false,
 	handleChange,
 	items,
 	label,
@@ -67,9 +69,10 @@ const SelectField = ({
 	});
 
 	return (
-		<FormControl fullWidth>
+		<FormControl fullWidth disabled={disabled}>
 			<InputLabel id={labelId}>{label}</InputLabel>
 			<Select
+				disabled={disabled}
 				labelId={labelId}
 				label={label}
 				value={value}

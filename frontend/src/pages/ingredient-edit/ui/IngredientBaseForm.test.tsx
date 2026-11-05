@@ -33,6 +33,7 @@ type IngredientBaseFormTestHostProps = {
 	variants?: IngredientVariantDto[];
 	defaultVariantId?: string;
 	onDelete?: () => void;
+	onSubmit?: () => void;
 	isSubmitting?: boolean;
 };
 
@@ -41,6 +42,7 @@ const IngredientBaseFormTestHost = ({
 	variants = [],
 	defaultVariantId,
 	onDelete,
+	onSubmit = vi.fn(),
 	isSubmitting = false,
 }: IngredientBaseFormTestHostProps) => {
 	const form = useAppForm({
@@ -59,6 +61,7 @@ const IngredientBaseFormTestHost = ({
 				form={form}
 				variants={variants}
 				onDelete={onDelete}
+				onSubmit={onSubmit}
 				isSubmitting={isSubmitting}
 			/>
 		</form>

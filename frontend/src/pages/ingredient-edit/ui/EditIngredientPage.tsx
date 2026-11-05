@@ -1,8 +1,10 @@
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
+import Typography from "@mui/material/Typography";
+import { useSelector } from "@tanstack/react-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import type { IngredientDto } from "home-api";
-import { useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import {
 	createDeleteIngredientMutationOptions,
 	createIngredientMutationOptions,
@@ -17,6 +19,11 @@ import { ingredientFormSchema } from "@/pages/ingredient-edit/model/ingredientFo
 import { DeleteIngredientDialog } from "@/pages/ingredient-edit/ui/DeleteIngredientDialog.tsx";
 import { IngredientBaseForm } from "@/pages/ingredient-edit/ui/IngredientBaseForm.tsx";
 import { IngredientFormActions } from "@/pages/ingredient-edit/ui/IngredientFormActions.tsx";
+import {
+	type IngredientVariantEditorHandle,
+	type IngredientVariantEditorState,
+	IngredientVariantForm,
+} from "@/pages/ingredient-edit/ui/IngredientVariantForm.tsx";
 
 type EditIngredientPageProps = {
 	mode: "edit" | "create";
@@ -50,7 +57,7 @@ const createFormDefaultValues = (ingredientDto: IngredientDto) => {
 	);
 };
 
-const EditIngredientPage = (props: EditIngredientPageProps) => {
+const EditIngredientPageContent = (props: EditIngredientPageProps) => {
 	const queryClient = useQueryClient();
 	const createMutation = useMutation(
 		createIngredientMutationOptions(queryClient),
@@ -62,10 +69,23 @@ const EditIngredientPage = (props: EditIngredientPageProps) => {
 		createDeleteIngredientMutationOptions(queryClient),
 	);
 	const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+	const [isSavingAll, setIsSavingAll] = useState(false);
+	const [saveAllError, setSaveAllError] = useState<string>();
+	const [variantStates, setVariantStates] = useState<
+		Record<string, IngredientVariantEditorState>
+	>({});
+	const variantEditorRefs = useRef<
+		Record<string, IngredientVariantEditorHandle | null>
+	>({});
 	const activeMutation =
 		props.mode === "create" ? createMutation : updateMutation;
 	const ingredientDto = props.mode === "edit" ? props.ingredientDto : undefined;
-	const isSubmitting = activeMutation.isPending || deleteMutation.isPending;
+	const variants = ingredientDto?.ingredientVariants ?? [];
+	const initialIngredientFormValues =
+		ingredientDto === undefined
+			? createIngredientFormDefaultValues()
+			: createFormDefaultValues(ingredientDto);
+	const ingredientFormBaseline = useRef(initialIngredientFormValues);
 
 	const handleDeleteCancel = () => {
 		if (deleteMutation.isPending) return;
@@ -82,65 +102,249 @@ const EditIngredientPage = (props: EditIngredientPageProps) => {
 	};
 
 	const form = useAppForm({
-		defaultValues:
-			ingredientDto === undefined
-				? createIngredientFormDefaultValues()
-				: createFormDefaultValues(ingredientDto),
+		defaultValues: ingredientFormBaseline.current,
 		validators: {
 			onChange: ingredientFormSchema,
 		},
-		onSubmit: ({ formApi, value }) => {
+		onSubmit: async ({ formApi, value }) => {
 			const ingredientWriteRequest = toIngredientWriteRequest(value);
 
 			if (props.mode === "create") {
-				createMutation.mutate(ingredientWriteRequest, {
-					onSuccess: (createdIngredientDto) => {
-						props.onCreated(createdIngredientDto);
-					},
-				});
+				const createdIngredientDto = await createMutation.mutateAsync(
+					ingredientWriteRequest,
+				);
+				props.onCreated(createdIngredientDto);
 				return;
 			}
 
-			updateMutation.mutate(
-				{
-					ingredientId: props.ingredientDto.id,
-					ingredientWriteRequest,
-				},
-				{
-					onSuccess: (updatedIngredientDto) => {
-						formApi.reset(createFormDefaultValues(updatedIngredientDto));
-					},
-				},
-			);
+			const updatedIngredientDto = await updateMutation.mutateAsync({
+				ingredientId: props.ingredientDto.id,
+				ingredientWriteRequest,
+			});
+			const updatedFormValues = createFormDefaultValues(updatedIngredientDto);
+			ingredientFormBaseline.current = updatedFormValues;
+			formApi.reset(updatedFormValues);
 		},
 	});
 
+	const baseIsDirty = useSelector(form.store, (state) => state.isDirty);
+	const baseCanSubmit = useSelector(form.store, (state) => state.canSubmit);
+
+	const handleVariantStateChange = useCallback(
+		(state: IngredientVariantEditorState) => {
+			setVariantStates((currentStates) => {
+				const previousState = currentStates[state.id];
+				if (
+					previousState?.description === state.description &&
+					previousState?.isDirty === state.isDirty &&
+					previousState?.canSubmit === state.canSubmit &&
+					previousState?.isSubmitting === state.isSubmitting &&
+					previousState?.errorMessage === state.errorMessage
+				) {
+					return currentStates;
+				}
+
+				return { ...currentStates, [state.id]: state };
+			});
+		},
+		[],
+	);
+
+	const registerVariantEditor = useCallback(
+		(variantId: string, editor: IngredientVariantEditorHandle | null) => {
+			variantEditorRefs.current[variantId] = editor;
+		},
+		[],
+	);
+
+	const duplicateVariantIds = useMemo(() => {
+		const descriptions = new Map<string, string[]>();
+
+		for (const variant of variants) {
+			const description = (
+				variantStates[variant.id]?.description ?? variant.description
+			).trim();
+			if (description === "") continue;
+
+			const ids = descriptions.get(description) ?? [];
+			ids.push(variant.id);
+			descriptions.set(description, ids);
+		}
+
+		return new Set(
+			[...descriptions.values()].filter((ids) => ids.length > 1).flat(),
+		);
+	}, [variantStates, variants]);
+
+	const variantEditorsReady = variants.every(
+		(variant) => variantStates[variant.id] !== undefined,
+	);
+	const dirtyVariantStates = variants
+		.map((variant) => variantStates[variant.id])
+		.filter((state): state is IngredientVariantEditorState => state?.isDirty);
+	const descriptionTransitionConflict = useMemo(() => {
+		const originalDescriptions = new Map(
+			variants.map((variant) => [variant.id, variant.description.trim()]),
+		);
+		const changedDescriptionIds = dirtyVariantStates
+			.filter(
+				(state) =>
+					originalDescriptions.get(state.id) !== state.description.trim(),
+			)
+			.map((state) => state.id);
+
+		if (changedDescriptionIds.length < 2) return false;
+
+		const changedOriginalDescriptions = new Set(
+			changedDescriptionIds.map((id) => originalDescriptions.get(id)),
+		);
+
+		return dirtyVariantStates.some((state) => {
+			const originalDescription = originalDescriptions.get(state.id);
+			const nextDescription = state.description.trim();
+
+			return (
+				originalDescription !== nextDescription &&
+				changedOriginalDescriptions.has(nextDescription) &&
+				changedDescriptionIds.some(
+					(id) =>
+						id !== state.id && originalDescriptions.get(id) === nextDescription,
+				)
+			);
+		});
+	}, [dirtyVariantStates, variants]);
+	const descriptionTransitionError = descriptionTransitionConflict
+		? "These variant description changes depend on save order. Save them one at a time."
+		: undefined;
+	const unsavedCount = (baseIsDirty ? 1 : 0) + dirtyVariantStates.length;
+	const hasInvalidDirtyEditor =
+		(baseIsDirty && !baseCanSubmit) ||
+		descriptionTransitionConflict ||
+		dirtyVariantStates.some(
+			(state) => !state.canSubmit || duplicateVariantIds.has(state.id),
+		);
+	const canSaveAll =
+		variantEditorsReady &&
+		unsavedCount > 0 &&
+		!hasInvalidDirtyEditor &&
+		!isSavingAll;
+	const isSubmitting =
+		isSavingAll ||
+		activeMutation.isPending ||
+		deleteMutation.isPending ||
+		Object.values(variantStates).some((state) => state.isSubmitting);
+
+	const submitIngredientForm = useCallback(async () => {
+		try {
+			await form.handleSubmit();
+			return form.state.isSubmitSuccessful;
+		} catch {
+			return false;
+		}
+	}, [form]);
+
+	const handleDiscardAll = useCallback(() => {
+		if (isSubmitting) return;
+
+		setSaveAllError(undefined);
+		activeMutation.reset();
+		form.reset(ingredientFormBaseline.current);
+		for (const variant of variants) {
+			variantEditorRefs.current[variant.id]?.reset();
+		}
+	}, [activeMutation, form, isSubmitting, variants]);
+
+	const handleSaveAll = useCallback(async () => {
+		if (!canSaveAll) return;
+
+		setIsSavingAll(true);
+		setSaveAllError(undefined);
+
+		const variantResults = await Promise.all(
+			dirtyVariantStates.map(async (state) => {
+				const editor = variantEditorRefs.current[state.id];
+				return editor === null || editor === undefined
+					? false
+					: editor.submit();
+			}),
+		);
+		const variantsSaved = variantResults.every(Boolean);
+
+		if (!variantsSaved) {
+			setSaveAllError(
+				"Some variant changes could not be saved. Review the highlighted variants.",
+			);
+			setIsSavingAll(false);
+			return;
+		}
+
+		if (baseIsDirty) {
+			const ingredientSaved = await submitIngredientForm();
+			if (!ingredientSaved) {
+				setSaveAllError(
+					"The ingredient changes could not be saved. Review the ingredient form.",
+				);
+			}
+		}
+
+		setIsSavingAll(false);
+	}, [baseIsDirty, canSaveAll, dirtyVariantStates, submitIngredientForm]);
+
 	return (
 		<>
-			<Box
-				component="form"
-				sx={{ mx: "auto", width: "100%", maxWidth: 640 }}
-				onSubmit={(event) => {
-					event.preventDefault();
-					event.stopPropagation();
-					void form.handleSubmit();
-				}}
-			>
+			<Box sx={{ mx: "auto", width: "100%", maxWidth: 640 }}>
 				<Stack spacing={3}>
 					<IngredientFormActions
-						form={form}
+						canSaveAll={canSaveAll}
 						onCancel={props.onCancel}
-						onReset={() => activeMutation.reset()}
+						onDiscardAll={handleDiscardAll}
+						onSaveAll={() => void handleSaveAll()}
 						isSubmitting={isSubmitting}
-						errorMessage={activeMutation.error?.message}
+						errorMessage={
+							saveAllError ??
+							descriptionTransitionError ??
+							activeMutation.error?.message
+						}
+						unsavedCount={unsavedCount}
 					/>
 
 					<IngredientBaseForm
 						form={form}
-						variants={ingredientDto?.ingredientVariants ?? []}
+						variants={variants}
 						onDelete={props.mode === "edit" ? handleDelete : undefined}
+						onSubmit={() => void submitIngredientForm()}
 						isSubmitting={isSubmitting}
 					/>
+
+					{props.mode === "edit" && variants.length > 0 && (
+						<Stack
+							component="section"
+							aria-labelledby="ingredient-variants-heading"
+							spacing={1.5}
+						>
+							<Typography
+								id="ingredient-variants-heading"
+								variant="h5"
+								sx={{
+									fontWeight: "fontWeightBold",
+									typography: { xs: "body1", sm: "h5" },
+								}}
+							>
+								Variants
+							</Typography>
+							{variants.map((variant) => (
+								<IngredientVariantForm
+									key={variant.id}
+									ref={(editor) => registerVariantEditor(variant.id, editor)}
+									ingredientId={props.ingredientDto.id}
+									variant={variant}
+									duplicateDescription={duplicateVariantIds.has(variant.id)}
+									pageIsSubmitting={isSubmitting}
+									onStateChange={handleVariantStateChange}
+								/>
+							))}
+						</Stack>
+					)}
 				</Stack>
 			</Box>
 			{ingredientDto !== undefined && (
@@ -161,6 +365,12 @@ const EditIngredientPage = (props: EditIngredientPageProps) => {
 			)}
 		</>
 	);
+};
+
+const EditIngredientPage = (props: EditIngredientPageProps) => {
+	const editorKey = props.mode === "edit" ? props.ingredientDto.id : "create";
+
+	return <EditIngredientPageContent key={editorKey} {...props} />;
 };
 
 export { EditIngredientPage };
