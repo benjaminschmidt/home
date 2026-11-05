@@ -11,6 +11,7 @@ import type { IngredientDto } from "home-api";
 import {
 	createIngredient,
 	deleteIngredient,
+	deleteIngredientVariant,
 	updateIngredient,
 	updateIngredientVariant,
 } from "home-api";
@@ -24,6 +25,7 @@ vi.mock("home-api", async () => {
 		...actual,
 		createIngredient: vi.fn(),
 		deleteIngredient: vi.fn(),
+		deleteIngredientVariant: vi.fn(),
 		updateIngredient: vi.fn(),
 		updateIngredientVariant: vi.fn(),
 	};
@@ -191,6 +193,33 @@ describe("EditIngredientPage", () => {
 		expect(screen.getAllByLabelText("Serving size")).toHaveLength(2);
 	});
 
+	test("renders a delete action next to Save for every ingredient variant", () => {
+		// given
+		const variants = ingredientVariantFactory.buildList(2, {
+			unit: "GRAM",
+			servingSize: 100,
+		});
+		const ingredientDto = ingredientFactory.build({
+			ingredientVariants: variants,
+		});
+
+		// when
+		renderPage(ingredientDto);
+
+		// then
+		for (const variant of variants) {
+			const variantForm = screen.getByRole("form", {
+				name: `Ingredient variant: ${variant.description}`,
+			});
+			expect(
+				within(variantForm).getByRole("button", { name: "Save" }),
+			).toBeTruthy();
+			expect(
+				within(variantForm).getByRole("button", { name: "Delete" }),
+			).toBeTruthy();
+		}
+	});
+
 	test("saves an individual variant and resets its baseline", async () => {
 		// given
 		const variant = ingredientVariantFactory.build({
@@ -284,6 +313,9 @@ describe("EditIngredientPage", () => {
 			"disabled",
 			true,
 		);
+		expect(
+			within(variantForm).getByRole("button", { name: "Delete" }),
+		).toHaveProperty("disabled", true);
 
 		resolveUpdate({
 			data: { ...variant, calories: 200 },
@@ -297,6 +329,88 @@ describe("EditIngredientPage", () => {
 				false,
 			),
 		);
+	});
+
+	test("deletes an ingredient variant after confirmation", async () => {
+		// given
+		const variant = ingredientVariantFactory.build({
+			id: "whole-id",
+			description: "Whole",
+			defaultVariant: true,
+		});
+		const ingredientDto = ingredientFactory.build({
+			ingredientVariants: [variant],
+		});
+		vi.mocked(deleteIngredientVariant).mockResolvedValue({
+			data: undefined,
+			error: undefined,
+			request: new Request("http://localhost"),
+			response: new Response(),
+		});
+		renderPage(ingredientDto);
+		const variantForm = screen.getByRole("form", {
+			name: "Ingredient variant: Whole",
+		});
+
+		// when
+		fireEvent.click(
+			within(variantForm).getByRole("button", { name: "Delete" }),
+		);
+		const dialog = screen.getByRole("dialog");
+		expect(screen.getByText(/Permanently delete variant "Whole"/)).toBeTruthy();
+		fireEvent.click(within(dialog).getByRole("button", { name: "Delete" }));
+
+		// then
+		await waitFor(() => {
+			expect(vi.mocked(deleteIngredientVariant)).toHaveBeenCalledWith({
+				path: { ingredientId: ingredientDto.id, variantId: variant.id },
+			});
+			expect(
+				screen.queryByRole("form", { name: "Ingredient variant: Whole" }),
+			).toBeNull();
+			const defaultVariantSelector = screen.getByRole("combobox", {
+				name: "Default variant",
+			});
+			fireEvent.mouseDown(defaultVariantSelector);
+			expect(screen.getByRole("option", { name: "None" })).toBeTruthy();
+		});
+	});
+
+	test("keeps the variant deletion dialog open when deletion fails", async () => {
+		// given
+		const variant = ingredientVariantFactory.build({
+			id: "whole-id",
+			description: "Whole",
+		});
+		const ingredientDto = ingredientFactory.build({
+			ingredientVariants: [variant],
+		});
+		vi.mocked(deleteIngredientVariant).mockResolvedValue({
+			data: undefined,
+			error: { message: "Variant is still in use" },
+			request: new Request("http://localhost"),
+			response: new Response(),
+		});
+		renderPage(ingredientDto);
+		const variantForm = screen.getByRole("form", {
+			name: "Ingredient variant: Whole",
+		});
+
+		// when
+		fireEvent.click(
+			within(variantForm).getByRole("button", { name: "Delete" }),
+		);
+		fireEvent.click(
+			within(screen.getByRole("dialog")).getByRole("button", {
+				name: "Delete",
+			}),
+		);
+
+		// then
+		await waitFor(() => {
+			expect(screen.getByRole("dialog")).toBeTruthy();
+			expect(screen.getByText("Variant is still in use")).toBeTruthy();
+		});
 	});
 
 	test("saves variants before the ingredient in Save all", async () => {
@@ -710,11 +824,21 @@ describe("EditIngredientPage", () => {
 		renderPage(ingredientDto);
 
 		// then
-		expect(screen.getByRole("button", { name: "Delete" })).toBeTruthy();
+		expect(
+			within(screen.getByRole("region", { name: "Form actions" })).getByRole(
+				"button",
+				{ name: "Delete" },
+			),
+		).toBeTruthy();
 
 		cleanup();
 		renderCreatePage();
-		expect(screen.queryByRole("button", { name: "Delete" })).toBeNull();
+		expect(
+			within(screen.getByRole("region", { name: "Form actions" })).queryByRole(
+				"button",
+				{ name: "Delete" },
+			),
+		).toBeNull();
 	});
 
 	test("opens a confirmation dialog for permanent deletion", () => {

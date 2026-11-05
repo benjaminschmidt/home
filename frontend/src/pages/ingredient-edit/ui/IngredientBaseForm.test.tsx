@@ -32,7 +32,6 @@ type IngredientBaseFormTestHostProps = {
 	};
 	variants?: IngredientVariantDto[];
 	defaultVariantId?: string;
-	onDelete?: () => void;
 	onSubmit?: () => void;
 	isSubmitting?: boolean;
 };
@@ -41,7 +40,6 @@ const IngredientBaseFormTestHost = ({
 	initialValues,
 	variants = [],
 	defaultVariantId,
-	onDelete,
 	onSubmit = vi.fn(),
 	isSubmitting = false,
 }: IngredientBaseFormTestHostProps) => {
@@ -59,7 +57,6 @@ const IngredientBaseFormTestHost = ({
 		<IngredientBaseForm
 			form={form}
 			variants={variants}
-			onDelete={onDelete}
 			onSubmit={onSubmit}
 			isSubmitting={isSubmitting}
 		/>
@@ -112,31 +109,6 @@ describe("IngredientBaseForm", () => {
 		expect(
 			screen.getByRole("combobox", { name: "Volume unit" }).textContent,
 		).toBe("ml");
-	});
-
-	test("renders the delete action in the card header when provided", () => {
-		// given
-		const onDelete = vi.fn();
-
-		// when
-		render(<IngredientBaseFormTestHost onDelete={onDelete} />);
-
-		// then
-		const deleteButton = screen.getByRole("button", { name: "Delete" });
-		expect(deleteButton).toBeTruthy();
-		fireEvent.click(deleteButton);
-		expect(onDelete).toHaveBeenCalledOnce();
-	});
-
-	test("disables the delete action while submitting", () => {
-		// when
-		render(<IngredientBaseFormTestHost onDelete={vi.fn()} isSubmitting />);
-
-		// then
-		expect(screen.getByRole("button", { name: "Delete" })).toHaveProperty(
-			"disabled",
-			true,
-		);
 	});
 
 	test("renders a default variant selector with None without variants", () => {

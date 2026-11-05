@@ -1,15 +1,22 @@
 import Alert from "@mui/material/Alert";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
+import Divider from "@mui/material/Divider";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import { CancelButton, ResetButton, SaveButton } from "@/shared/ui/button";
+import {
+	CancelButton,
+	DeleteButton,
+	ResetButton,
+	SaveButton,
+} from "@/shared/ui/button";
 
 type IngredientFormActionsProps = {
 	canSaveAll: boolean;
 	errorMessage?: string;
 	isSubmitting?: boolean;
 	onCancel: () => void;
+	onDelete?: () => void;
 	onDiscardAll: () => void;
 	onSaveAll: () => void;
 	unsavedCount: number;
@@ -20,6 +27,7 @@ const IngredientFormActions = ({
 	errorMessage,
 	isSubmitting = false,
 	onCancel,
+	onDelete,
 	onDiscardAll,
 	onSaveAll,
 	unsavedCount,
@@ -73,6 +81,12 @@ const IngredientFormActions = ({
 					</Stack>
 
 					<Stack direction="row" spacing={0.5}>
+						{onDelete === undefined ? null : (
+							<>
+								<DeleteButton onClick={onDelete} disabled={isSubmitting} />
+								<Divider orientation="vertical" flexItem sx={{ mx: 0.5 }} />
+							</>
+						)}
 						<SaveButton
 							type="button"
 							label="Save all"

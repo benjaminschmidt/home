@@ -46,6 +46,26 @@ describe("IngredientFormActions", () => {
 		);
 	});
 
+	test("renders and calls Delete when provided", () => {
+		// given
+		const onDelete = vi.fn();
+
+		// when
+		renderActions({ onDelete });
+		fireEvent.click(screen.getByRole("button", { name: "Delete" }));
+
+		// then
+		expect(onDelete).toHaveBeenCalledOnce();
+	});
+
+	test("does not render Delete when no callback is provided", () => {
+		// when
+		renderActions();
+
+		// then
+		expect(screen.queryByRole("button", { name: "Delete" })).toBeNull();
+	});
+
 	test("calls the top-level actions", () => {
 		// given
 		const props = renderActions();
@@ -63,7 +83,7 @@ describe("IngredientFormActions", () => {
 
 	test("disables all actions while submitting", () => {
 		// when
-		renderActions({ isSubmitting: true });
+		renderActions({ isSubmitting: true, onDelete: vi.fn() });
 
 		// then
 		expect(screen.getByRole("button", { name: "Reset" })).toHaveProperty(
@@ -75,6 +95,10 @@ describe("IngredientFormActions", () => {
 			true,
 		);
 		expect(screen.getByRole("button", { name: "Save all" })).toHaveProperty(
+			"disabled",
+			true,
+		);
+		expect(screen.getByRole("button", { name: "Delete" })).toHaveProperty(
 			"disabled",
 			true,
 		);

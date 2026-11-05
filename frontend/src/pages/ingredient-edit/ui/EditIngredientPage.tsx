@@ -15,7 +15,10 @@ import {
 	toIngredientWriteRequest,
 	useAppForm,
 } from "@/pages/ingredient-edit/model/ingredientForm.ts";
-import { ingredientFormSchema } from "@/pages/ingredient-edit/model/ingredientFormSchema.ts";
+import {
+	ingredientFormSchema,
+	NO_DEFAULT_VARIANT,
+} from "@/pages/ingredient-edit/model/ingredientFormSchema.ts";
 import { DeleteIngredientDialog } from "@/pages/ingredient-edit/ui/DeleteIngredientDialog.tsx";
 import { IngredientBaseForm } from "@/pages/ingredient-edit/ui/IngredientBaseForm.tsx";
 import { IngredientFormActions } from "@/pages/ingredient-edit/ui/IngredientFormActions.tsx";
@@ -71,6 +74,9 @@ const EditIngredientPageContent = (props: EditIngredientPageProps) => {
 	const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
 	const [isSavingAll, setIsSavingAll] = useState(false);
 	const [saveAllError, setSaveAllError] = useState<string>();
+	const [deletedVariantIds, setDeletedVariantIds] = useState<Set<string>>(
+		new Set(),
+	);
 	const [variantStates, setVariantStates] = useState<
 		Record<string, IngredientVariantEditorState>
 	>({});
@@ -80,7 +86,10 @@ const EditIngredientPageContent = (props: EditIngredientPageProps) => {
 	const activeMutation =
 		props.mode === "create" ? createMutation : updateMutation;
 	const ingredientDto = props.mode === "edit" ? props.ingredientDto : undefined;
-	const variants = ingredientDto?.ingredientVariants ?? [];
+	const allVariants = ingredientDto?.ingredientVariants ?? [];
+	const variants = allVariants.filter(
+		(variant) => !deletedVariantIds.has(variant.id),
+	);
 	const initialIngredientFormValues =
 		ingredientDto === undefined
 			? createIngredientFormDefaultValues()
@@ -148,6 +157,26 @@ const EditIngredientPageContent = (props: EditIngredientPageProps) => {
 			});
 		},
 		[],
+	);
+
+	const handleVariantDeleted = useCallback(
+		(variantId: string) => {
+			setDeletedVariantIds((currentIds) => {
+				if (currentIds.has(variantId)) return currentIds;
+
+				return new Set(currentIds).add(variantId);
+			});
+			if (ingredientFormBaseline.current.defaultVariantId === variantId) {
+				ingredientFormBaseline.current = {
+					...ingredientFormBaseline.current,
+					defaultVariantId: NO_DEFAULT_VARIANT,
+				};
+			}
+			if (form.getFieldValue("defaultVariantId") === variantId) {
+				form.setFieldValue("defaultVariantId", NO_DEFAULT_VARIANT);
+			}
+		},
+		[form],
 	);
 
 	const registerVariantEditor = useCallback(
@@ -297,6 +326,7 @@ const EditIngredientPageContent = (props: EditIngredientPageProps) => {
 					<IngredientFormActions
 						canSaveAll={canSaveAll}
 						onCancel={props.onCancel}
+						onDelete={props.mode === "edit" ? handleDelete : undefined}
 						onDiscardAll={handleDiscardAll}
 						onSaveAll={() => void handleSaveAll()}
 						isSubmitting={isSubmitting}
@@ -311,7 +341,6 @@ const EditIngredientPageContent = (props: EditIngredientPageProps) => {
 					<IngredientBaseForm
 						form={form}
 						variants={variants}
-						onDelete={props.mode === "edit" ? handleDelete : undefined}
 						onSubmit={() => void submitIngredientForm()}
 						isSubmitting={isSubmitting}
 					/>
@@ -340,6 +369,7 @@ const EditIngredientPageContent = (props: EditIngredientPageProps) => {
 									variant={variant}
 									duplicateDescription={duplicateVariantIds.has(variant.id)}
 									pageIsSubmitting={isSubmitting}
+									onDeleted={() => handleVariantDeleted(variant.id)}
 									onStateChange={handleVariantStateChange}
 								/>
 							))}

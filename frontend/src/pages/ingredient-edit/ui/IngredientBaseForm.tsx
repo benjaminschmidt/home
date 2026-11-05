@@ -9,7 +9,7 @@ import {
 } from "@/pages/ingredient-edit/model/ingredientForm.ts";
 import { NO_DEFAULT_VARIANT } from "@/pages/ingredient-edit/model/ingredientFormSchema.ts";
 import { IngredientConversionPanel } from "@/pages/ingredient-edit/ui/IngredientConversionPanel.tsx";
-import { DeleteButton, SaveButton } from "@/shared/ui/button";
+import { SaveButton } from "@/shared/ui/button";
 import { CardHeader } from "@/shared/ui/card";
 import { SelectField, type SelectFieldItem, TextField } from "@/shared/ui/form";
 
@@ -17,11 +17,10 @@ const IngredientBaseForm = withForm({
 	...ingredientFormCompositionOptions,
 	props: {
 		variants: [] as IngredientVariantDto[],
-		onDelete: undefined as (() => void) | undefined,
 		onSubmit: (() => undefined) as () => void,
 		isSubmitting: false,
 	},
-	render: ({ form, variants, onDelete, onSubmit, isSubmitting }) => {
+	render: ({ form, variants, onSubmit, isSubmitting }) => {
 		const defaultVariantItems: SelectFieldItem[] = [
 			{
 				type: "option",
@@ -62,9 +61,6 @@ const IngredientBaseForm = withForm({
 									<SaveButton disabled={!canSave || isSubmitting} />
 								)}
 							</form.Subscribe>
-							{onDelete === undefined ? null : (
-								<DeleteButton onClick={onDelete} disabled={isSubmitting} />
-							)}
 						</Stack>
 					}
 				/>
