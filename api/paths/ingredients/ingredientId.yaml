@@ -21,6 +21,12 @@ get:
         application/json:
           schema:
             $ref: '../../components/errors/ErrorDto.yaml'
+    '500':
+      description: Unexpected server error
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/errors/ErrorDto.yaml'
 put:
   summary: Update an ingredient
   operationId: updateIngredient
@@ -50,6 +56,12 @@ put:
         application/json:
           schema:
             $ref: '../../components/errors/ErrorDto.yaml'
+    '500':
+      description: Unexpected server error
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/errors/ErrorDto.yaml'
     '404':
       description: Ingredient not found
       content:
@@ -69,3 +81,9 @@ delete:
   responses:
     '204':
       description: Ingredient successfully deleted
+    '500':
+      description: Unexpected server error
+      content:
+        application/json:
+          schema:
+            $ref: '../../components/errors/ErrorDto.yaml'

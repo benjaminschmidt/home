@@ -27,6 +27,12 @@ get:
         application/json:
           schema:
             $ref: '../../../../components/errors/ErrorDto.yaml'
+    '500':
+      description: Unexpected server error
+      content:
+        application/json:
+          schema:
+            $ref: '../../../../components/errors/ErrorDto.yaml'
 put:
   summary: Update a custom unit
   operationId: updateCustomUnit
@@ -62,6 +68,12 @@ put:
         application/json:
           schema:
             $ref: '../../../../components/errors/ErrorDto.yaml'
+    '500':
+      description: Unexpected server error
+      content:
+        application/json:
+          schema:
+            $ref: '../../../../components/errors/ErrorDto.yaml'
 delete:
   summary: Remove a custom unit
   operationId: deleteCustomUnit
@@ -83,6 +95,12 @@ delete:
       description: Custom unit successfully removed
     '404':
       description: Ingredient or unit not found
+      content:
+        application/json:
+          schema:
+            $ref: '../../../../components/errors/ErrorDto.yaml'
+    '500':
+      description: Unexpected server error
       content:
         application/json:
           schema:
