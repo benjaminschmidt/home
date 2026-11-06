@@ -1,18 +1,6 @@
 import type { QueryClient, UseMutationOptions } from "@tanstack/react-query";
 import { deleteIngredient } from "home-api";
-
-const getDeleteErrorMessage = (error: unknown) => {
-	if (
-		typeof error === "object" &&
-		error !== null &&
-		"message" in error &&
-		typeof error.message === "string"
-	) {
-		return error.message;
-	}
-
-	return undefined;
-};
+import { throwIfMutationResponseError } from "@/entities/ingredients/api/mutationResponse.ts";
 
 const createDeleteIngredientMutationOptions = (
 	queryClient: QueryClient,
@@ -22,11 +10,7 @@ const createDeleteIngredientMutationOptions = (
 			path: { ingredientId },
 		});
 
-		if (response.error !== undefined) {
-			throw new Error(
-				getDeleteErrorMessage(response.error) ?? "Failed to delete ingredient",
-			);
-		}
+		throwIfMutationResponseError(response.error, "Failed to delete ingredient");
 	},
 	onSuccess: (_, ingredientId) => {
 		queryClient.removeQueries({ queryKey: ["ingredient", ingredientId] });

@@ -5,6 +5,7 @@ import type {
 	IngredientVariantWriteRequest,
 } from "home-api";
 import { updateIngredientVariant } from "home-api";
+import { getMutationResponseData } from "@/entities/ingredients/api/mutationResponse.ts";
 import { sortIngredientVariants } from "@/entities/ingredients/lib/sortVariants.ts";
 
 type UpdateIngredientVariantVariables = {
@@ -30,13 +31,10 @@ const createUpdateIngredientVariantMutationOptions = (
 			body: ingredientVariantWriteRequest,
 		});
 
-		if (response.data === undefined) {
-			throw new Error(
-				response.error?.message ?? "Failed to update ingredient variant",
-			);
-		}
-
-		return response.data;
+		return getMutationResponseData(
+			response,
+			"Failed to update ingredient variant",
+		);
 	},
 	onSuccess: (updatedVariant, { ingredientId, variantId }) => {
 		queryClient.setQueryData<IngredientDto>(

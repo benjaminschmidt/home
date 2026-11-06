@@ -1,23 +1,11 @@
 import type { QueryClient, UseMutationOptions } from "@tanstack/react-query";
 import type { IngredientDto } from "home-api";
 import { deleteCustomUnit } from "home-api";
+import { throwIfMutationResponseError } from "@/entities/ingredients/api/mutationResponse.ts";
 
 type DeleteCustomUnitVariables = {
 	ingredientId: string;
 	unitId: string;
-};
-
-const getDeleteErrorMessage = (error: unknown) => {
-	if (
-		typeof error === "object" &&
-		error !== null &&
-		"message" in error &&
-		typeof error.message === "string"
-	) {
-		return error.message;
-	}
-
-	return undefined;
 };
 
 const createDeleteCustomUnitMutationOptions = (
@@ -28,11 +16,10 @@ const createDeleteCustomUnitMutationOptions = (
 			path: { ingredientId, unitId },
 		});
 
-		if (response.error !== undefined) {
-			throw new Error(
-				getDeleteErrorMessage(response.error) ?? "Failed to delete custom unit",
-			);
-		}
+		throwIfMutationResponseError(
+			response.error,
+			"Failed to delete custom unit",
+		);
 	},
 	onSuccess: (_, { ingredientId, unitId }) => {
 		queryClient.setQueryData<IngredientDto>(

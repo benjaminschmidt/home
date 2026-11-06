@@ -5,6 +5,7 @@ import type {
 	IngredientDto,
 } from "home-api";
 import { addCustomUnit } from "home-api";
+import { getMutationResponseData } from "@/entities/ingredients/api/mutationResponse.ts";
 import { sortCustomUnits } from "@/entities/ingredients/lib/sortCustomUnits.ts";
 
 type CreateCustomUnitVariables = {
@@ -21,13 +22,7 @@ const createCustomUnitMutationOptions = (
 			body: customUnitWriteRequest,
 		});
 
-		if (response.data === undefined) {
-			throw new Error(
-				response.error?.message ?? "Failed to create custom unit",
-			);
-		}
-
-		return response.data;
+		return getMutationResponseData(response, "Failed to create custom unit");
 	},
 	onSuccess: (createdUnit, { ingredientId }) => {
 		queryClient.setQueryData<IngredientDto>(

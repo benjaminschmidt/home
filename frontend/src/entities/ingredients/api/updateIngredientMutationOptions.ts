@@ -1,6 +1,7 @@
 import type { QueryClient, UseMutationOptions } from "@tanstack/react-query";
 import type { IngredientDto, IngredientWriteRequest } from "home-api";
 import { updateIngredient } from "home-api";
+import { getMutationResponseData } from "@/entities/ingredients/api/mutationResponse.ts";
 
 type UpdateIngredientVariables = {
 	ingredientId: string;
@@ -16,11 +17,7 @@ const createUpdateIngredientMutationOptions = (
 			body: ingredientWriteRequest,
 		});
 
-		if (response.data === undefined) {
-			throw new Error(response.error?.message ?? "Failed to update ingredient");
-		}
-
-		return response.data;
+		return getMutationResponseData(response, "Failed to update ingredient");
 	},
 	onSuccess: (_, { ingredientId }) => {
 		void queryClient.invalidateQueries({

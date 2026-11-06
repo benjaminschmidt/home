@@ -5,6 +5,7 @@ import type {
 	IngredientDto,
 } from "home-api";
 import { updateCustomUnit } from "home-api";
+import { getMutationResponseData } from "@/entities/ingredients/api/mutationResponse.ts";
 import { sortCustomUnits } from "@/entities/ingredients/lib/sortCustomUnits.ts";
 
 type UpdateCustomUnitVariables = {
@@ -22,13 +23,7 @@ const createUpdateCustomUnitMutationOptions = (
 			body: customUnitWriteRequest,
 		});
 
-		if (response.data === undefined) {
-			throw new Error(
-				response.error?.message ?? "Failed to update custom unit",
-			);
-		}
-
-		return response.data;
+		return getMutationResponseData(response, "Failed to update custom unit");
 	},
 	onSuccess: (updatedUnit, { ingredientId, unitId }) => {
 		queryClient.setQueryData<IngredientDto>(

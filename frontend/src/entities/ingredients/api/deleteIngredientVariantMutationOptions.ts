@@ -1,23 +1,11 @@
 import type { QueryClient, UseMutationOptions } from "@tanstack/react-query";
 import type { IngredientDto } from "home-api";
 import { deleteIngredientVariant } from "home-api";
+import { throwIfMutationResponseError } from "@/entities/ingredients/api/mutationResponse.ts";
 
 type DeleteIngredientVariantVariables = {
 	ingredientId: string;
 	variantId: string;
-};
-
-const getDeleteErrorMessage = (error: unknown) => {
-	if (
-		typeof error === "object" &&
-		error !== null &&
-		"message" in error &&
-		typeof error.message === "string"
-	) {
-		return error.message;
-	}
-
-	return undefined;
 };
 
 const createDeleteIngredientVariantMutationOptions = (
@@ -28,12 +16,10 @@ const createDeleteIngredientVariantMutationOptions = (
 			path: { ingredientId, variantId },
 		});
 
-		if (response.error !== undefined) {
-			throw new Error(
-				getDeleteErrorMessage(response.error) ??
-					"Failed to delete ingredient variant",
-			);
-		}
+		throwIfMutationResponseError(
+			response.error,
+			"Failed to delete ingredient variant",
+		);
 	},
 	onSuccess: (_, { ingredientId, variantId }) => {
 		queryClient.setQueryData<IngredientDto>(
