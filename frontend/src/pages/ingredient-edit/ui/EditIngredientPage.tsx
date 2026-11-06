@@ -3,12 +3,18 @@ import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
 import { useSelector } from "@tanstack/react-form";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import type { IngredientDto, IngredientVariantDto } from "home-api";
+import type {
+	CustomUnitDto,
+	IngredientDto,
+	IngredientVariantDto,
+} from "home-api";
 import { useCallback, useMemo, useRef, useState } from "react";
 import {
 	createDeleteIngredientMutationOptions,
 	createIngredientMutationOptions,
 	createUpdateIngredientMutationOptions,
+	genericUnitDtoArray,
+	sortCustomUnits,
 	sortIngredientVariants,
 } from "@/entities/ingredients";
 import {
@@ -20,6 +26,11 @@ import {
 	ingredientFormSchema,
 	NO_DEFAULT_VARIANT,
 } from "@/pages/ingredient-edit/model/ingredientFormSchema.ts";
+import {
+	type CustomUnitEditorHandle,
+	type CustomUnitEditorState,
+	CustomUnitForm,
+} from "@/pages/ingredient-edit/ui/CustomUnitForm.tsx";
 import { DeleteIngredientDialog } from "@/pages/ingredient-edit/ui/DeleteIngredientDialog.tsx";
 import { IngredientBaseForm } from "@/pages/ingredient-edit/ui/IngredientBaseForm.tsx";
 import { IngredientFormActions } from "@/pages/ingredient-edit/ui/IngredientFormActions.tsx";
@@ -46,6 +57,7 @@ type EditIngredientPageProps = {
 );
 
 const EMPTY_VARIANTS: IngredientVariantDto[] = [];
+const EMPTY_CUSTOM_UNITS: CustomUnitDto[] = [];
 
 const createFormDefaultValues = (ingredientDto: IngredientDto) => {
 	const currentDefaultVariantId = ingredientDto.ingredientVariants.find(
@@ -70,6 +82,11 @@ const createDraftVariant = (id: string): IngredientVariantDto => ({
 	defaultVariant: false,
 });
 
+const createDraftCustomUnit = (id: string): CustomUnitDto => ({
+	id,
+	name: "",
+});
+
 const EditIngredientPageContent = (props: EditIngredientPageProps) => {
 	const queryClient = useQueryClient();
 	const createMutation = useMutation(
@@ -90,12 +107,23 @@ const EditIngredientPageContent = (props: EditIngredientPageProps) => {
 	const [draftVariants, setDraftVariants] = useState<IngredientVariantDto[]>(
 		[],
 	);
+	const [deletedCustomUnitIds, setDeletedCustomUnitIds] = useState<Set<string>>(
+		new Set(),
+	);
+	const [draftCustomUnits, setDraftCustomUnits] = useState<CustomUnitDto[]>([]);
 	const draftIdCounter = useRef(0);
+	const customUnitDraftIdCounter = useRef(0);
 	const [variantStates, setVariantStates] = useState<
 		Record<string, IngredientVariantEditorState>
 	>({});
 	const variantEditorRefs = useRef<
 		Record<string, IngredientVariantEditorHandle | null>
+	>({});
+	const [customUnitStates, setCustomUnitStates] = useState<
+		Record<string, CustomUnitEditorState>
+	>({});
+	const customUnitEditorRefs = useRef<
+		Record<string, CustomUnitEditorHandle | null>
 	>({});
 	const activeMutation =
 		props.mode === "create" ? createMutation : updateMutation;
@@ -115,6 +143,24 @@ const EditIngredientPageContent = (props: EditIngredientPageProps) => {
 	const draftVariantIds = useMemo(
 		() => new Set(draftVariants.map((variant) => variant.id)),
 		[draftVariants],
+	);
+	const allCustomUnits = ingredientDto?.customUnits ?? EMPTY_CUSTOM_UNITS;
+	const persistedCustomUnits = useMemo(
+		() =>
+			sortCustomUnits(
+				allCustomUnits.filter(
+					(customUnit) => !deletedCustomUnitIds.has(customUnit.id),
+				),
+			),
+		[allCustomUnits, deletedCustomUnitIds],
+	);
+	const customUnits = useMemo(
+		() => [...draftCustomUnits, ...persistedCustomUnits],
+		[persistedCustomUnits, draftCustomUnits],
+	);
+	const draftCustomUnitIds = useMemo(
+		() => new Set(draftCustomUnits.map((customUnit) => customUnit.id)),
+		[draftCustomUnits],
 	);
 	const initialIngredientFormValues =
 		ingredientDto === undefined
@@ -242,6 +288,76 @@ const EditIngredientPageContent = (props: EditIngredientPageProps) => {
 		[],
 	);
 
+	const handleCustomUnitStateChange = useCallback(
+		(state: CustomUnitEditorState) => {
+			setCustomUnitStates((currentStates) => {
+				const previousState = currentStates[state.id];
+				if (
+					previousState?.name === state.name &&
+					previousState?.conversionAmount === state.conversionAmount &&
+					previousState?.conversionUnit === state.conversionUnit &&
+					previousState?.isDraft === state.isDraft &&
+					previousState?.isDirty === state.isDirty &&
+					previousState?.canSubmit === state.canSubmit &&
+					previousState?.isSubmitting === state.isSubmitting &&
+					previousState?.errorMessage === state.errorMessage
+				) {
+					return currentStates;
+				}
+
+				return { ...currentStates, [state.id]: state };
+			});
+		},
+		[],
+	);
+
+	const clearCustomUnitEditorState = useCallback((unitId: string) => {
+		setCustomUnitStates((currentStates) => {
+			if (currentStates[unitId] === undefined) return currentStates;
+
+			const nextStates = { ...currentStates };
+			delete nextStates[unitId];
+			return nextStates;
+		});
+		delete customUnitEditorRefs.current[unitId];
+	}, []);
+
+	const handleCustomUnitDeleted = useCallback(
+		(unitId: string, isDraft: boolean) => {
+			clearCustomUnitEditorState(unitId);
+			if (isDraft) {
+				setDraftCustomUnits((currentUnits) =>
+					currentUnits.filter((customUnit) => customUnit.id !== unitId),
+				);
+				return;
+			}
+
+			setDeletedCustomUnitIds((currentIds) => {
+				if (currentIds.has(unitId)) return currentIds;
+
+				return new Set(currentIds).add(unitId);
+			});
+		},
+		[clearCustomUnitEditorState],
+	);
+
+	const handleCustomUnitCreated = useCallback(
+		(draftId: string) => {
+			clearCustomUnitEditorState(draftId);
+			setDraftCustomUnits((currentUnits) =>
+				currentUnits.filter((customUnit) => customUnit.id !== draftId),
+			);
+		},
+		[clearCustomUnitEditorState],
+	);
+
+	const registerCustomUnitEditor = useCallback(
+		(unitId: string, editor: CustomUnitEditorHandle | null) => {
+			customUnitEditorRefs.current[unitId] = editor;
+		},
+		[],
+	);
+
 	const duplicateVariantIds = useMemo(() => {
 		const descriptions = new Map<string, string[]>();
 
@@ -261,6 +377,55 @@ const EditIngredientPageContent = (props: EditIngredientPageProps) => {
 		);
 	}, [variantStates, variants]);
 
+	const duplicateCustomUnitIds = useMemo(() => {
+		const names = new Map<string, string[]>();
+
+		for (const customUnit of customUnits) {
+			const name = (
+				customUnitStates[customUnit.id]?.name ?? customUnit.name
+			).trim();
+			if (name === "") continue;
+
+			const ids = names.get(name) ?? [];
+			ids.push(customUnit.id);
+			names.set(name, ids);
+		}
+
+		return new Set([...names.values()].filter((ids) => ids.length > 1).flat());
+	}, [customUnitStates, customUnits]);
+
+	const reservedCustomUnitIds = useMemo(() => {
+		const genericUnitNames = new Set(
+			genericUnitDtoArray.map((unit) => unit.toUpperCase()),
+		);
+		return new Set(
+			customUnits
+				.filter((customUnit) =>
+					genericUnitNames.has(
+						(customUnitStates[customUnit.id]?.name ?? customUnit.name)
+							.trim()
+							.toUpperCase(),
+					),
+				)
+				.map((customUnit) => customUnit.id),
+		);
+	}, [customUnitStates, customUnits]);
+
+	const occupiedCustomUnitNames = useMemo(() => {
+		const owners = new Map(
+			persistedCustomUnits.map((unit) => [unit.name.trim(), unit.id]),
+		);
+		const conflicts = new Map<string, string>();
+		for (const unit of customUnits) {
+			const name = (customUnitStates[unit.id]?.name ?? unit.name).trim();
+			const ownerId = owners.get(name);
+			if (ownerId !== undefined && ownerId !== unit.id) {
+				conflicts.set(unit.id, name);
+			}
+		}
+		return conflicts;
+	}, [customUnits, customUnitStates, persistedCustomUnits]);
+
 	const variantEditorsReady = variants.every(
 		(variant) => variantStates[variant.id] !== undefined,
 	);
@@ -268,6 +433,15 @@ const EditIngredientPageContent = (props: EditIngredientPageProps) => {
 		.map((variant) => variantStates[variant.id])
 		.filter(
 			(state): state is IngredientVariantEditorState =>
+				state?.isDirty || state?.isDraft === true,
+		);
+	const customUnitEditorsReady = customUnits.every(
+		(customUnit) => customUnitStates[customUnit.id] !== undefined,
+	);
+	const dirtyCustomUnitStates = customUnits
+		.map((customUnit) => customUnitStates[customUnit.id])
+		.filter(
+			(state): state is CustomUnitEditorState =>
 				state?.isDirty || state?.isDraft === true,
 		);
 	const descriptionTransitionConflict = useMemo(() => {
@@ -304,15 +478,57 @@ const EditIngredientPageContent = (props: EditIngredientPageProps) => {
 	const descriptionTransitionError = descriptionTransitionConflict
 		? "These variant description changes depend on save order. Save them one at a time."
 		: undefined;
-	const unsavedCount = (baseIsDirty ? 1 : 0) + dirtyVariantStates.length;
+	const customUnitNameTransitionConflict = useMemo(() => {
+		const originalNames = new Map(
+			customUnits.map((customUnit) => [customUnit.id, customUnit.name.trim()]),
+		);
+		const changedNameIds = dirtyCustomUnitStates
+			.filter((state) => originalNames.get(state.id) !== state.name.trim())
+			.map((state) => state.id);
+
+		if (changedNameIds.length < 2) return false;
+
+		const changedOriginalNames = new Set(
+			changedNameIds.map((id) => originalNames.get(id)),
+		);
+
+		return dirtyCustomUnitStates.some((state) => {
+			const originalName = originalNames.get(state.id);
+			const nextName = state.name.trim();
+
+			return (
+				originalName !== nextName &&
+				changedOriginalNames.has(nextName) &&
+				changedNameIds.some(
+					(id) => id !== state.id && originalNames.get(id) === nextName,
+				)
+			);
+		});
+	}, [customUnits, dirtyCustomUnitStates]);
+	const customUnitTransitionError = customUnitNameTransitionConflict
+		? "These custom unit name changes depend on save order. Save them one at a time."
+		: undefined;
+	const unsavedCount =
+		(baseIsDirty ? 1 : 0) +
+		dirtyVariantStates.length +
+		dirtyCustomUnitStates.length;
 	const hasInvalidDirtyEditor =
 		(baseIsDirty && !baseCanSubmit) ||
 		descriptionTransitionConflict ||
+		customUnitNameTransitionConflict ||
 		dirtyVariantStates.some(
 			(state) => !state.canSubmit || duplicateVariantIds.has(state.id),
+		) ||
+		dirtyCustomUnitStates.some(
+			(state) =>
+				!state.canSubmit ||
+				duplicateCustomUnitIds.has(state.id) ||
+				occupiedCustomUnitNames.has(state.id) ||
+				reservedCustomUnitIds.has(state.id),
 		);
 	const canSaveAll =
 		variantEditorsReady &&
+		customUnitEditorsReady &&
 		unsavedCount > 0 &&
 		!hasInvalidDirtyEditor &&
 		!isSavingAll;
@@ -320,13 +536,22 @@ const EditIngredientPageContent = (props: EditIngredientPageProps) => {
 		isSavingAll ||
 		activeMutation.isPending ||
 		deleteMutation.isPending ||
-		Object.values(variantStates).some((state) => state.isSubmitting);
+		Object.values(variantStates).some((state) => state.isSubmitting) ||
+		Object.values(customUnitStates).some((state) => state.isSubmitting);
 	const handleAddVariant = useCallback(() => {
 		const draftId = `draft-variant-${draftIdCounter.current}`;
 		draftIdCounter.current += 1;
 		setDraftVariants((currentVariants) => [
 			...currentVariants,
 			createDraftVariant(draftId),
+		]);
+	}, []);
+	const handleAddCustomUnit = useCallback(() => {
+		const draftId = `draft-custom-unit-${customUnitDraftIdCounter.current}`;
+		customUnitDraftIdCounter.current += 1;
+		setDraftCustomUnits((currentUnits) => [
+			...currentUnits,
+			createDraftCustomUnit(draftId),
 		]);
 	}, []);
 
@@ -345,11 +570,21 @@ const EditIngredientPageContent = (props: EditIngredientPageProps) => {
 		setSaveAllError(undefined);
 		activeMutation.reset();
 		setDraftVariants([]);
+		setDraftCustomUnits([]);
 		form.reset(ingredientFormBaseline.current);
 		for (const variant of persistedVariants) {
 			variantEditorRefs.current[variant.id]?.reset();
 		}
-	}, [activeMutation, form, isSubmitting, persistedVariants]);
+		for (const customUnit of persistedCustomUnits) {
+			customUnitEditorRefs.current[customUnit.id]?.reset();
+		}
+	}, [
+		activeMutation,
+		form,
+		isSubmitting,
+		persistedCustomUnits,
+		persistedVariants,
+	]);
 
 	const handleSaveAll = useCallback(async () => {
 		if (!canSaveAll) return;
@@ -365,11 +600,27 @@ const EditIngredientPageContent = (props: EditIngredientPageProps) => {
 					: editor.submit();
 			}),
 		);
+		const customUnitResults = await Promise.all(
+			dirtyCustomUnitStates.map(async (state) => {
+				const editor = customUnitEditorRefs.current[state.id];
+				return editor === null || editor === undefined
+					? false
+					: editor.submit();
+			}),
+		);
 		const variantsSaved = variantResults.every(Boolean);
+		const customUnitsSaved = customUnitResults.every(Boolean);
 
-		if (!variantsSaved) {
+		if (!variantsSaved || !customUnitsSaved) {
 			setSaveAllError(
-				"Some variant changes could not be saved. Review the highlighted variants.",
+				[
+					!variantsSaved &&
+						"Some variant changes could not be saved. Review the highlighted variants.",
+					!customUnitsSaved &&
+						"Some custom unit changes could not be saved. Review the highlighted units.",
+				]
+					.filter(Boolean)
+					.join(" "),
 			);
 			setIsSavingAll(false);
 			return;
@@ -385,7 +636,13 @@ const EditIngredientPageContent = (props: EditIngredientPageProps) => {
 		}
 
 		setIsSavingAll(false);
-	}, [baseIsDirty, canSaveAll, dirtyVariantStates, submitIngredientForm]);
+	}, [
+		baseIsDirty,
+		canSaveAll,
+		dirtyCustomUnitStates,
+		dirtyVariantStates,
+		submitIngredientForm,
+	]);
 
 	return (
 		<>
@@ -401,6 +658,7 @@ const EditIngredientPageContent = (props: EditIngredientPageProps) => {
 						errorMessage={
 							saveAllError ??
 							descriptionTransitionError ??
+							customUnitTransitionError ??
 							activeMutation.error?.message
 						}
 						unsavedCount={unsavedCount}
@@ -459,6 +717,61 @@ const EditIngredientPageContent = (props: EditIngredientPageProps) => {
 									}
 									onCreated={() => handleVariantCreated(variant.id)}
 									onStateChange={handleVariantStateChange}
+								/>
+							))}
+						</Stack>
+					)}
+
+					{props.mode === "edit" && (
+						<Stack
+							component="section"
+							aria-labelledby="ingredient-custom-units-heading"
+							spacing={1.5}
+						>
+							<Stack
+								direction="row"
+								sx={{
+									alignItems: "center",
+									justifyContent: "space-between",
+								}}
+							>
+								<Typography
+									id="ingredient-custom-units-heading"
+									variant="h5"
+									sx={{
+										fontWeight: "fontWeightBold",
+										typography: { xs: "body1", sm: "h5" },
+									}}
+								>
+									Custom units
+								</Typography>
+								<AddButton
+									label="Add custom unit"
+									onClick={handleAddCustomUnit}
+									disabled={isSubmitting}
+								/>
+							</Stack>
+							{customUnits.map((customUnit) => (
+								<CustomUnitForm
+									key={customUnit.id}
+									ref={(editor) =>
+										registerCustomUnitEditor(customUnit.id, editor)
+									}
+									ingredientId={props.ingredientDto.id}
+									customUnit={customUnit}
+									isDraft={draftCustomUnitIds.has(customUnit.id)}
+									duplicateName={duplicateCustomUnitIds.has(customUnit.id)}
+									nameInUse={occupiedCustomUnitNames.get(customUnit.id)}
+									reservedName={reservedCustomUnitIds.has(customUnit.id)}
+									pageIsSubmitting={isSubmitting}
+									onDeleted={() =>
+										handleCustomUnitDeleted(
+											customUnit.id,
+											draftCustomUnitIds.has(customUnit.id),
+										)
+									}
+									onCreated={() => handleCustomUnitCreated(customUnit.id)}
+									onStateChange={handleCustomUnitStateChange}
 								/>
 							))}
 						</Stack>

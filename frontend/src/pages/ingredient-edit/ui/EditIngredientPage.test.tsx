@@ -9,25 +9,35 @@ import {
 } from "@testing-library/react";
 import type { IngredientDto } from "home-api";
 import {
+	addCustomUnit,
 	addIngredientVariant,
 	createIngredient,
+	deleteCustomUnit,
 	deleteIngredient,
 	deleteIngredientVariant,
+	updateCustomUnit,
 	updateIngredient,
 	updateIngredientVariant,
 } from "home-api";
 import { afterEach, describe, expect, test, vi } from "vitest";
 import { EditIngredientPage } from "@/pages/ingredient-edit/ui/EditIngredientPage.tsx";
-import { ingredientFactory, ingredientVariantFactory } from "@/shared/testing";
+import {
+	customUnitFactory,
+	ingredientFactory,
+	ingredientVariantFactory,
+} from "@/shared/testing";
 
 vi.mock("home-api", async () => {
 	const actual = await vi.importActual<typeof import("home-api")>("home-api");
 	return {
 		...actual,
+		addCustomUnit: vi.fn(),
 		addIngredientVariant: vi.fn(),
 		createIngredient: vi.fn(),
+		deleteCustomUnit: vi.fn(),
 		deleteIngredient: vi.fn(),
 		deleteIngredientVariant: vi.fn(),
+		updateCustomUnit: vi.fn(),
 		updateIngredient: vi.fn(),
 		updateIngredientVariant: vi.fn(),
 	};
@@ -41,16 +51,21 @@ const renderPage = (
 	onDeleted = vi.fn(),
 ) => {
 	const queryClient = new QueryClient();
-	render(
+	const page = (ingredient: IngredientDto) => (
 		<QueryClientProvider client={queryClient}>
 			<EditIngredientPage
 				mode="edit"
-				ingredientDto={ingredientDto}
+				ingredientDto={ingredient}
 				onCancel={onCancel}
 				onDeleted={onDeleted}
 			/>
-		</QueryClientProvider>,
+		</QueryClientProvider>
 	);
+	const view = render(page(ingredientDto));
+	return {
+		rerenderIngredient: (ingredient: IngredientDto) =>
+			view.rerender(page(ingredient)),
+	};
 };
 
 const renderCreatePage = (onCancel = vi.fn(), onCreated = vi.fn()) => {
@@ -192,6 +207,340 @@ describe("EditIngredientPage", () => {
 		// then
 		expect(screen.getByText("Variants")).toBeTruthy();
 		expect(screen.getByRole("button", { name: "Add variant" })).toBeTruthy();
+	});
+
+	test("renders sorted custom units and the add action", () => {
+		const customUnits = [
+			customUnitFactory.build({ id: "slice-id", name: "Slice" }),
+			customUnitFactory.build({ id: "piece-id", name: "Piece" }),
+		];
+		const ingredientDto = ingredientFactory.build({
+			ingredientVariants: [],
+			customUnits,
+		});
+
+		renderPage(ingredientDto);
+
+		expect(screen.getByText("Custom units")).toBeTruthy();
+		expect(
+			screen.getByRole("button", { name: "Add custom unit" }),
+		).toBeTruthy();
+		expect(
+			screen
+				.getAllByRole("form", { name: /Ingredient custom unit:/ })
+				.map((form) => form.getAttribute("aria-label")),
+		).toEqual([
+			"Ingredient custom unit: Piece",
+			"Ingredient custom unit: Slice",
+		]);
+	});
+
+	test("creates a name-only custom unit from a draft", async () => {
+		const ingredientDto = ingredientFactory.build({
+			ingredientVariants: [],
+			customUnits: [],
+		});
+		const createdUnit = customUnitFactory.build({
+			id: "slice-id",
+			name: "Slice",
+			customUnitToConversionUnitFactor: undefined,
+			conversionUnit: undefined,
+		});
+		vi.mocked(addCustomUnit).mockResolvedValue({
+			data: createdUnit,
+			error: undefined,
+			request: new Request("http://localhost"),
+			response: new Response(),
+		});
+
+		renderPage(ingredientDto);
+		fireEvent.click(screen.getByRole("button", { name: "Add custom unit" }));
+		const draftForm = screen.getByRole("form", {
+			name: "Ingredient custom unit: Custom unit",
+		});
+
+		fireEvent.change(within(draftForm).getByLabelText("Name"), {
+			target: { value: "Slice" },
+		});
+		fireEvent.click(within(draftForm).getByRole("button", { name: "Save" }));
+
+		await waitFor(() => {
+			expect(vi.mocked(addCustomUnit)).toHaveBeenCalledWith({
+				path: { ingredientId: ingredientDto.id },
+				body: {
+					name: "Slice",
+					customUnitToConversionUnitFactor: undefined,
+					conversionUnit: undefined,
+				},
+			});
+		});
+	});
+
+	test("updates an existing custom unit", async () => {
+		const customUnit = customUnitFactory.build({
+			id: "slice-id",
+			name: "Slice",
+			customUnitToConversionUnitFactor: 30,
+			conversionUnit: "GRAM",
+		});
+		const ingredientDto = ingredientFactory.build({
+			ingredientVariants: [],
+			customUnits: [customUnit],
+		});
+		const updatedUnit = {
+			...customUnit,
+			name: "Chunk",
+			customUnitToConversionUnitFactor: 40,
+		};
+		vi.mocked(updateCustomUnit).mockResolvedValue({
+			data: updatedUnit,
+			error: undefined,
+			request: new Request("http://localhost"),
+			response: new Response(),
+		});
+
+		renderPage(ingredientDto);
+		const unitForm = screen.getByRole("form", {
+			name: "Ingredient custom unit: Slice",
+		});
+		fireEvent.change(within(unitForm).getByLabelText("Name"), {
+			target: { value: "Chunk" },
+		});
+		fireEvent.change(
+			within(unitForm).getByLabelText("Amount for 1 custom unit"),
+			{ target: { value: "40" } },
+		);
+		fireEvent.click(within(unitForm).getByRole("button", { name: "Save" }));
+
+		await waitFor(() => {
+			expect(vi.mocked(updateCustomUnit)).toHaveBeenCalledWith({
+				path: { ingredientId: ingredientDto.id, unitId: customUnit.id },
+				body: {
+					name: "Chunk",
+					customUnitToConversionUnitFactor: 40,
+					conversionUnit: "GRAM",
+				},
+			});
+		});
+	});
+
+	test("uses refetched conversion data when saving a pristine custom unit", async () => {
+		const unit = customUnitFactory.build({
+			name: "Slice",
+			customUnitToConversionUnitFactor: 30,
+			conversionUnit: "GRAM",
+		});
+		const ingredient = ingredientFactory.build({
+			ingredientVariants: [],
+			customUnits: [unit],
+		});
+		const { rerenderIngredient } = renderPage(ingredient);
+		const refreshedUnit = { ...unit, customUnitToConversionUnitFactor: 50 };
+		rerenderIngredient({ ...ingredient, customUnits: [refreshedUnit] });
+		expect(screen.getByLabelText("Amount for 1 custom unit")).toHaveProperty(
+			"value",
+			"50",
+		);
+		expect(screen.getByRole("button", { name: "Save all" })).toHaveProperty(
+			"disabled",
+			true,
+		);
+
+		vi.mocked(updateCustomUnit).mockResolvedValue({
+			data: { ...refreshedUnit, name: "Chunk" },
+			error: undefined,
+			request: new Request("http://localhost"),
+			response: new Response(),
+		});
+		const unitForm = screen.getByRole("form", {
+			name: "Ingredient custom unit: Slice",
+		});
+		fireEvent.change(within(unitForm).getByLabelText("Name"), {
+			target: { value: "Chunk" },
+		});
+		fireEvent.click(within(unitForm).getByRole("button", { name: "Save" }));
+		await waitFor(() => {
+			expect(updateCustomUnit).toHaveBeenCalledWith({
+				path: { ingredientId: ingredient.id, unitId: unit.id },
+				body: {
+					name: "Chunk",
+					customUnitToConversionUnitFactor: 50,
+					conversionUnit: "GRAM",
+				},
+			});
+			expect(screen.getByRole("button", { name: "Save all" })).toHaveProperty(
+				"disabled",
+				true,
+			);
+		});
+	});
+
+	test("preserves unsaved custom unit edits on refetch and discards to the latest data", () => {
+		const unit = customUnitFactory.build({
+			name: "Slice",
+			customUnitToConversionUnitFactor: 30,
+			conversionUnit: "GRAM",
+		});
+		const ingredient = ingredientFactory.build({
+			ingredientVariants: [],
+			customUnits: [unit],
+		});
+		const { rerenderIngredient } = renderPage(ingredient);
+		const unitForm = screen.getByRole("form", {
+			name: "Ingredient custom unit: Slice",
+		});
+		fireEvent.change(within(unitForm).getByLabelText("Name"), {
+			target: { value: "Chunk" },
+		});
+		rerenderIngredient({
+			...ingredient,
+			customUnits: [{ ...unit, customUnitToConversionUnitFactor: 50 }],
+		});
+		expect(within(unitForm).getByLabelText("Name")).toHaveProperty(
+			"value",
+			"Chunk",
+		);
+		expect(
+			within(unitForm).getByLabelText("Amount for 1 custom unit"),
+		).toHaveProperty("value", "30");
+		fireEvent.click(screen.getByRole("button", { name: "Reset" }));
+		expect(within(unitForm).getByLabelText("Name")).toHaveProperty(
+			"value",
+			"Slice",
+		);
+		expect(
+			within(unitForm).getByLabelText("Amount for 1 custom unit"),
+		).toHaveProperty("value", "50");
+		expect(screen.getByRole("button", { name: "Save all" })).toHaveProperty(
+			"disabled",
+			true,
+		);
+	});
+
+	test("blocks individual saves and form submission until a persisted name is released", async () => {
+		vi.mocked(updateCustomUnit).mockClear();
+		const piece = customUnitFactory.build({ name: "Piece" });
+		const slice = customUnitFactory.build({ name: "Slice" });
+		const ingredient = ingredientFactory.build({
+			ingredientVariants: [],
+			customUnits: [piece, slice],
+		});
+		const { rerenderIngredient } = renderPage(ingredient);
+		const pieceForm = screen.getByRole("form", {
+			name: "Ingredient custom unit: Piece",
+		});
+		const sliceForm = screen.getByRole("form", {
+			name: "Ingredient custom unit: Slice",
+		});
+		fireEvent.change(within(pieceForm).getByLabelText("Name"), {
+			target: { value: "Chunk" },
+		});
+		fireEvent.change(within(sliceForm).getByLabelText("Name"), {
+			target: { value: "Piece" },
+		});
+		expect(
+			within(sliceForm).getByRole("button", { name: "Save" }),
+		).toHaveProperty("disabled", true);
+		expect(
+			within(pieceForm).getByRole("button", { name: "Save" }),
+		).toHaveProperty("disabled", false);
+		expect(
+			within(sliceForm).getByText(/is still saved for another unit/),
+		).toBeTruthy();
+		fireEvent.submit(sliceForm);
+		expect(updateCustomUnit).not.toHaveBeenCalled();
+
+		vi.mocked(updateCustomUnit).mockResolvedValue({
+			data: { ...piece, name: "Chunk" },
+			error: undefined,
+			request: new Request("http://localhost"),
+			response: new Response(),
+		});
+		fireEvent.click(within(pieceForm).getByRole("button", { name: "Save" }));
+		await waitFor(() =>
+			expect(updateCustomUnit).toHaveBeenCalledWith({
+				path: { ingredientId: ingredient.id, unitId: piece.id },
+				body: expect.objectContaining({ name: "Chunk" }),
+			}),
+		);
+		rerenderIngredient({
+			...ingredient,
+			customUnits: [{ ...piece, name: "Chunk" }, slice],
+		});
+		await waitFor(() =>
+			expect(
+				within(sliceForm).getByRole("button", { name: "Save" }),
+			).toHaveProperty("disabled", false),
+		);
+		expect(
+			within(sliceForm).queryByText(/is still saved for another unit/),
+		).toBeNull();
+	});
+
+	test("blocks creating a draft using another unit's unsaved old name", () => {
+		vi.mocked(addCustomUnit).mockClear();
+		const ingredient = ingredientFactory.build({
+			ingredientVariants: [],
+			customUnits: [customUnitFactory.build({ name: "Slice" })],
+		});
+		renderPage(ingredient);
+		const existing = screen.getByRole("form", {
+			name: "Ingredient custom unit: Slice",
+		});
+		fireEvent.change(within(existing).getByLabelText("Name"), {
+			target: { value: "Chunk" },
+		});
+		fireEvent.click(screen.getByRole("button", { name: "Add custom unit" }));
+		const draft = screen.getByRole("form", {
+			name: "Ingredient custom unit: Custom unit",
+		});
+		fireEvent.change(within(draft).getByLabelText("Name"), {
+			target: { value: "Slice" },
+		});
+		expect(within(draft).getByRole("button", { name: "Save" })).toHaveProperty(
+			"disabled",
+			true,
+		);
+		fireEvent.submit(draft);
+		expect(addCustomUnit).not.toHaveBeenCalled();
+	});
+
+	test("deletes a persisted custom unit after confirmation", async () => {
+		const customUnit = customUnitFactory.build({
+			id: "slice-id",
+			name: "Slice",
+		});
+		const ingredientDto = ingredientFactory.build({
+			ingredientVariants: [],
+			customUnits: [customUnit],
+		});
+		vi.mocked(deleteCustomUnit).mockResolvedValue({
+			data: undefined,
+			error: undefined,
+			request: new Request("http://localhost"),
+			response: new Response(),
+		});
+
+		renderPage(ingredientDto);
+		const unitForm = screen.getByRole("form", {
+			name: "Ingredient custom unit: Slice",
+		});
+		fireEvent.click(within(unitForm).getByRole("button", { name: "Delete" }));
+
+		expect(
+			screen.getByText(/Permanently delete custom unit "Slice"/),
+		).toBeTruthy();
+		fireEvent.click(
+			within(screen.getByRole("dialog")).getByRole("button", {
+				name: "Delete",
+			}),
+		);
+
+		await waitFor(() => {
+			expect(vi.mocked(deleteCustomUnit)).toHaveBeenCalledWith({
+				path: { ingredientId: ingredientDto.id, unitId: customUnit.id },
+			});
+		});
 	});
 
 	test("shows multiple empty variant drafts at the top", () => {
