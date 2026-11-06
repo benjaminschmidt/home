@@ -7,15 +7,9 @@ const createIngredientIdQueryOptions = (ingredientId: string) =>
 		queryFn: async () => {
 			const response = await getIngredient({
 				path: { ingredientId: ingredientId },
+				throwOnError: true,
 			});
-			return (
-				response?.data ?? {
-					id: ingredientId,
-					name: "Unknown",
-					ingredientVariants: [],
-					customUnits: [],
-				}
-			);
+			return response.data;
 		},
 		staleTime: 1000,
 	});

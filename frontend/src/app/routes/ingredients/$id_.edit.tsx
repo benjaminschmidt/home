@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { createIngredientIdQueryOptions } from "@/entities/ingredients";
 import { EditIngredientPage } from "@/pages/ingredient-edit";
+import { QueryErrorState } from "@/shared/ui/QueryErrorState.tsx";
 
 const Component = () => {
 	const { id } = Route.useParams();
@@ -25,6 +26,9 @@ const Component = () => {
 
 export const Route = createFileRoute("/ingredients/$id_/edit")({
 	component: Component,
+	errorComponent: ({ error }) => (
+		<QueryErrorState error={error} title="Couldn't load ingredient" />
+	),
 	loader: async ({ context: { queryClient }, params: { id } }) => {
 		await queryClient.query({
 			...createIngredientIdQueryOptions(id),

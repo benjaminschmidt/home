@@ -3,6 +3,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { z } from "zod";
 import { createIngredientsQueryOptions } from "@/entities/ingredients";
 import { IngredientListPage, useInfiniteScroll } from "@/pages/ingredient-list";
+import { QueryErrorState } from "@/shared/ui/QueryErrorState.tsx";
 
 const IngredientsPage = () => {
 	const { search } = Route.useSearch();
@@ -37,6 +38,9 @@ const IngredientsPage = () => {
 
 const Route = createFileRoute("/ingredients/")({
 	component: IngredientsPage,
+	errorComponent: ({ error }) => (
+		<QueryErrorState error={error} title="Couldn't load ingredients" />
+	),
 	validateSearch: (search) => {
 		return z
 			.object({

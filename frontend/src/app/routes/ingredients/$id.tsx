@@ -6,6 +6,7 @@ import {
 	dropUnnecessarySearchParams,
 	IngredientDetail,
 } from "@/pages/ingredient-display";
+import { QueryErrorState } from "@/shared/ui/QueryErrorState.tsx";
 
 const Component = () => {
 	const { id } = Route.useParams();
@@ -49,6 +50,9 @@ const Component = () => {
 
 export const Route = createFileRoute("/ingredients/$id")({
 	component: Component,
+	errorComponent: ({ error }) => (
+		<QueryErrorState error={error} title="Couldn't load ingredient" />
+	),
 	validateSearch: (search) => {
 		return z
 			.object({

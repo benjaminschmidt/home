@@ -15,8 +15,9 @@ const createIngredientsQueryOptions = (search?: string) => {
 					size: INGREDIENTS_PAGE_SIZE,
 					search: trimmedSearch,
 				},
+				throwOnError: true,
 			});
-			return response?.data ?? [];
+			return response.data;
 		},
 		initialPageParam: 0,
 		getNextPageParam: (lastPage, _, lastPageParam) => {
