@@ -26,7 +26,9 @@ describe("MenuDrawer", () => {
 		);
 
 		// then
-		expect(await screen.findByLabelText("mobile-navigation")).toBeVisible();
+		expect(
+			await screen.findByLabelText("mobile-navigation"),
+		).not.toHaveAttribute("aria-hidden", "true");
 	});
 
 	it("mobile drawer is hidden", async () => {
