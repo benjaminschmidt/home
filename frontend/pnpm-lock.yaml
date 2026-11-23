@@ -103,8 +103,8 @@ importers:
         specifier: 31.0.0
         version: 31.0.0
       steiger:
-        specifier: 0.9.0
-        version: 0.9.0(typescript@6.0.3)
+        specifier: 0.10.0
+        version: 0.10.0(typescript@6.0.3)
       typescript:
         specifier: 6.0.3
         version: 6.0.3
@@ -1869,8 +1869,8 @@ packages:
   std-env@4.3.0:
     resolution: {integrity: sha512-OtU/EgQ1kIm5KwqQpBC6ZEMXrZRui11w8zgfTWp8cdO9B8OaPsbA8bTHO2P+HNo1VlUTGMVBwPhydu6poeXiag==}
 
-  steiger@0.9.0:
-    resolution: {integrity: sha512-J/Iw/33PaHi8Ws99ikizIKV3uLL/PGCsq2Xqsj+qGASq48EukXHrvqHDgEWJAZuKToMha8uOmbNRT6S1XumqsA==}
+  steiger@0.10.0:
+    resolution: {integrity: sha512-tZw/nlwLgiOhw1QeTluahgZdNo3r1I9WmYUXVx1BPG1GgoVJh/MBFCzA2oiXPtzi/0GamcYJtlZDAiZ2o9bEnw==}
     engines: {node: '>=22.18.0'}
     hasBin: true
 
@@ -2165,12 +2165,6 @@ packages:
   yargs@17.7.3:
     resolution: {integrity: sha512-GZtjxm/J/4TSxuL3FNYjCmLktBTnIw/rVmKSIyKeYAZpmJB2ig9VauCC5xsa82GNKVKDAqpOn3KVzNt0zmrU0g==}
     engines: {node: '>=12'}
-
-  zod-validation-error@5.0.0:
-    resolution: {integrity: sha512-hmk+pkyKq7Q71PiWVSDUc3VfpzpvcRHZ3QPw9yEMVvmtCekaMeOHnbr3WbxfrgEnQTv6haGP4cmv0Ojmihzsxw==}
-    engines: {node: '>=18.0.0'}
-    peerDependencies:
-      zod: ^3.25.0 || ^4.0.0
 
   zod@4.6.7:
     resolution: {integrity: sha512-g8W2D2kU6a8untc053fX1uVBKzM7yqAxW/3zwk83+6RyF2+SKOuV+c0wBDhUwzV1PaGapmZH+rmcUzPf+3CGwg==}
@@ -3841,7 +3835,7 @@ snapshots:
 
   std-env@4.3.0: {}
 
-  steiger@0.9.0(typescript@6.0.3):
+  steiger@0.10.0(typescript@6.0.3):
     dependencies:
       '@clack/prompts': 0.9.1
       '@feature-sliced/steiger-plugin': 0.8.2(typescript@6.0.3)
@@ -3858,7 +3852,6 @@ snapshots:
       prexit: 2.3.0
       yargs: 17.7.3
       zod: 4.6.7
-      zod-validation-error: 5.0.0(zod@4.6.7)
     transitivePeerDependencies:
       - typescript
 
@@ -4034,9 +4027,5 @@ snapshots:
       string-width: 4.2.3
       y18n: 5.0.8
       yargs-parser: 21.1.1
-
-  zod-validation-error@5.0.0(zod@4.6.7):
-    dependencies:
-      zod: 4.6.7
 
   zod@4.6.7: {}
